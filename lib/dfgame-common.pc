@@ -1,0 +1,10 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: dfgame-common
+Description: The common functions of the DFGame engine helper library
+Version: 0.0.1
+Requires: glew gl lua
+CFlags: -I${includedir}/dfgame
+Libs: -L${libdir}/dfgame -ldfgame-common
