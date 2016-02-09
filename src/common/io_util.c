@@ -1,10 +1,14 @@
 #include "io_util.h"
 #include "util.h"
 
+#include <inttypes.h>
 #include <math.h>
 #include <stdlib.h>
-#ifdef WINDOWS
+#ifdef __MINGW32__
 #include <windows.h>
+#include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #elif __GNUC__
 #define _GNU_SOURCE
 #include <unistd.h>
@@ -23,7 +27,7 @@ char* resource_path = NULL;
 
 void get_exe_path(char* buf)
 {
-#ifdef WINDOWS
+#ifdef __MINGW32__
     GetModuleFileName(NULL, buf, strlen(buf));
     char* c = strrchr(buf, '/');
     c[1] = 0;
@@ -169,10 +173,11 @@ char* get_unique_resource_name(const char* resource_location, const char* resour
     } else {
         resource_prefix = strdup(resource_name);
     }
-    struct stat dir_stat = {0};
+
     uint8_t  digits = 1;
     uint16_t digits_next = 10;
     uint16_t value = 1;
+    struct stat dir_stat;
 
     while (stat(path, &dir_stat) != -1) {
         free(path);
@@ -188,7 +193,6 @@ char* get_unique_resource_name(const char* resource_location, const char* resour
     }
     free(path);
     free(resource_prefix);
-
     return name;
 }
 
@@ -199,7 +203,11 @@ bool ensure_directory(const char* path)
         return false;
     }
 
+#ifdef __MINGW32__
+    mkdir(path);
+#elif __GNUC__
     mkdir(path, 0700);
+#endif
     return true;
 }
 

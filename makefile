@@ -2,6 +2,7 @@
 CC=gcc
 VALAC=valac
 PKGCONFIG=pkg-config
+OS=Linux
 
 # Filepaths
 SRCPATH=src/
@@ -57,6 +58,14 @@ $(shell mkdir -p $(OBJPATH)$(EDITORBACKTARGET))
 $(shell mkdir -p $(OBJPATH)$(EDITORFRONTTARGET))
 $(shell mkdir -p $(OBJPATH)$(GAMEBACKTARGET))
 $(shell mkdir -p $(OBJPATH)$(GAMEFRONTTARGET))
+
+ifeq ($(OS), Linux)
+else ifeq ($(OS), Windows)
+CC=i686-w64-mingw32-gcc
+PKGCONFIG=i686-w64-mingw32-pkg-config
+else
+$(error Unknown OS selected for output)
+endif
 
 # Filetype Rules
 $(OBJPATH)$(COMMONTARGET)%.depend: $(SRCPATH)$(COMMONTARGET)%.c
