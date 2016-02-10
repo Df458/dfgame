@@ -2,6 +2,8 @@
 #include "texture.h"
 #include "util.h"
 
+#include <stdio.h>
+#include <jpeglib.h>
 #include <png.h>
 #include <stdlib.h>
 
@@ -13,8 +15,7 @@ png_byte* load_png_to_buffer(const char* path, uint16_t* w, uint16_t* h)
 {
     FILE* infile = fopen(path, "rb");
     if(!infile) {
-        warn("Could not open file.");
-        fprintf(stderr, "Error Path: %s\n", path);
+        warn("Could not open file: %s", path);
         return 0;
     }
     
@@ -88,6 +89,43 @@ png_byte* load_png_to_buffer(const char* path, uint16_t* w, uint16_t* h)
     *w = width;
     *h = height;
     return image_data;
+}
+
+uint8_t* load_jpeg_to_buffer(const char* path, uint16_t* w, uint16_t* h)
+{
+    struct jpeg_decompress_struct decompresser;
+
+    // TODO: Error handler
+    
+    FILE* infile = fopen(path, "rb");
+    JSAMPARRAY* row;
+    uint16_t row_width;
+    if(!infile) {
+        warn("Could not open file: %s", path);
+        return 0;
+    }
+
+    // TODO: Initialize error, then add a setjmp for error handling
+
+    jpeg_create_decompress(&decompresser);
+    jpeg_stdio_src(&decompresser, infile);
+    jpeg_read_header(&decompresser, TRUE);
+    jpeg_start_decompress(&decompresser);
+    row_width = decompresser.output_width * decompresser.output_components;
+
+    row = (*decompresser.mem->alloc_sarray) ((j_common_ptr) &decompresser, JPOOL_IMAGE, row_width, 1);
+    *w = decompresser.output_width;
+    *h = decompresser.output_height;
+    uint8_t* buffer = calloc(decompresser.output_width * decompresser.output_height * 4, sizeof(uint8_t));
+    while(decompresser.output_scanline < decompresser.output_height) {
+        jpeg_read_scanlines(&decompresser, row, 1);
+        // TODO: Transfer the data to the buffer
+    }
+
+    jpeg_finish_decompress(&decompresser);
+    jpeg_destroy_decompress(&decompresser);
+
+    fclose(infile);
 }
 
 texture* create_texture(uint16_t w, uint16_t h)
