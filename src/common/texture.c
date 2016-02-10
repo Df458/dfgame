@@ -3,6 +3,7 @@
 #include "util.h"
 
 #include <png.h>
+#include <tga.h>
 #include <stdlib.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,6 +90,61 @@ png_byte* load_png_to_buffer(const char* path, uint16_t* w, uint16_t* h)
     *h = height;
     return image_data;
 }
+
+// TODO: Add support for all TGA features
+uint8_t* load_tga_to_buffer(const char* path, uint16_t* w, uint16_t* h)
+{
+    // In order to satisfy libtga's irrational desire for a non-const char
+    // array, we copy the path to a temporary buffer.
+    char* temp_path = strdup(path);
+    TGA* image = TGAOpen(temp_path, "r");
+    TGAData data;
+    free(temp_path);
+    if(!image) {
+        error("Could not open file: %s", path);
+        return 0;
+    }
+
+    int res = TGAReadHeader(image);
+    if(res != TGA_OK) {
+        error("Failed to parse tga file: %s", TGAStrError(res));
+        TGAClose(image);
+        return 0;
+    }
+
+    // If there's no image data, stop
+    if(image->hdr.img_t == 0) {
+        error("Failed to load tga file: No image data found");
+        TGAClose(image);
+        return 0;
+    }
+
+    // If we have color maps, stop
+    // TODO: Add support for colormapped TGAs
+    if(image->hdr.img_t == 1 || image->hdr.img_t == 9) {
+        error("Failed to load tga file: Color-mapped tga files are unsupported");
+        TGAClose(image);
+        return 0;
+    }
+
+    data.img_data = malloc(image->hdr.depth * image->hdr.width * image->hdr.height);
+    size_t size = TGAReadScanlines(image, data.img_data, 0, image->hdr.height, TGA_RGB);
+    if(size != image->hdr.height) {
+        error("Failed to load tga file: Expected %d lines, but got %d.", image->hdr.height, size);
+        TGAClose(image);
+        free(data.img_data);
+        return 0;
+    }
+    uint8_t* final_buffer = calloc(4 * image->hdr.width * image->hdr.height, sizeof(uint8_t));
+
+    // TODO: Convert the image data and fill the buffer
+
+    return final_buffer;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Public Functions
+///////////////////////////////////////////////////////////////////////////////
 
 texture* create_texture(uint16_t w, uint16_t h)
 {
