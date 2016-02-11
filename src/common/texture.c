@@ -207,6 +207,10 @@ uint8_t* load_tga_to_buffer(const char* path, uint16_t* w, uint16_t* h)
         return 0;
     }
 
+    // Get the byte count, not the bit count.
+    // TODO: Use bitshifting for this instead
+    px_size /= 8;
+
     data.img_data = malloc(image->hdr.depth * image->hdr.width * image->hdr.height);
     size_t size = TGAReadScanlines(image, data.img_data, 0, image->hdr.height, TGA_RGB);
     if(size != image->hdr.height) {
@@ -216,6 +220,7 @@ uint8_t* load_tga_to_buffer(const char* path, uint16_t* w, uint16_t* h)
         return 0;
     }
     uint8_t* final_buffer = calloc(4 * image->hdr.width * image->hdr.height, sizeof(uint8_t));
+    info("w: %d, h: %d, size: %d\n", *w, *h, px_size);
     for(int j = 0; j < *h; ++j) {
         for(int i = 0; i < *w; ++i) {
             final_buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 0] = (uint8_t)data.img_data[((j * (*w)) + i) * px_size + 0];
@@ -228,8 +233,6 @@ uint8_t* load_tga_to_buffer(const char* path, uint16_t* w, uint16_t* h)
             /*info("Getting [%d, %d] (%d, %d, %d, %d)", i, j, final_buffer[((j * (*w)) + i) * 4 + 1], final_buffer[((j * (*w)) + i) * 4 + 1], final_buffer[((j * (*w)) + i) * 4 + 2], final_buffer[((j * (*w)) + i) * 4 + 3]);*/
         }
     }
-
-    // TODO: Convert the image data and fill the buffer
 
     return final_buffer;
 }
