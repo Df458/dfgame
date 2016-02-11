@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <jpeglib.h>
 #include <png.h>
+#include <tga.h>
 #include <stdlib.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,21 +92,44 @@ png_byte* load_png_to_buffer(const char* path, uint16_t* w, uint16_t* h)
     return image_data;
 }
 
+typedef struct jpeg_error
+{
+    struct jpeg_error_mgr pub;
+    jmp_buf setjmp_buffer;
+} jpeg_error;
+
+void handle_jpeg_error(j_common_ptr ptr)
+{
+    jpeg_error* err = (jpeg_error*)ptr->err;
+
+    (*ptr->err->output_message) (ptr);
+
+    longjmp(err->setjmp_buffer, 1);
+}
+
 uint8_t* load_jpeg_to_buffer(const char* path, uint16_t* w, uint16_t* h)
 {
     struct jpeg_decompress_struct decompresser;
 
-    // TODO: Error handler
+    jpeg_error err;
     
     FILE* infile = fopen(path, "rb");
-    JSAMPARRAY* row;
+    JSAMPARRAY row;
     uint16_t row_width;
     if(!infile) {
         warn("Could not open file: %s", path);
         return 0;
     }
 
-    // TODO: Initialize error, then add a setjmp for error handling
+    decompresser.err = jpeg_std_error(&err.pub);
+    err.pub.error_exit = handle_jpeg_error;
+
+    if(setjmp(err.setjmp_buffer)) {
+        jpeg_destroy_decompress(&decompresser);
+        fclose(infile);
+
+        return 0;
+    }
 
     jpeg_create_decompress(&decompresser);
     jpeg_stdio_src(&decompresser, infile);
@@ -117,16 +141,101 @@ uint8_t* load_jpeg_to_buffer(const char* path, uint16_t* w, uint16_t* h)
     *w = decompresser.output_width;
     *h = decompresser.output_height;
     uint8_t* buffer = calloc(decompresser.output_width * decompresser.output_height * 4, sizeof(uint8_t));
-    while(decompresser.output_scanline < decompresser.output_height) {
+    for(int j = 0; j < *h; ++j) {
         jpeg_read_scanlines(&decompresser, row, 1);
-        // TODO: Transfer the data to the buffer
+        for(int i = 0; i < *w; ++i) {
+            buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 0] = (uint8_t)row[0][(i * 3) + 0];
+            buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 1] = (uint8_t)row[0][(i * 3) + 1];
+            buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 2] = (uint8_t)row[0][(i * 3) + 2];
+            buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 3] = 255;
+            /*info("Getting (%d, %d, %d, %d)", buffer[((j * (*w)) + i) * 4 + 1], buffer[((j * (*w)) + i) * 4 + 1], buffer[((j * (*w)) + i) * 4 + 2], buffer[((j * (*w)) + i) * 4 + 3]);*/
+        }
     }
 
     jpeg_finish_decompress(&decompresser);
     jpeg_destroy_decompress(&decompresser);
 
     fclose(infile);
+
+    return buffer;
 }
+
+// TODO: Add support for all TGA features
+uint8_t* load_tga_to_buffer(const char* path, uint16_t* w, uint16_t* h)
+{
+    // In order to satisfy libtga's irrational desire for a non-const char
+    // array, we copy the path to a temporary buffer.
+    char* temp_path = strdup(path);
+    TGA* image = TGAOpen(temp_path, "r");
+    TGAData data;
+    free(temp_path);
+    if(!image) {
+        error("Could not open file: %s", path);
+        return 0;
+    }
+
+    int res = TGAReadHeader(image);
+    if(res != TGA_OK) {
+        error("Failed to parse tga file: %s", TGAStrError(res));
+        TGAClose(image);
+        return 0;
+    }
+
+    // If there's no image data, stop
+    if(image->hdr.img_t == 0) {
+        error("Failed to load tga file: No image data found");
+        TGAClose(image);
+        return 0;
+    }
+
+    // If we have color maps, stop
+    // TODO: Add support for colormapped TGAs
+    if(image->hdr.map_t) {
+        error("Failed to load tga file: Color-mapped tga files are unsupported");
+        TGAClose(image);
+        return 0;
+    }
+
+    bool alpha = (image->hdr.alpha);
+    int px_size = image->hdr.depth;
+    *w = image->hdr.width;
+    *h = image->hdr.height;
+    if(px_size != 24 && px_size != 32) {
+        error("Error trying to load tga file: Expected 24 or 32-bit color depth, got %d", image->hdr.depth);
+        TGAClose(image);
+        return 0;
+    }
+
+    data.img_data = malloc(image->hdr.depth * image->hdr.width * image->hdr.height);
+    size_t size = TGAReadScanlines(image, data.img_data, 0, image->hdr.height, TGA_RGB);
+    if(size != image->hdr.height) {
+        error("Failed to load tga file: Expected %d lines, but got %d.", image->hdr.height, size);
+        TGAClose(image);
+        free(data.img_data);
+        return 0;
+    }
+    uint8_t* final_buffer = calloc(4 * image->hdr.width * image->hdr.height, sizeof(uint8_t));
+    for(int j = 0; j < *h; ++j) {
+        for(int i = 0; i < *w; ++i) {
+            final_buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 0] = (uint8_t)data.img_data[((j * (*w)) + i) * px_size + 0];
+            final_buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 1] = (uint8_t)data.img_data[((j * (*w)) + i) * px_size + 1];
+            final_buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 2] = (uint8_t)data.img_data[((j * (*w)) + i) * px_size + 2];
+            if(!alpha)
+                final_buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 3] = 255;
+            else
+                final_buffer[((((*h - 1) - j) * (*w)) + i) * 4 + 3] = (uint8_t)data.img_data[((j * (*w)) + i) * px_size + 3];
+            /*info("Getting [%d, %d] (%d, %d, %d, %d)", i, j, final_buffer[((j * (*w)) + i) * 4 + 1], final_buffer[((j * (*w)) + i) * 4 + 1], final_buffer[((j * (*w)) + i) * 4 + 2], final_buffer[((j * (*w)) + i) * 4 + 3]);*/
+        }
+    }
+
+    // TODO: Convert the image data and fill the buffer
+
+    return final_buffer;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Public Functions
+///////////////////////////////////////////////////////////////////////////////
 
 texture* create_texture(uint16_t w, uint16_t h)
 {
@@ -184,8 +293,17 @@ uint8_t* load_resource_to_texture_buffer(const char* resource_location, const ch
     char* path = construct_extended_resource_path(resource_location, resource_name);
     nulltest(path);
 
-    // TODO: Add support for more texture formats
-    uint8_t* buffer = load_png_to_buffer(path, w, h);
+    uint8_t* buffer = 0;
+    const char* ext = get_extension(resource_name);
+    if(!strcmp(ext, "png")) {
+        buffer = load_png_to_buffer(path, w, h);
+    } else if(!strcmp(ext, "jpg") || !strcmp(ext, "jpeg")) {
+        buffer = load_jpeg_to_buffer(path, w, h);
+    } else if(!strcmp(ext, "tga")) {
+        buffer = load_tga_to_buffer(path, w, h);
+    } else {
+        error("Failed to load texture: File extension %s not recognized", ext);
+    }
 
     free(path);
     return buffer;

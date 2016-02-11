@@ -5,6 +5,6 @@ libdir=${prefix}/lib
 Name: dfgame-common
 Description: The common functions of the DFGame engine helper library
 Version: 0.0.1
-Requires: glew gl lua
+Requires: glew gl lua libpng
 CFlags: -I${includedir}/dfgame
-Libs: -L${libdir}/dfgame -ldfgame-common
+Libs: -L${libdir}/dfgame -ldfgame-common -ljpeg -ltga
