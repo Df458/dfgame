@@ -1,12 +1,10 @@
 public class ResourceModel : ListModel, Object
 {
     Gee.ArrayList<ResourceEntry> list;
-    string? extension;
 
-    public ResourceModel(string? desired_extension)
+    public ResourceModel()
     {
         list = new Gee.ArrayList<ResourceEntry>();
-        extension = desired_extension;
     }
 
     public Object? get_item(uint position)

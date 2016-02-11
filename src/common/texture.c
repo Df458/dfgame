@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <jpeglib.h>
 #include <png.h>
+#include <tiffio.h>
 #include <tga.h>
 #include <stdlib.h>
 
@@ -233,6 +234,43 @@ uint8_t* load_tga_to_buffer(const char* path, uint16_t* w, uint16_t* h)
     return final_buffer;
 }
 
+uint8_t* load_tiff_to_buffer(const char* path, uint16_t* w, uint16_t* h)
+{
+    TIFF* infile = TIFFOpen(path, "r");
+    if(!infile) {
+        error("Could not open file: %s", path);
+        return 0;
+    }
+
+    TIFFRGBAImage img;
+    char err[1024];
+    if(!TIFFRGBAImageBegin(&img, infile, 0, err)) {
+        error("Cannot load tiff file: %s", err);
+        TIFFClose(infile);
+        return 0;
+    }
+    *w = img.width;
+    *h = img.height;
+    info("Dimensions: %dx%d", *w, *h);
+    uint32_t* temp_buffer = 0;
+    temp_buffer = _TIFFmalloc((*w) * (*h) * sizeof(uint32_t));
+    uint8_t* buffer = calloc((*w) * (*h) * 4, sizeof(uint8_t));
+    if(temp_buffer == NULL) {
+        error("Can't load tiff: temp_buffer could not be allocated");
+        TIFFClose(infile);
+        return 0;
+    }
+
+    TIFFRGBAImageGet(&img, temp_buffer, *w, *h);
+    memcpy(buffer, temp_buffer, (*w) * (*h) * 4);
+    _TIFFfree(temp_buffer);
+
+    TIFFRGBAImageEnd(&img);
+
+    TIFFClose(infile);
+    return buffer;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Public Functions
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,6 +339,8 @@ uint8_t* load_resource_to_texture_buffer(const char* resource_location, const ch
         buffer = load_jpeg_to_buffer(path, w, h);
     } else if(!strcmp(ext, "tga")) {
         buffer = load_tga_to_buffer(path, w, h);
+    } else if(!strcmp(ext, "tif") || !strcmp(ext, "tiff")) {
+        buffer = load_tiff_to_buffer(path, w, h);
     } else {
         error("Failed to load texture: File extension %s not recognized", ext);
     }

@@ -5,7 +5,7 @@ using DF;
 public class ResourceSelector : Box
 {
     string  title;
-    string? extension;
+    Gee.TreeSet<string> extensions;
     bool    multi_select;
     bool    can_cancel;
 
@@ -26,7 +26,9 @@ public class ResourceSelector : Box
         this.spacing = 6;
         this.margin = 12;
         this.title = display_title;
-        this.extension = desired_extension;
+        this.extensions = new Gee.TreeSet<string>();
+        if(desired_extension != null)
+            this.extensions.add(desired_extension);
         this.multi_select = should_allow_multiple;
         this.can_cancel = show_cancel;
 
@@ -47,9 +49,14 @@ public class ResourceSelector : Box
         Gee.ArrayList<ResourceEntry> resource_list = new Gee.ArrayList<ResourceEntry>();
 
         // TODO: Get all rows and return their matching data
-        warning("get_selected_full is a stub!");
+        Logger.stub();
 
         return resource_list;
+    }
+
+    public void add_extension(string ext)
+    {
+        this.extensions.add(ext);
     }
 
     public signal void respond(ResponseType response);
@@ -87,9 +94,9 @@ public class ResourceSelector : Box
             response_box.pack_end(cancel_button, true, false);
     }
 
-    private void generate_list()
+    public void generate_list()
     {
-        list_data = new ResourceModel(extension);
+        list_data = new ResourceModel();
         int add_position = iterate_directory(File.new_for_path(IO.get_path()));
         list.bind_model(list_data, create_list_widget);
 
@@ -123,7 +130,7 @@ public class ResourceSelector : Box
                 }
 
                 string ext = name.substring(name.last_index_of_char('.') + 1);
-                if(extension == null || extension == ext) {
+                if(extensions.size == 0 || extensions.contains(ext)) {
                     list_data.append(f.resolve_relative_path(name));
                     count++;
                 }
