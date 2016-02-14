@@ -25,14 +25,14 @@ char* resource_path = NULL;
 // Hidden functions
 ///////////////////////////////////////////////////////////////////////////////
 
-void get_exe_path(char* buf)
+void get_exe_path(char* buf, size_t bufsize)
 {
 #ifdef __MINGW32__
-    GetModuleFileName(NULL, buf, strlen(buf));
+    GetModuleFileName(NULL, buf, bufsize);
     char* c = strrchr(buf, '/');
     c[1] = 0;
 #elif __GNUC__
-    ssize_t len = readlink("/proc/self/exe", buf, strlen(buf) - 1);
+    ssize_t len = readlink("/proc/self/exe", buf, bufsize - 1);
     if (len != -1) {
         char* c = strrchr(buf, '/');
         c[1] = 0;
@@ -50,16 +50,16 @@ const char* get_base_resource_path()
 {
     if(resource_path == NULL) {
         resource_path = calloc(512, sizeof(char));
-        get_exe_path(resource_path);
+        get_exe_path(resource_path, 512);
     }
 
     return resource_path;
 }
 
-char* construct_extended_resource_path(const char* resource_location, const char* resource_name)
+char* construct_extended_resource_path(resource_pair)
 {
     nulltest(resource_name);
-    size_t len = strlen(resource_path) + strlen(resource_name) + 2;
+    size_t len = strlen(get_base_resource_path()) + strlen(resource_name) + 2;
     char* path = NULL;
 
     if(resource_location != NULL) {
@@ -95,12 +95,12 @@ void set_resource_path_relative(const char* path)
         free(resource_path);
 
     resource_path = calloc(512 + strlen(path), sizeof(char));
-    get_exe_path(resource_path);
+    get_exe_path(resource_path, 512);
     strcat(resource_path, "/");
     strcat(resource_path, path);
 }
 
-FILE* load_resource_file(const char* resource_location, const char* resource_name, const char* mode)
+FILE* load_resource_file(resource_pair, const char* mode)
 {
     char* final_path = construct_extended_resource_path(resource_location, resource_name);
     FILE* file = fopen(final_path, mode);
@@ -124,7 +124,7 @@ FILE* load_resource_file(const char* resource_location, const char* resource_nam
     return file;
 }
 
-unsigned char* load_resource_to_buffer(const char* resource_location, const char* resource_name)
+unsigned char* load_resource_to_buffer(resource_pair)
 {
     FILE* file = load_resource_file(resource_location, resource_name, "rb");
     fseek(file, 0, SEEK_END);
@@ -160,7 +160,7 @@ void write_string_to_file(FILE* file, const char* str)
         fwrite(str, sizeof(char), len, file);
 }
 
-char* get_unique_resource_name(const char* resource_location, const char* resource_name)
+char* get_unique_resource_name(resource_pair)
 {
     char* name = strdup(resource_name);
     char* path = construct_extended_resource_path(resource_location, name);
@@ -237,14 +237,14 @@ const char* get_extension(const char* file_name)
         return ext + 1;
 }
 
-void* load_anonymous_resource(const char* resource_location, const char* resource_name)
+void* load_anonymous_resource(resource_pair)
 {
     // TODO: Implement this
     fprintf(stderr, "Load called: %s, %s\n", resource_location, resource_name);
     return 0;
 }
 
-bool resource_eq(const char* resource_location, const char* resource_name, const char* resource2_location, const char* resource2_name)
+bool resource_eq(resource_pair, const char* resource2_location, const char* resource2_name)
 {
     if(!resource_location) {
         if(resource2_location)
@@ -259,7 +259,7 @@ bool resource_eq(const char* resource_location, const char* resource_name, const
     return true;
 }
 
-bool resource_exists(const char* resource_location, const char* resource_name)
+bool resource_exists(resource_pair)
 {
     struct stat dir_stat = {0};
     char* path  = construct_extended_resource_path(resource_location, resource_name);

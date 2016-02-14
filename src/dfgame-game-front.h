@@ -4,4 +4,6 @@
 #include "dfgame-common.h"
 #include "dfgame-game.h"
 
+#include "game-frontend/loop.h"
+
 #endif

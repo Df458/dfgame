@@ -303,7 +303,7 @@ void destroy_texture(texture* tex)
     free(tex);
 }
 
-texture* load_resource_to_texture(const char* resource_location, const char* resource_name)
+texture* load_resource_to_texture(resource_pair)
 {
 	texture* texture_data = malloc(sizeof(texture));
 	glGenTextures(1, &texture_data->handle);
@@ -324,12 +324,12 @@ texture* load_resource_to_texture(const char* resource_location, const char* res
     return texture_data;
 }
 
-bool save_texture_to_resource(texture* tex, const char* resource_location, const char* resource_name)
+bool save_texture_to_resource(texture* tex, resource_pair)
 {
     stub(false);
 }
 
-uint8_t* load_resource_to_texture_buffer(const char* resource_location, const char* resource_name, uint16_t* w, uint16_t* h)
+uint8_t* load_resource_to_texture_buffer(resource_pair, uint16_t* w, uint16_t* h)
 {
     char* path = construct_extended_resource_path(resource_location, resource_name);
     nulltest(path);
