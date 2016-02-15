@@ -35,4 +35,5 @@ struct player_data
 
     bool playing;
     bool stopped;
+    bool simple;
 };

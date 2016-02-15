@@ -5,5 +5,6 @@
 #include "dfgame-game.h"
 
 #include "game-frontend/loop.h"
+#include "game-frontend/window.h"
 
 #endif

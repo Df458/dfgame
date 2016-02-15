@@ -10,6 +10,7 @@ float dt;
 
 void main_loop_begin(loop_func f)
 {
+    iter = f;
     continue_loop = true;
     dt = 0;
 

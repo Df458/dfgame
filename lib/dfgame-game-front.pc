@@ -2,9 +2,9 @@ prefix=/usr
 includedir=${prefix}/include
 libdir=${prefix}/lib
 
-Name: dfgame-game
+Name: dfgame-game-front
 Description: The game-specific frontend functions of the DFGame engine helper library
 Version: 0.0.1
-Requires: dfgame-game = 0.0.1 glew gl lua
+Requires: dfgame-game = 0.0.1 glew gl lua glfw3
 CFlags: -I${includedir}/dfgame
 Libs: -L${libdir}/dfgame -ldfgame-game-front

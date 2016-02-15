@@ -23,15 +23,18 @@ COMMONSRC=$(wildcard ${SRCPATH}${COMMONTARGET}*.c)
 EDITORBACKSRC=$(wildcard ${SRCPATH}${EDITORBACKTARGET}*.c)
 EDITORFRONTSRC=$(wildcard ${SRCPATH}${EDITORFRONTTARGET}*.vala)
 GAMEBACKSRC=$(wildcard ${SRCPATH}${GAMEBACKTARGET}*.c)
+GAMEFRONTSRC=$(wildcard ${SRCPATH}${GAMEFRONTTARGET}*.c)
 
 COMMONOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(COMMONSRC))
 EDITORBACKOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(EDITORBACKSRC))
 EDITORFRONTOBJ=$(patsubst $(SRCPATH)%.vala,$(OBJPATH)%.vala.o,$(EDITORFRONTSRC))
 GAMEBACKOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(GAMEBACKSRC))
+GAMEFRONTOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(GAMEFRONTSRC))
 
 COMMONDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(COMMONSRC))
 EDITORBACKDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(EDITORBACKSRC))
 GAMEBACKDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(GAMEBACKSRC))
+GAMEFRONTDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(GAMEFRONTSRC))
 
 # Flags
 VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(EDITORFRONTTARGET) -X -I$(SRCPATH)$(GAMEBACKTARGET) -X -I$(SRCPATH)$(COMMONTARGET) --cc=$(CC) -H $(SRCPATH)dfgame-editor-front.h --vapi=$(VAPIPATH)dfgame-editor-frontend.vapi
@@ -119,7 +122,7 @@ $(COMMONTARGET): $(COMMONOBJ)
 	ar -rs $(LIBPATH)libdfgame-common.a $(COMMONOBJ)
 $(GAMEBACKTARGET): $(COMMONTARGET) $(GAMEBACKSRC)
 	ar -rs $(LIBPATH)libdfgame-game.a $(GAMEBACKOBJ)
-$(GAMEFRONTTARGET): $(COMMONTARGET) $(GAMEBACKTARGET) $(GAMEFRONTSRC)
+$(GAMEFRONTTARGET): $(COMMONTARGET) $(GAMEBACKTARGET) $(GAMEFRONTOBJ)
 	ar -rs $(LIBPATH)libdfgame-game-front.a $(GAMEFRONTOBJ)
 $(EDITORBACKTARGET): $(COMMONTARGET) $(EDITORBACKSRC)
 	ar -rs $(LIBPATH)libdfgame-editor.a $(EDITORBACKOBJ)
@@ -161,6 +164,6 @@ install:
 	mkdir -p /usr/include/dfgame/game
 	#cp -t /usr/include/dfgame/game src/game/*.h
 	mkdir -p /usr/include/dfgame/game-frontend
-	#cp -t /usr/include/dfgame/game-frontend src/game-frontend/*.h
+	cp -t /usr/include/dfgame/game-frontend src/game-frontend/*.h
 	cp -t /usr/share/vala/vapi/ vapi/*.vapi vapi/*.deps
 	cp -t /usr/lib/pkgconfig/ lib/*.pc

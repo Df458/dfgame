@@ -26,6 +26,9 @@ bool   save_audio_to_resource(audio* a, resource_pair);
 audio* load_resource_to_audio(resource_pair);
 int8_t stream_audio_to_buffer(audio* a, ALuint buf);
 
+// TODO: Player audio should be private in case of simple players
+// TODO: Need to add a function to make a player less simple
+// TODO: Need to add a function to set player audio
 /*!
  * An audio player handles actual audio output.
  * The audio struct itself provides it with the necessary stream-related
@@ -44,6 +47,11 @@ typedef struct player
  * Note: source can be set to NULL, and further player functions won't break
  */
 player* create_player(audio* source);
+
+/*!
+ * Loads an audio struct and creates a player for it.
+ */
+player* load_resource_to_simple_player(resource_pair);
 
 /*!
  * Destroys a player, and stops/deletes its OpenAL data.

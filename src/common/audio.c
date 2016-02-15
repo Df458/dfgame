@@ -128,6 +128,7 @@ audio* create_audio()
     return a;
 }
 
+// FIXME: Need to destroy open file data
 void destroy_audio(audio* a)
 {
     free(a);
@@ -191,14 +192,28 @@ player* create_player(audio* source)
 
     p->data = malloc(sizeof(struct player_data));
     p->data->playing = false;
+    p->data->stopped = true;
+    p->data->simple = false;
 	alGenBuffers(2, p->data->buffers);
 	alGenSources(1, &p->data->source);
 
     return p;
 }
 
+player* load_resource_to_simple_player(resource_pair)
+{
+    audio* a = load_resource_to_audio(resource_location, resource_name);
+
+    player* p = create_player(a);
+    p->data->simple = true;
+
+    return p;
+}
+
 void destroy_player(player* p)
 {
+    if(p->data->simple)
+        destroy_audio(p->source);
     alSourceStop(p->data->source);
     alDeleteBuffers(2, p->data->buffers);
     alDeleteSources(1, &p->data->source);
