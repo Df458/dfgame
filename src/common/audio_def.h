@@ -15,10 +15,18 @@ struct vorbis_data
     vorbis_info*   info;
 };
 
+struct wav_data
+{
+    FILE*    infile;
+    uint32_t data_size;
+    uint32_t sample_rate;
+    uint32_t position;
+};
+
 typedef union audio_content
 {
     struct vorbis_data ogg;
-    FILE*              wav;
+    struct wav_data    wav;
 } audio_content;
 
 struct audio

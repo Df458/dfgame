@@ -45,9 +45,85 @@ bool prepare_ogg(audio* a, const char* path)
     return true;
 }
 
+// FIXME: WAV loader is currently broken
 bool prepare_wav(audio* a, const char* path)
 {
-    stub(false);
+    a->content.wav.infile = fopen(path, "rb");
+    FILE* infile = a->content.wav.infile;
+    if(!infile) {
+        error("Failed to prepare WAV stream, file %s not found", path);
+        return false;
+    }
+    
+    char id[5];
+    id[4] = 0;
+    uint8_t* input_buffer;
+    uint32_t file_size, format_size, uint8_ts_per_sec;
+    short tag, channel_count, block_alignment, bits_per_sample;
+    a->channels = AL_FORMAT_MONO8;
+    
+    fread(&id, sizeof(uint8_t), 4, infile);
+    if(strcmp(id, "RIFF")) {
+        error("Cannot prepare WAV stream: Not a RIFF file. (Got %s)", id);
+        fclose(infile);
+        return false;
+    }
+    fread(&file_size, sizeof(uint32_t), 1, infile);
+    fread(&id, sizeof(uint8_t), 4, infile);
+    if(strcmp(id, "WAVE")) {
+        error("Cannot prepare WAV stream: Not a WAVE file. (Got %s)", id);
+        fclose(infile);
+        return false;
+    }
+    
+    fread(&id, sizeof(uint8_t), 4, infile);
+    if(strcmp(id, "fmt ")) {
+        error("Cannot prepare WAV stream: Unrecognized format. (fmt not found, got %s)", id);
+        fclose(infile);
+        return false;
+    }
+    fread(&format_size, sizeof(uint32_t), 1, infile);
+    if(format_size != 16) {
+        error("Cannot prepare WAV stream: Unrecognized format. (nonstandard formatting length)");
+        fclose(infile);
+        return false;
+    }
+    fread(&tag, sizeof(short), 1, infile);
+    fread(&channel_count, sizeof(short), 1, infile);
+    fread(&a->content.wav.sample_rate, sizeof(uint32_t), 1, infile);
+    fread(&uint8_ts_per_sec, sizeof(uint32_t), 1, infile);
+    fread(&block_alignment, sizeof(short), 1, infile);
+    fread(&bits_per_sample, sizeof(short), 1, infile);
+    
+    fread(&id, sizeof(uint8_t), 4, infile);
+    if(strcmp(id, "data")) {
+        error("Cannot prepare WAV stream: Unrecognized format. (data not found)");
+        fclose(infile);
+        return false;
+    }
+    // TODO: Implement this
+    fread(&a->content.wav.data_size, sizeof(uint32_t), 1, infile);
+    /*input_buffer = (uint8_t*) malloc(sizeof(uint8_t) * data_size);*/
+    /*fread(input_buffer, sizeof(uint8_t), data_size, infile);*/
+    
+    if(channel_count == 1) {
+        if(bits_per_sample == 8) {
+            a->channels = AL_FORMAT_MONO8;
+        } else if(bits_per_sample == 16) {
+            a->channels = AL_FORMAT_MONO16;
+        }
+    } else if(channel_count == 2) {
+        if(bits_per_sample == 8) {
+            a->channels = AL_FORMAT_STEREO8;
+        } else if(bits_per_sample == 16) {
+            a->channels = AL_FORMAT_STEREO16;
+        }
+    }
+    
+    /*free(input_buffer);*/
+    a->content.wav.position = 0;
+
+    return true;
 }
 
 int8_t stream_ogg_to_buffer(audio* a, ALuint buf)
@@ -81,7 +157,33 @@ int8_t stream_ogg_to_buffer(audio* a, ALuint buf)
 
 int8_t stream_wav_to_buffer(audio* a, ALuint buf)
 {
-    stub(AUDIO_STREAM_FAILURE);
+    char data[STREAM_BUFFER_SIZE];
+    int  size = 0;
+    int  section;
+    int  result;
+ 
+    while(size < STREAM_BUFFER_SIZE && size < (a->content.wav.data_size - a->content.wav.position))
+    {
+        result = fread(data + size, STREAM_BUFFER_SIZE - size, sizeof(uint8_t), a->content.wav.infile);
+    
+        if(result > 0)
+            size += result;
+        else
+            if(result < 0) {
+                error("Failed to stream wav file");
+                return AUDIO_STREAM_FAILURE;
+            } else
+                break;
+    }
+
+    a->content.wav.position += size;
+    
+    if(size == 0)
+        return AUDIO_STREAM_FINISHED;
+ 
+    alBufferData(buf, a->channels, data, size, a->content.wav.sample_rate);
+ 
+    return AUDIO_STREAM_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -173,7 +275,7 @@ int8_t stream_audio_to_buffer(audio* a, ALuint buf)
         case AFMT_OGG:
             return stream_ogg_to_buffer(a, buf);
         case AFMT_WAV:
-            return stream_ogg_to_buffer(a, buf);
+            return stream_wav_to_buffer(a, buf);
         case AFMT_INVALID:
             error("Cannot stream audio: Invalid format");
             return AUDIO_STREAM_FAILURE;
@@ -240,6 +342,7 @@ void player_set_playing(player* p, bool play)
     if(play) {
         alSourceQueueBuffers(p->data->source, 2, p->data->buffers);
         alGetError();
+        info("Playing");
         alSourcePlay(p->data->source);
 
         ALuint err = alGetError();
@@ -279,8 +382,10 @@ void player_stop(player* p)
 
 bool player_update(player* p)
 {
+    info("Starting update");
     if(!p->data->playing)
         return false;
+    info("Check play");
     ALenum state;
     alGetSourcei(p->data->source, AL_SOURCE_STATE, &state);
     if(state != AL_PLAYING)
@@ -289,9 +394,11 @@ bool player_update(player* p)
  
     alGetSourcei(p->data->source, AL_BUFFERS_PROCESSED, &processed);
  
+    info("Processing");
     while(processed--)
     {
         ALuint buffer;
+        ALuint queued;
         
         alSourceUnqueueBuffers(p->data->source, 1, &buffer);
  
@@ -300,13 +407,19 @@ bool player_update(player* p)
         switch(res) {
             case AUDIO_STREAM_SUCCESS:
                 alSourceQueueBuffers(p->data->source, 1, &buffer);
+                info("Success");
                 break;
             case AUDIO_STREAM_FAILURE:
+                info("Failure");
                 player_stop(p);
                 return false;
             case AUDIO_STREAM_FINISHED:
+                info("Done");
                 // TODO: If loop is true, this should reset
-                player_stop(p);
+                // Also, this should wait until all sources are finished
+                alGetSourcei(p->data->source, AL_BUFFERS_QUEUED, &queued);
+                if(queued == 0)
+                    player_stop(p);
                 break;
         }
     }
