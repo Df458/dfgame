@@ -1,0 +1,3 @@
+[CCode ()]
+namespace editor {
+}

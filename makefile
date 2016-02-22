@@ -167,3 +167,6 @@ install:
 	cp -t /usr/include/dfgame/game-frontend src/game-frontend/*.h
 	cp -t /usr/share/vala/vapi/ vapi/*.vapi vapi/*.deps
 	cp -t /usr/lib/pkgconfig/ lib/*.pc
+	mkdir -p /usr/share/dfgame
+	cp -rft /usr/share/dfgame data/*
+	mv /usr/share/dfgame/dfgame.sh /usr/bin/dfgame
