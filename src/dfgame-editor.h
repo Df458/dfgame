@@ -3,4 +3,6 @@
 
 #include "dfgame-common.h"
 
+#include "editor/project.h"
+
 #endif

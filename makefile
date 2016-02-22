@@ -124,7 +124,7 @@ $(GAMEBACKTARGET): $(COMMONTARGET) $(GAMEBACKSRC)
 	ar -rs $(LIBPATH)libdfgame-game.a $(GAMEBACKOBJ)
 $(GAMEFRONTTARGET): $(COMMONTARGET) $(GAMEBACKTARGET) $(GAMEFRONTOBJ)
 	ar -rs $(LIBPATH)libdfgame-game-front.a $(GAMEFRONTOBJ)
-$(EDITORBACKTARGET): $(COMMONTARGET) $(EDITORBACKSRC)
+$(EDITORBACKTARGET): $(COMMONTARGET) $(EDITORBACKOBJ)
 	ar -rs $(LIBPATH)libdfgame-editor.a $(EDITORBACKOBJ)
 $(EDITORFRONTTARGET): $(COMMONTARGET) $(EDITORBACKTARGET) $(GAMEBACKTARGET) $(EDITORFRONTSRC)
 	$(VALAC) $(VFLAGS) $(EDITORFRONTSRC) $(VLIBS)
@@ -159,9 +159,9 @@ install:
 	mkdir -p /usr/include/dfgame/common
 	cp -t /usr/include/dfgame/common src/common/*.h
 	mkdir -p /usr/include/dfgame/editor
-	# TODO: Uncomment when necessary
-	#cp -t /usr/include/dfgame/editor src/editor/*.h
+	cp -t /usr/include/dfgame/editor src/editor/*.h
 	mkdir -p /usr/include/dfgame/game
+	# TODO: Uncomment when necessary
 	#cp -t /usr/include/dfgame/game src/game/*.h
 	mkdir -p /usr/include/dfgame/game-frontend
 	cp -t /usr/include/dfgame/game-frontend src/game-frontend/*.h
