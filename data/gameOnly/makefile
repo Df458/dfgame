@@ -16,12 +16,12 @@ else
 endif
 
 # Flags
-CFLAGS=-Wall -Werror `$(PKGCONFIG) --cflags dfgame-common`
+CFLAGS=-Wall -Werror -D BUILD_TYPE=$(BUILDTYPE) -D PROJECT_NAME="$(APPNAME)" -D VERSION="$(VERSION)" `$(PKGCONFIG) --cflags dfgame-common`
 CLIBS=`$(PKGCONFIG) --libs dfgame-common`
-GAMEFLAGS=-I$(SRCPATH)/$(LIBGAMETARGET) `$(PKGCONFIG) --cflags dfgame-game-front`
-GAMELIBS=`$(PKGCONFIG) --libs dfgame-game-front`
-LIBGAMEFLAGS=`$(PKGCONFIG) --cflags dfgame-game`
-LIBGAMELIBS=-lm `$(PKGCONFIG) --libs dfgame-game`
+GAMEFLAGS=$(CFLAGS) -I$(SRCPATH)/$(LIBGAMETARGET) `$(PKGCONFIG) --cflags dfgame-game-front`
+GAMELIBS=$(CLIBS) `$(PKGCONFIG) --libs dfgame-game-front`
+LIBGAMEFLAGS=$(CFLAGS) `$(PKGCONFIG) --cflags dfgame-game`
+LIBGAMELIBS=$(CLIBS) -lm `$(PKGCONFIG) --libs dfgame-game`
 
 # Type-specific config
 ifeq ($(BUILDTYPE), Debug)

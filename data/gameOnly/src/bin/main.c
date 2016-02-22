@@ -12,7 +12,7 @@ void loop(float delta)
 
 int main()
 {
-    window = create_main_window(1024, 768, "DFGame Project");
+    window = create_main_window(1024, 768, macro_str(PROJECT_NAME) " v" macro_str(VERSION));
 
     main_loop_begin(loop);
 
