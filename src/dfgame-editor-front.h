@@ -5,15 +5,50 @@
 #define __SRC_DFGAME_EDITOR_FRONT_H__
 
 #include <glib.h>
+#include <glib-object.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib-object.h>
 #include <gee.h>
 #include <gio/gio.h>
 
 G_BEGIN_DECLS
 
+
+#define TYPE_NEW_PROJECT_DIALOG (new_project_dialog_get_type ())
+#define NEW_PROJECT_DIALOG(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_NEW_PROJECT_DIALOG, NewProjectDialog))
+#define NEW_PROJECT_DIALOG_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_NEW_PROJECT_DIALOG, NewProjectDialogClass))
+#define IS_NEW_PROJECT_DIALOG(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_NEW_PROJECT_DIALOG))
+#define IS_NEW_PROJECT_DIALOG_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_NEW_PROJECT_DIALOG))
+#define NEW_PROJECT_DIALOG_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_NEW_PROJECT_DIALOG, NewProjectDialogClass))
+
+typedef struct _NewProjectDialog NewProjectDialog;
+typedef struct _NewProjectDialogClass NewProjectDialogClass;
+typedef struct _NewProjectDialogPrivate NewProjectDialogPrivate;
+
+#define TYPE_ASSET_TYPE (asset_type_get_type ())
+
+#define TYPE_PROJECT_FILE_PANE (project_file_pane_get_type ())
+#define PROJECT_FILE_PANE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_PROJECT_FILE_PANE, ProjectFilePane))
+#define PROJECT_FILE_PANE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_PROJECT_FILE_PANE, ProjectFilePaneClass))
+#define IS_PROJECT_FILE_PANE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_PROJECT_FILE_PANE))
+#define IS_PROJECT_FILE_PANE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_PROJECT_FILE_PANE))
+#define PROJECT_FILE_PANE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_PROJECT_FILE_PANE, ProjectFilePaneClass))
+
+typedef struct _ProjectFilePane ProjectFilePane;
+typedef struct _ProjectFilePaneClass ProjectFilePaneClass;
+typedef struct _ProjectFilePanePrivate ProjectFilePanePrivate;
+
+#define TYPE_MISSING_FILES_DIALOG (missing_files_dialog_get_type ())
+#define MISSING_FILES_DIALOG(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_MISSING_FILES_DIALOG, MissingFilesDialog))
+#define MISSING_FILES_DIALOG_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_MISSING_FILES_DIALOG, MissingFilesDialogClass))
+#define IS_MISSING_FILES_DIALOG(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_MISSING_FILES_DIALOG))
+#define IS_MISSING_FILES_DIALOG_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_MISSING_FILES_DIALOG))
+#define MISSING_FILES_DIALOG_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_MISSING_FILES_DIALOG, MissingFilesDialogClass))
+
+typedef struct _MissingFilesDialog MissingFilesDialog;
+typedef struct _MissingFilesDialogClass MissingFilesDialogClass;
+typedef struct _MissingFilesDialogPrivate MissingFilesDialogPrivate;
 
 #define TYPE_RESOURCE_SELECTOR (resource_selector_get_type ())
 #define RESOURCE_SELECTOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_RESOURCE_SELECTOR, ResourceSelector))
@@ -48,6 +83,44 @@ typedef struct _ResourceModelClass ResourceModelClass;
 typedef struct _ResourceModelPrivate ResourceModelPrivate;
 typedef struct _ResourceEntryPrivate ResourceEntryPrivate;
 
+struct _NewProjectDialog {
+	GTypeInstance parent_instance;
+	volatile int ref_count;
+	NewProjectDialogPrivate * priv;
+};
+
+struct _NewProjectDialogClass {
+	GTypeClass parent_class;
+	void (*finalize) (NewProjectDialog *self);
+};
+
+typedef enum  {
+	ASSET_TYPE_NONE = 0,
+	ASSET_TYPE_ACTOR,
+	ASSET_TYPE_MAP,
+	ASSET_TYPE_SPRITE,
+	ASSET_TYPE_TILESET
+} AssetType;
+
+struct _ProjectFilePane {
+	GtkBox parent_instance;
+	ProjectFilePanePrivate * priv;
+	gint icon_size;
+};
+
+struct _ProjectFilePaneClass {
+	GtkBoxClass parent_class;
+};
+
+struct _MissingFilesDialog {
+	GtkDialog parent_instance;
+	MissingFilesDialogPrivate * priv;
+};
+
+struct _MissingFilesDialogClass {
+	GtkDialogClass parent_class;
+};
+
 struct _ResourceSelector {
 	GtkBox parent_instance;
 	ResourceSelectorPrivate * priv;
@@ -78,6 +151,27 @@ struct _ResourceEntryClass {
 };
 
 
+gpointer new_project_dialog_ref (gpointer instance);
+void new_project_dialog_unref (gpointer instance);
+GParamSpec* param_spec_new_project_dialog (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void value_set_new_project_dialog (GValue* value, gpointer v_object);
+void value_take_new_project_dialog (GValue* value, gpointer v_object);
+gpointer value_get_new_project_dialog (const GValue* value);
+GType new_project_dialog_get_type (void) G_GNUC_CONST;
+NewProjectDialog* new_project_dialog_new (GtkWindow* parent, const gchar* default_path);
+NewProjectDialog* new_project_dialog_construct (GType object_type, GtkWindow* parent, const gchar* default_path);
+void new_project_dialog_display (NewProjectDialog* self);
+void new_project_dialog_respond (NewProjectDialog* self, gint response_id);
+void new_project_dialog_destroy (NewProjectDialog* self);
+GType asset_type_get_type (void) G_GNUC_CONST;
+GType project_file_pane_get_type (void) G_GNUC_CONST;
+ProjectFilePane* project_file_pane_new (void);
+ProjectFilePane* project_file_pane_construct (GType object_type);
+gchar* project_file_pane_get_selected_path (ProjectFilePane* self);
+GType missing_files_dialog_get_type (void) G_GNUC_CONST;
+MissingFilesDialog* missing_files_dialog_new (GtkWindow* win);
+MissingFilesDialog* missing_files_dialog_construct (GType object_type, GtkWindow* win);
+void missing_files_dialog_apply (MissingFilesDialog* self);
 GType resource_selector_get_type (void) G_GNUC_CONST;
 ResourceSelector* resource_selector_new (const gchar* display_title, const gchar* desired_extension, gboolean should_allow_multiple, gboolean show_cancel);
 ResourceSelector* resource_selector_construct (GType object_type, const gchar* display_title, const gchar* desired_extension, gboolean should_allow_multiple, gboolean show_cancel);
@@ -86,6 +180,9 @@ ResourceEntry* resource_selector_get_selected (ResourceSelector* self);
 GeeArrayList* resource_selector_get_selected_full (ResourceSelector* self);
 void resource_selector_add_extension (ResourceSelector* self, const gchar* ext);
 void resource_selector_generate_list (ResourceSelector* self);
+GFile* get_content_directory (void);
+GFile* file_from_resource (const gchar* ext, const gchar* name, gboolean new_file);
+gboolean file_is_content (GFile* file);
 GType resource_model_get_type (void) G_GNUC_CONST;
 ResourceModel* resource_model_new (void);
 ResourceModel* resource_model_construct (GType object_type);
