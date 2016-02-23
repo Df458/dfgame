@@ -1,0 +1,6 @@
+# Generated files
+obj
+lib
+
+# Vim undo files
+*.un~

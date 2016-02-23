@@ -1,5 +1,6 @@
 #ifndef IO_UTIL_H
 #define IO_UTIL_H
+#include "resource_def.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -32,7 +33,7 @@ const char* get_base_resource_path();
  * resource_location: NULL
  * resource_name: "foo.bar"
  */
-char* construct_extended_resource_path(const char* resource_location, const char* resource_name);
+char* construct_extended_resource_path(resource_pair);
 
 /*!
  * This sets the path of the base data directory.
@@ -57,14 +58,14 @@ void set_resource_path_relative(const char* path);
  * appending a ! to the end of mode will cause this function to try swapping an
  * initial r with w if the file cannot be loaded.
  */
-FILE* load_resource_file(const char* resource_location, const char* resource_name, const char* mode);
+FILE* load_resource_file(resource_pair, const char* mode);
 
 /*!
  * Loads a file in the resource directory to a new buffer.
  * The user must handle freeing the returned buffer's memory.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-unsigned char* load_resource_to_buffer(const char* resource_location, const char* resource_name);
+unsigned char* load_resource_to_buffer(resource_pair);
 
 /*!
  * This funcion loads a string from a file.
@@ -91,7 +92,7 @@ void write_string_to_file(FILE* file, const char* str);
  *
  * See get_extended_resource_path(io_util.h) for additional usage details
  */
-char* get_unique_resource_name(const char* resource_location, const char* resource_name);
+char* get_unique_resource_name(resource_pair);
 
 /*!
  * Checks to see if the directory at path exists. If not, the directory is
@@ -107,7 +108,7 @@ bool ensure_directory(const char* path);
  *
  * Note that the resulting string must be freed by the user.
  */
-char* swap_extension(const char* file_name, const char* file_extension);
+char* swap_extension(resource_pair);
 
 /*!
  * Returns a substring with a file's extension.
@@ -120,17 +121,17 @@ const char* get_extension(const char* file_name);
  * This shouldn't generally be called manually, as it is used by the resource
  * system.
  */
-void* load_anonymous_resource(const char* resource_location, const char* resource_name);
+void* load_anonymous_resource(resource_pair);
 
 /*!
  * Tests to see if two pairs of resource data refer to the same path
  */
-bool resource_eq(const char* resource_location, const char* resource_name, const char* resource2_location, const char* resource2_name);
+bool resource_eq(resource_pair, const char* resource2_location, const char* resource2_name);
 
 /*!
  * Test if a given resource exists
  */
-bool resource_exists(const char* resource_location, const char* resource_name);
+bool resource_exists(resource_pair);
 
 /*!
  * Converts an absolute path to a relative content path, or NULL if it doesn't

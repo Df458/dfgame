@@ -30,4 +30,7 @@ unsigned char* loadFileContents(const char* const filepath);
 #define DEGTORAD 0.01745329251
 #define RADTODEG 57.2957795131
 
+#define macro_str(m) name_str(m)
+#define name_str(m) #m
+
 #endif
