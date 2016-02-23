@@ -1,4 +1,5 @@
-using DF.IO;
+namespace DF {
+using IO;
 
 public File get_content_directory()
 {
@@ -34,4 +35,5 @@ public bool file_is_content(File file)
 
     g_free(path);
     return false;
+}
 }
