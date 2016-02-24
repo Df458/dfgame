@@ -1,5 +1,7 @@
 using Gtk;
-using DF.IO;
+
+namespace DF {
+using IO;
 
 public class MissingFilesDialog : Dialog
 {
@@ -135,4 +137,5 @@ public class MissingFilesDialog : Dialog
         }
         return false;
     }
+}
 }

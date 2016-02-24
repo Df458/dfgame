@@ -1,0 +1,3 @@
+class LogViewer : Gtk.Box
+{
+}

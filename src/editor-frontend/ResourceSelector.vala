@@ -1,5 +1,5 @@
 using Gtk;
-using DF;
+namespace DF {
 
 // TODO: Update the way objects are selected to match the mockup
 public class ResourceSelector : Box
@@ -168,4 +168,5 @@ public class ResourceSelector : Box
 
         return filter.get_text_length() <= 0 || label.get_text().down().contains(filter.get_text().down());
     }
+}
 }
