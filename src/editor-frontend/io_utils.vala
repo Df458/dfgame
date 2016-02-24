@@ -1,5 +1,5 @@
-using DF.IO;
-
+namespace DF.IO
+{
 public File get_content_directory()
 {
     return File.new_for_path(DF.IO.get_path());
@@ -34,4 +34,5 @@ public bool file_is_content(File file)
 
     g_free(path);
     return false;
+}
 }

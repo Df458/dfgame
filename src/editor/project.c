@@ -20,6 +20,8 @@ bool create_project(const char* path)
     // Create subdirectories and set the resource path
     char* content_path = calloc(strlen(path) + 8 + 1, sizeof(char));
     strcpy(content_path, path);
+    char* log_path = strcat(content_path, "/logs");
+    mkdir(log_path, 0750);
     content_path = strcat(content_path, "/content");
     mkdir(content_path, 0750);
     set_resource_path(content_path);
@@ -31,6 +33,7 @@ bool create_project(const char* path)
 
     char* project_fname = calloc(strlen(project_name) + 5, sizeof(char));
     strcpy(project_fname, project_name);
+    // TODO: Make this configurable
     strcat(project_fname, ".hal");
 
     xmlTextWriterPtr writer = create_xml_resource("..", project_fname);
@@ -54,6 +57,7 @@ bool create_project(const char* path)
     xmlFreeTextWriter(writer);
 
     create_resource_definition_file();
+    // TODO: Set the log file?
 
     return true;
 }
@@ -69,6 +73,7 @@ bool load_project(const char* path)
     strcat(content_path, "content");
     set_resource_path(content_path);
     resources_init(load_anonymous_resource);
+    // TODO: Set the log file
     return true;
 }
 

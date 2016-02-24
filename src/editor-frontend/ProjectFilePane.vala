@@ -62,7 +62,7 @@ public class ProjectFilePane : Box
         add_actions();
         init_menus();
 
-        add_project_directory(get_content_directory(), null);
+        add_project_directory(IO.get_content_directory(), null);
         TreePath path = new TreePath.from_indices(0);
         sidebar_view.expand_to_path(path);
         sidebar_view.set_cursor(path, null, false);
@@ -346,7 +346,7 @@ public class ProjectFilePane : Box
         act_new_folder.activate.connect(() =>
         {
             try {
-                File new_folder = file_from_resource(get_selected_path(), "Untitled", true);
+                File new_folder = IO.file_from_resource(get_selected_path(), "Untitled", true);
                 new_folder.make_directory();
             } catch(Error e) {
                 Logger.log_warning("Can't make directory: %s", e.message);
@@ -508,10 +508,10 @@ public class ProjectFilePane : Box
                 }
                 ResourceEntry moved_entry = new ResourceEntry(src);
                 ResourceEntry new_entry = new ResourceEntry(dest);
-                if(!file_is_content(dest)) {
-                    DF.IO.delete_resource(moved_entry.path, moved_entry.name);
+                if(!IO.file_is_content(dest)) {
+                    IO.delete_resource(moved_entry.path, moved_entry.name);
                 } else {
-                    DF.IO.move_resource(moved_entry.path, moved_entry.name, new_entry.path, new_entry.name);
+                    IO.move_resource(moved_entry.path, moved_entry.name, new_entry.path, new_entry.name);
                 }
                 file_data.remove(ref file_iter);
                 break;
@@ -586,7 +586,7 @@ public class ProjectFilePane : Box
 
         string parent_uri;
         if(parent_iter == null)
-            parent_uri = get_content_directory().get_uri();
+            parent_uri = IO.get_content_directory().get_uri();
         else
             file_data.get(parent_iter, ProjectTreeColumn.URI, out parent_uri);
         file_data.set(temp_iter, ProjectTreeColumn.FILENAME, info.get_name(), ProjectTreeColumn.URI, parent_uri + "/" + info.get_name(), ProjectTreeColumn.SIDEBAR_FILTER, false, ProjectTreeColumn.ICON_NAME, name);

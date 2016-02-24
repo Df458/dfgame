@@ -5,15 +5,27 @@
 #define __SRC_DFGAME_EDITOR_FRONT_H__
 
 #include <glib.h>
-#include <glib-object.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <string.h>
+#include <util.h>
+#include <glib-object.h>
 #include <gee.h>
 #include <gio/gio.h>
 
 G_BEGIN_DECLS
 
+
+#define DF_TYPE_LOG_PANE (df_log_pane_get_type ())
+#define DF_LOG_PANE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), DF_TYPE_LOG_PANE, DFLogPane))
+#define DF_LOG_PANE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), DF_TYPE_LOG_PANE, DFLogPaneClass))
+#define DF_IS_LOG_PANE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), DF_TYPE_LOG_PANE))
+#define DF_IS_LOG_PANE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), DF_TYPE_LOG_PANE))
+#define DF_LOG_PANE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), DF_TYPE_LOG_PANE, DFLogPaneClass))
+
+typedef struct _DFLogPane DFLogPane;
+typedef struct _DFLogPaneClass DFLogPaneClass;
+typedef struct _DFLogPanePrivate DFLogPanePrivate;
 
 #define TYPE_NEW_PROJECT_DIALOG (new_project_dialog_get_type ())
 #define NEW_PROJECT_DIALOG(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_NEW_PROJECT_DIALOG, NewProjectDialog))
@@ -83,6 +95,15 @@ typedef struct _ResourceModelClass ResourceModelClass;
 typedef struct _ResourceModelPrivate ResourceModelPrivate;
 typedef struct _ResourceEntryPrivate ResourceEntryPrivate;
 
+struct _DFLogPane {
+	GtkBox parent_instance;
+	DFLogPanePrivate * priv;
+};
+
+struct _DFLogPaneClass {
+	GtkBoxClass parent_class;
+};
+
 struct _NewProjectDialog {
 	GTypeInstance parent_instance;
 	volatile int ref_count;
@@ -151,6 +172,13 @@ struct _ResourceEntryClass {
 };
 
 
+GType df_log_pane_get_type (void) G_GNUC_CONST;
+extern DFLogPane* df_active_pane;
+void df_log_to_pane (const gchar* file, guint line, log_level level, const gchar* message);
+DFLogPane* df_log_pane_new (void);
+DFLogPane* df_log_pane_construct (GType object_type);
+void df_log_pane_write_log_to_file (DFLogPane* self, const gchar* file, guint line, log_level level, const gchar* message);
+void df_log_pane_set_active (DFLogPane* self);
 gpointer new_project_dialog_ref (gpointer instance);
 void new_project_dialog_unref (gpointer instance);
 GParamSpec* param_spec_new_project_dialog (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
@@ -180,9 +208,9 @@ ResourceEntry* resource_selector_get_selected (ResourceSelector* self);
 GeeArrayList* resource_selector_get_selected_full (ResourceSelector* self);
 void resource_selector_add_extension (ResourceSelector* self, const gchar* ext);
 void resource_selector_generate_list (ResourceSelector* self);
-GFile* get_content_directory (void);
-GFile* file_from_resource (const gchar* ext, const gchar* name, gboolean new_file);
-gboolean file_is_content (GFile* file);
+GFile* df_io_get_content_directory (void);
+GFile* df_io_file_from_resource (const gchar* ext, const gchar* name, gboolean new_file);
+gboolean df_io_file_is_content (GFile* file);
 GType resource_model_get_type (void) G_GNUC_CONST;
 ResourceModel* resource_model_new (void);
 ResourceModel* resource_model_construct (GType object_type);

@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include <stdio.h>
 
 typedef enum
 {
@@ -24,6 +25,7 @@ void _log(const char* file, unsigned line, log_level level, char* const message,
 #define stub(ret) warn("%s stub!", __FUNCTION__); return ret
 
 void register_log_handler(log_handler handler);
+void register_log_file(FILE* file);
 
 unsigned char* loadFileContents(const char* const filepath);
 
