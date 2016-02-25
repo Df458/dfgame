@@ -56,4 +56,6 @@ sprite* load_resource_to_sprite(resource_pair);
  */
 bool save_sprite_to_resource(sprite* fnt, resource_pair);
 
+int8_t index_by_handle(sprite* spr, const char* handle);
+
 #endif
