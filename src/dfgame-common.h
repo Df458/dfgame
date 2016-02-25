@@ -7,5 +7,6 @@
 #include "common/asset_registry.h"
 #include "common/audio.h"
 #include "common/texture.h"
+#include "common/sprite.h"
 
 #endif
