@@ -120,7 +120,7 @@ all: $(COMMONTARGET) $(GAMEBACKTARGET) $(GAMEFRONTTARGET) $(EDITORBACKTARGET) $(
 
 $(COMMONTARGET): $(COMMONOBJ)
 	ar -rs $(LIBPATH)libdfgame-common.a $(COMMONOBJ)
-$(GAMEBACKTARGET): $(COMMONTARGET) $(GAMEBACKSRC)
+$(GAMEBACKTARGET): $(COMMONTARGET) $(GAMEBACKOBJ)
 	ar -rs $(LIBPATH)libdfgame-game.a $(GAMEBACKOBJ)
 $(GAMEFRONTTARGET): $(COMMONTARGET) $(GAMEBACKTARGET) $(GAMEFRONTOBJ)
 	ar -rs $(LIBPATH)libdfgame-game-front.a $(GAMEFRONTOBJ)
@@ -161,8 +161,7 @@ install:
 	mkdir -p /usr/include/dfgame/editor
 	cp -t /usr/include/dfgame/editor src/editor/*.h
 	mkdir -p /usr/include/dfgame/game
-	# TODO: Uncomment when necessary
-	#cp -t /usr/include/dfgame/game src/game/*.h
+	cp -t /usr/include/dfgame/game src/game/*.h
 	mkdir -p /usr/include/dfgame/game-frontend
 	cp -t /usr/include/dfgame/game-frontend src/game-frontend/*.h
 	cp -t /usr/share/vala/vapi/ vapi/*.vapi
