@@ -3,4 +3,6 @@
 
 #include "dfgame-common.h"
 
+#include "game/input.h"
+
 #endif
