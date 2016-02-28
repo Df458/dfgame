@@ -12,7 +12,8 @@ typedef struct texture
     GLuint    handle;
     uint16_t  width;
     uint16_t  height;
-} texture;
+}
+texture;
 
 /*!
  * Creates an empty texture.

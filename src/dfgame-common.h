@@ -8,5 +8,7 @@
 #include "common/audio.h"
 #include "common/texture.h"
 #include "common/sprite.h"
+#include "common/matrix.h"
+#include "common/render.h"
 
 #endif
