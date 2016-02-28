@@ -255,13 +255,11 @@ spriteset* load_resource_to_spriteset(resource_pair)
     glBindTexture(GL_TEXTURE_2D, spr->atlas->handle);
     checkGLError();
     
-    info("dims: %d, %d", f_width, f_height);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, f_width, f_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     checkGLError();
     for(int i = 0; i < spr->animation_count; ++i) {
         glTexSubImage2D(GL_TEXTURE_2D, 0, spr->animations[i].box.pos_x, spr->animations[i].box.pos_y, spr->animations[i].box.size_x, spr->animations[i].box.size_y, GL_RGBA, GL_UNSIGNED_BYTE, buffers[i]);
         checkGLError();
-        info("dims: %f, %f, %f, %f", spr->animations[i].box.pos_x, spr->animations[i].box.pos_y, spr->animations[i].box.size_x, spr->animations[i].box.size_y);
         spr->animations[i].box = spr->animations[i].box;
         spr->animations[i].box.pos_x    /= (float)f_width;
         spr->animations[i].box.pos_y    /= (float)f_height;
@@ -269,7 +267,6 @@ spriteset* load_resource_to_spriteset(resource_pair)
         spr->animations[i].box.size_y   /= (float)f_height;
         spr->animations[i].dimensions_x = spr->animations[i].box.size_x / spr->animations[i].length;
         spr->animations[i].dimensions_y = spr->animations[i].box.size_y;
-        info("dims: %f, %f, %f, %f", spr->animations[i].box.pos_x, spr->animations[i].box.pos_y, spr->animations[i].box.size_x, spr->animations[i].box.size_y);
     }
 
     free(available);
@@ -306,13 +303,14 @@ sprite* create_sprite(spriteset* set)
     spr->source = set;
     spr->handle = 0;
 
-    if(set->animation_count)
-        spr->handle = &set->animations[0];
-    else
-        warn("Creating a sprite for a set with no animations");
-
     spr->position = 0;
     spr->playing = false;
+
+    if(set->animation_count) {
+        spr->handle = &set->animations[0];
+        sprite_set_playing(spr, spr->handle->autoplay);
+    } else
+        warn("Creating a sprite for a set with no animations");
 
     return spr;
 }
@@ -353,7 +351,8 @@ bool sprite_update(sprite* spr, float delta)
     if(!spr->playing)
         return false;
 
-    spr->position += delta;
+    // TODO: Don't hardcode the framerate
+    spr->position += delta * 60;
     if(spr->position >= spr->handle->length) {
         if(spr->handle->autoloop) {
             while(spr->position >= spr->handle->length) {

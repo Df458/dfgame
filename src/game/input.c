@@ -1,84 +1,155 @@
 #include "input.h"
+#include "util.h"
+#include <math.h>
 
-bool up_state = false;
-bool down_state = false;
-bool left_state = false;
-bool right_state = false;
-bool action_state = false;
-bool confirm_state = false;
-bool cancel_state = false;
-bool menu_state = false;
-bool quit_state = false;
-
-bool y_input_prio = false;
-
-uint8_t get_directional_input()
+// Private structs
+struct axisState
 {
-    int8_t x = 0;
-    int8_t y = 0;
+    float x;
+    float y;
+};
 
-    if(left_state > 0)
-        --x;
-    if(right_state > 0)
-        ++x;
-    if(up_state > 0)
-        --y;
-    if(down_state > 0)
-        ++y;
+// Private data
+// TODO: Move to structs
+static uint16_t input_down_counts[MAX_INPUTS] = { 0 };
+static uint8_t input_states[MAX_INPUTS] = { 0 };
 
-    if (x && y) {
-        if(y_input_prio)
-            x = 0;
+// Set directly
+static float axis_x_analog_value[MAX_INPUTS] = { 0 };
+static float axis_y_analog_value[MAX_INPUTS] = { 0 };
+
+static int16_t axis_x_digital_counts[MAX_INPUTS] = { 0 };
+static int16_t axis_y_digital_counts[MAX_INPUTS] = { 0 };
+
+// Counts with interpolation
+static int16_t axis_x_emulated_counts[MAX_INPUTS] = { 0 };
+static int16_t axis_y_emulated_counts[MAX_INPUTS] = { 0 };
+static float axis_x_emulated_value[MAX_INPUTS] = { 0 };
+static float axis_y_emulated_value[MAX_INPUTS] = { 0 };
+
+static struct axisState axis_states[MAX_INPUTS] = { 0 };
+
+// FIXME: This might eat inputs
+// TODO: Support axes
+void update_input_states(float delta)
+{
+    for(int i = 0; i < MAX_INPUTS; ++i) {
+        if(input_states[i] == 2)
+            input_states[i] = 1;
+        switch(input_states[i]) {
+            case 2:
+                input_states[i] = 1;
+                break;
+            case 3:
+                input_states[i] = 0;
+                break;
+        }
+
+        float clamped_x_value = 0;
+        if(axis_x_emulated_counts[i] > 0)
+            clamped_x_value = 1;
+        else if(axis_x_emulated_counts[i] < 0)
+            clamped_x_value = -1;
+
+        float clamped_y_value = 0;
+        if(axis_y_emulated_counts[i] > 0)
+            clamped_y_value = 1;
+        else if(axis_y_emulated_counts[i] < 0)
+            clamped_y_value = -1;
+
+        if(axis_x_emulated_value[i] < clamped_x_value)
+            axis_x_emulated_value[i] += delta * 5;
+        else if(axis_x_emulated_value[i] > clamped_x_value)
+            axis_x_emulated_value[i] -= delta * 5;
+        if(fabsf(axis_x_emulated_value[i] - clamped_x_value) < 0.1f)
+            axis_x_emulated_value[i] = clamped_x_value;
+
+        if(axis_y_emulated_value[i] < clamped_y_value)
+            axis_y_emulated_value[i] += delta * 5;
+        else if(axis_y_emulated_value[i] > clamped_y_value)
+            axis_y_emulated_value[i] -= delta * 5;
+        if(fabsf(axis_y_emulated_value[i] - clamped_y_value) < 0.1f)
+            axis_y_emulated_value[i] = clamped_y_value;
+
+        float axis_x_digital_value = axis_x_digital_counts[i];
+        if(axis_x_digital_value > 1)
+            axis_x_digital_value = 1;
+        else if(axis_x_digital_value < -1)
+            axis_x_digital_value = -1;
+        float axis_y_digital_value = axis_y_digital_counts[i];
+        if(axis_y_digital_value > 1)
+            axis_y_digital_value = 1;
+        else if(axis_y_digital_value < -1)
+            axis_y_digital_value = -1;
+
+        axis_states[i].x = axis_x_analog_value[i] + axis_x_emulated_value[i] + axis_x_digital_value;
+        if(axis_states[i].x < -1)
+            axis_states[i].x = -1;
+        else if(axis_states[i].x > 1)
+            axis_states[i].x = 1;
+        axis_states[i].y = axis_y_analog_value[i] + axis_y_emulated_value[i] + axis_y_digital_value;
+        if(axis_states[i].y < -1)
+            axis_states[i].y = -1;
+        else if(axis_states[i].y > 1)
+            axis_states[i].y = 1;
+    }
+}
+
+uint8_t get_input_state(uint8_t id)
+{
+    return input_states[id];
+}
+
+void set_input_state(uint8_t id, bool down)
+{
+    if(down) {
+        if(input_down_counts[id] == 0)
+            input_states[id] = 2;
+        input_down_counts[id]++;
+    } else {
+        input_down_counts[id]--;
+        if(input_down_counts[id] <= 0) {
+            input_down_counts[id] = 0;
+            input_states[id] = 3;
+        }
+    }
+}
+
+// FIXME: Emulation could potentially desync depending on when it's added
+void set_axis(uint8_t id, bool isx, float value, bool analog, bool emulated)
+{
+    if(analog) {
+        if(isx)
+            axis_x_analog_value[id] = value;
         else
-            y = 0;
+            axis_y_analog_value[id] = value;
+    } else {
+        if(!emulated) {
+            if(isx)
+                axis_x_digital_counts[id] += value;
+            else
+                axis_y_digital_counts[id] += value;
+        } else {
+            if(isx)
+                axis_x_emulated_counts[id] += value > 0 ? 1 : -1;
+            else
+                axis_y_emulated_counts[id] += value > 0 ? 1 : -1;
+        }
     }
-    if(x) {
-        return x > 0 ? 2 : 1;
-    } else if(y) {
-        return y > 0 ? 4 : 3;
-    }
-
-    return 0;
 }
 
-bool get_action_input()
+void get_axis(uint8_t id, float* x, float* y)
 {
-    return action_state;
+    *x = axis_states[id].x;
+    *y = axis_states[id].y;
 }
 
-bool get_confirm_input()
+float get_axis_x(uint8_t id)
 {
-    return confirm_state;
+    return axis_states[id].x;
 }
 
-bool get_cancel_input()
+float get_axis_y(uint8_t id)
 {
-    return cancel_state;
+    return axis_states[id].y;
 }
-
-bool get_menu_input()
-{
-    return menu_state;
-}
-
-bool get_quit_input()
-{
-    return quit_state;
-}
-
-void update_input_states()
-{
-    action_state = 0;
-    confirm_state = 0;
-    cancel_state = 0;
-}
-
-void set_up_state(bool state) { up_state = state; y_input_prio = true; }
-void set_down_state(bool state) { down_state = state; y_input_prio = true; }
-void set_left_state(bool state) { left_state = state; y_input_prio = false; }
-void set_right_state(bool state) { right_state = state; y_input_prio = false; }
-void set_action_state(bool state) { action_state = state; }
-void set_confirm_state(bool state) { confirm_state = state; }
-void set_cancel_state(bool state) { cancel_state = state; }
-void set_menu_state(bool state) { menu_state = state; }
-void set_quit_state(bool state) { quit_state = state; }

@@ -3,25 +3,15 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-// TODO: Update this to be more generic
+#define MAX_INPUTS 256
 
-uint8_t get_directional_input();
-bool get_action_input();
-bool get_confirm_input();
-bool get_cancel_input();
-bool get_menu_input();
-bool get_quit_input();
+void update_input_states(float delta);
 
-void update_input_states();
-
-void set_up_state(bool state);
-void set_down_state(bool state);
-void set_left_state(bool state);
-void set_right_state(bool state);
-void set_action_state(bool state);
-void set_confirm_state(bool state);
-void set_cancel_state(bool state);
-void set_menu_state(bool state);
-void set_quit_state(bool state);
+uint8_t get_input_state(uint8_t id);
+void set_input_state(uint8_t id, bool down);
+void set_axis(uint8_t id, bool isx, float value, bool analog, bool emulated);
+void get_axis(uint8_t id, float* x, float* y);
+float get_axis_x(uint8_t id);
+float get_axis_y(uint8_t id);
 
 #endif

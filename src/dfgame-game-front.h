@@ -6,5 +6,6 @@
 
 #include "game-frontend/loop.h"
 #include "game-frontend/window.h"
+#include "game-frontend/input-source.h"
 
 #endif
