@@ -140,8 +140,10 @@ void set_axis(uint8_t id, bool isx, float value, bool analog, bool emulated)
 
 void get_axis(uint8_t id, float* x, float* y)
 {
-    *x = axis_states[id].x;
-    *y = axis_states[id].y;
+    if(x)
+        *x = axis_states[id].x;
+    if(y)
+        *y = axis_states[id].y;
 }
 
 float get_axis_x(uint8_t id)

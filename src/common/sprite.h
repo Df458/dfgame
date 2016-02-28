@@ -28,9 +28,12 @@ sprite* load_resource_to_sprite(resource_pair);
 
 
 bool sprite_set_animation(sprite* spr, int16_t index);
+bool sprite_set_animation_handle(sprite* spr, const char* handle);
 void sprite_set_playing(sprite* spr, bool play);
 bool sprite_update(sprite* spr, float delta);
 bool sprite_draw(mat4 camera, mat4 transform, sprite* spr, bool use_dims);
+const char* sprite_get_current_handle(sprite* spr);
+int16_t sprite_get_current_index(sprite* spr);
 
 
 int16_t index_by_handle(spriteset* spr, const char* handle);

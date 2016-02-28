@@ -297,8 +297,6 @@ bool save_spriteset_to_resource(spriteset* spr, resource_pair)
 
 sprite* create_sprite(spriteset* set)
 {
-    nulltest(set);
-
     sprite* spr = malloc(sizeof(sprite));
     spr->source = set;
     spr->handle = 0;
@@ -306,11 +304,12 @@ sprite* create_sprite(spriteset* set)
     spr->position = 0;
     spr->playing = false;
 
-    if(set->animation_count) {
-        spr->handle = &set->animations[0];
-        sprite_set_playing(spr, spr->handle->autoplay);
-    } else
-        warn("Creating a sprite for a set with no animations");
+    if(set) {
+        if(set->animation_count) {
+            sprite_set_animation(spr, 0);
+        } else
+            warn("Creating a sprite for a set with no animations");
+    }
 
     return spr;
 }
@@ -333,7 +332,22 @@ sprite* load_resource_to_sprite(resource_pair)
 
 bool sprite_set_animation(sprite* spr, int16_t index)
 {
-    stub(false);
+    nulltest(spr->source);
+    if(index >= spr->source->animation_count) {
+        error("Can't set animation: Index %d is out of bounds! (%d animations available)", index, spr->source->animation_count);
+        return false;
+    }
+    spr->position = 0;
+
+    spr->handle = &spr->source->animations[index];
+    sprite_set_playing(spr, spr->handle->autoplay);
+
+    return true;
+}
+
+bool sprite_set_animation_handle(sprite* spr, const char* handle)
+{
+    return sprite_set_animation(spr, index_by_handle(spr->source, handle));
 }
 
 void sprite_set_playing(sprite* spr, bool play)
@@ -358,6 +372,7 @@ bool sprite_update(sprite* spr, float delta)
             while(spr->position >= spr->handle->length) {
                 spr->position -= spr->handle->length;
             }
+            return true;
         } else {
             spr->position = spr->handle->length - 1;
             sprite_set_playing(spr, false);
@@ -374,6 +389,20 @@ bool sprite_draw(mat4 camera, mat4 transform, sprite* spr, bool use_dims)
     return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, spr->handle->box.pos_x + (spr->handle->box.size_x * (int)spr->position), spr->handle->box.pos_y, spr->handle->box.size_x, spr->handle->box.size_y);
     /*return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, 0, 0, 1, 1);*/
     /*return render_quad(camera, transform, spr->source->atlas, use_dims);*/
+}
+
+const char* sprite_get_current_handle(sprite* spr)
+{
+    return spr->handle->handle;
+}
+
+int16_t sprite_get_current_index(sprite* spr)
+{
+    for(int i = 0; i < spr->source->animation_count; ++i) {
+        if(&spr->source->animations[i] == spr->handle)
+            return i;
+    }
+    return -1;
 }
 
 
