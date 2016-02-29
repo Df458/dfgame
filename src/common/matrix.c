@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string.h>
 
-mat4 ident_data= ident;
+mat4 ident_data = ident;
 
 mat4 ortho(float left, float right, float bottom, float top, float near, float far)
 {
