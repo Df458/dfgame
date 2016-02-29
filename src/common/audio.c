@@ -126,15 +126,22 @@ bool prepare_wav(audio* a, const char* path)
     return true;
 }
 
-int8_t stream_ogg_to_buffer(audio* a, ALuint buf)
+int8_t stream_ogg_to_buffer(audio* a, ALuint buf, uint64_t *position)
 {
     char data[STREAM_BUFFER_SIZE];
     int  size = 0;
     int  section;
     int  result;
+
+    if(*position != a->content.ogg.file.pcm_offset) {
+        int ret = ov_pcm_seek(&a->content.ogg.file, *position);
+        if(ret) {
+            error("Failed to move ogg stream to the correct location");
+            return AUDIO_STREAM_FAILURE;
+        }
+    }
  
-    while(size < STREAM_BUFFER_SIZE)
-    {
+    while(size < STREAM_BUFFER_SIZE) {
         result = ov_read(&a->content.ogg.file, data + size, STREAM_BUFFER_SIZE - size, 0, 2, 1, &section);
     
         if(result > 0)
@@ -146,16 +153,20 @@ int8_t stream_ogg_to_buffer(audio* a, ALuint buf)
             } else
                 break;
     }
+
     
     if(size == 0)
         return AUDIO_STREAM_FINISHED;
  
     alBufferData(buf, a->channels, data, size, a->content.ogg.info->rate);
+    checkALError();
+
+    *position = a->content.ogg.file.pcm_offset;
  
     return AUDIO_STREAM_SUCCESS;
 }
 
-int8_t stream_wav_to_buffer(audio* a, ALuint buf)
+int8_t stream_wav_to_buffer(audio* a, ALuint buf, uint64_t *position)
 {
     char data[STREAM_BUFFER_SIZE];
     int  size = 0;
@@ -190,6 +201,40 @@ int8_t stream_wav_to_buffer(audio* a, ALuint buf)
 // Public Functions
 ///////////////////////////////////////////////////////////////////////////////
 
+bool _checkALError(const char* file, unsigned line)
+{
+    ALuint err;
+    bool error_found = false;
+    err = alGetError();
+    if (err != AL_NO_ERROR) {
+        error_found = true;
+        const char* message;
+        switch(err) {
+            case AL_INVALID_NAME:
+                message = "Invalid Name";
+            break;
+            case AL_INVALID_ENUM:
+                message = "Invalid Enum";
+            break;
+            case AL_INVALID_VALUE:
+                message = "Invalid Value";
+            break;
+            case AL_INVALID_OPERATION:
+                message = "Invalid Operation";
+            break;
+            case AL_OUT_OF_MEMORY:
+                message = "Out of Memory";
+            break;
+            default:
+                _log(file, line, LOG_WARNING, "OpenAL: Received error code 0x%0X. Consider adding a custom message to handle it", err);
+                message = "Unknown Error";
+        }
+
+        _log(file, line, LOG_ERROR, "OpenAL: %s", message);
+    }
+    return error_found;
+}
+
 // TODO: Add OpenAL error checking to init/cleanup functions
 bool init_audio()
 {
@@ -208,9 +253,11 @@ bool init_audio()
         return false;
     }
     alcMakeContextCurrent(context);
+    checkALError();
     alListener3f(AL_POSITION, 0, 0, 0);
     alListener3f(AL_VELOCITY, 0, 0, 0);
-    alListener3f(AL_ORIENTATION, 0, 0, -1);
+    /*alListener3f(AL_ORIENTATION, 0, 0, -1);*/
+    checkALError();
 
     return true;
 }
@@ -267,15 +314,15 @@ audio* load_resource_to_audio(resource_pair)
 
 // FIXME: Right now, only one player can exist per audio struct, or you get
 // issues. This needs to be fixed
-int8_t stream_audio_to_buffer(audio* a, ALuint buf)
+int8_t stream_audio_to_buffer(audio* a, ALuint buf, uint64_t* position)
 {
     nulltest(a);
 
     switch(a->fmt) {
         case AFMT_OGG:
-            return stream_ogg_to_buffer(a, buf);
+            return stream_ogg_to_buffer(a, buf, position);
         case AFMT_WAV:
-            return stream_wav_to_buffer(a, buf);
+            return stream_wav_to_buffer(a, buf, position);
         case AFMT_INVALID:
             error("Cannot stream audio: Invalid format");
             return AUDIO_STREAM_FAILURE;
@@ -293,11 +340,14 @@ player* create_player(audio* source)
     p->volume  = 1.0f;
 
     p->data = malloc(sizeof(struct player_data));
+    p->data->position = 0;
     p->data->playing = false;
     p->data->stopped = true;
     p->data->simple = false;
 	alGenBuffers(2, p->data->buffers);
+    checkALError();
 	alGenSources(1, &p->data->source);
+    checkALError();
 
     return p;
 }
@@ -331,7 +381,7 @@ void player_set_playing(player* p, bool play)
     }
 
     if(p->data->stopped == true) {
-        if(stream_audio_to_buffer(p->source, p->data->buffers[0]) == AUDIO_STREAM_FAILURE || stream_audio_to_buffer(p->source, p->data->buffers[1]) == AUDIO_STREAM_FAILURE) {
+        if(stream_audio_to_buffer(p->source, p->data->buffers[0], &p->data->position) == AUDIO_STREAM_FAILURE || stream_audio_to_buffer(p->source, p->data->buffers[1], &p->data->position) == AUDIO_STREAM_FAILURE) {
             error("Can't play: failed to load buffer");
             return;
         }
@@ -341,33 +391,9 @@ void player_set_playing(player* p, bool play)
     p->data->playing = play;
     if(play) {
         alSourceQueueBuffers(p->data->source, 2, p->data->buffers);
-        alGetError();
-        info("Playing");
+        checkALError();
         alSourcePlay(p->data->source);
-
-        ALuint err = alGetError();
-        if (err != AL_NO_ERROR) {
-            warn("Error playing audio: %d", err);
-            switch(err) {
-                case AL_INVALID_NAME:
-                    warn("Invalid name");
-                    break;
-                case AL_INVALID_ENUM:
-                    warn("Invalid enum");
-                    break;
-                case AL_INVALID_VALUE:
-                    warn("Invalid value");
-                    break;
-                case AL_INVALID_OPERATION:
-                    warn("Invalid operation");
-                    break;
-                case AL_OUT_OF_MEMORY:
-                    warn("Out of memory");
-                    break;
-                default:
-                    warn("Unknown error code: %d", err);
-            }
-        }
+        checkALError();
     } else {
         alSourcePause(p->data->source);
     }
@@ -377,49 +403,65 @@ void player_stop(player* p)
 {
     p->data->playing = false;
     p->data->stopped = true;
+    p->data->position = 0;
     alSourceStop(p->data->source);
 }
 
 bool player_update(player* p)
 {
-    info("Starting update");
     if(!p->data->playing)
         return false;
-    info("Check play");
     ALenum state;
     alGetSourcei(p->data->source, AL_SOURCE_STATE, &state);
-    if(state != AL_PLAYING)
-        return false;
+    checkALError();
+    if(state != AL_PLAYING) {
+        alSourcePlay(p->data->source);
+        /*if(state == AL_PAUSED)*/
+            /*info("Paused.");*/
+        /*else if(state == AL_STOPPED)*/
+            /*info("Stopped.");*/
+        /*return false;*/
+    }
     int processed;
  
     alGetSourcei(p->data->source, AL_BUFFERS_PROCESSED, &processed);
  
-    info("Processing");
     while(processed--)
     {
         ALuint buffer;
         ALuint queued;
         
         alSourceUnqueueBuffers(p->data->source, 1, &buffer);
+        checkALError();
  
-        int8_t res = stream_audio_to_buffer(p->source, buffer);
+        int8_t res = stream_audio_to_buffer(p->source, buffer, &p->data->position);
  
         switch(res) {
             case AUDIO_STREAM_SUCCESS:
                 alSourceQueueBuffers(p->data->source, 1, &buffer);
-                info("Success");
                 break;
             case AUDIO_STREAM_FAILURE:
-                info("Failure");
                 player_stop(p);
                 return false;
             case AUDIO_STREAM_FINISHED:
-                info("Done");
-                // TODO: If loop is true, this should reset
-                // Also, this should wait until all sources are finished
                 alGetSourcei(p->data->source, AL_BUFFERS_QUEUED, &queued);
-                if(queued == 0)
+                checkALError();
+                if(p->loop) {
+                    p->data->position = 0;
+                    if(stream_audio_to_buffer(p->source, buffer, &p->data->position) == AUDIO_STREAM_SUCCESS)
+                        alSourceQueueBuffers(p->data->source, 1, &buffer);
+                    /*if(queued == 0) {*/
+                        /*if(stream_audio_to_buffer(p->source, p->data->buffers[0], &p->data->position) == AUDIO_STREAM_FAILURE || stream_audio_to_buffer(p->source, p->data->buffers[1], &p->data->position) == AUDIO_STREAM_FAILURE) {*/
+                            /*error("Can't loop: failed to reload buffer");*/
+                            /*player_stop(p);*/
+                            /*break;*/
+                        /*}*/
+                        /*alSourceQueueBuffers(p->data->source, 2, p->data->buffers);*/
+                        /*checkALError();*/
+                    /*}*/
+                } else if(queued == 0) {
                     player_stop(p);
+                }
                 break;
         }
     }
