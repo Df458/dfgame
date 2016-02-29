@@ -1,12 +1,13 @@
 #ifndef DF_RENDER_H
 #define DF_RENDER_H
-#include "render_def.h"
 #include "matrix.h"
 #include "texture.h"
 
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <stdbool.h>
+
+bool _checkGLError(const char* file, unsigned line);
 
 #define checkGLError() _checkGLError(__FILE__, __LINE__)
 

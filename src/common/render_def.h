@@ -2,8 +2,6 @@
 #define DF_RENDER_DEF_H
 #include <stdbool.h>
 
-bool _checkGLError(const char* file, unsigned line);
-
 // Buffers
 static const float QUAD_BUFFER_DATA[] =
 {
