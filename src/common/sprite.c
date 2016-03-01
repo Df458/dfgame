@@ -309,6 +309,8 @@ sprite* create_sprite(spriteset* set)
             sprite_set_animation(spr, 0);
         } else
             warn("Creating a sprite for a set with no animations");
+    } else {
+        warn("Creating a sprite with no set");
     }
 
     return spr;
@@ -386,9 +388,9 @@ bool sprite_update(sprite* spr, float delta)
 
 bool sprite_draw(mat4 camera, mat4 transform, sprite* spr, bool use_dims)
 {
+    nulltest(spr);
+    nulltest(spr->handle);
     return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, spr->handle->box.pos_x + (spr->handle->box.size_x * (int)spr->position), spr->handle->box.pos_y, spr->handle->box.size_x, spr->handle->box.size_y);
-    /*return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, 0, 0, 1, 1);*/
-    /*return render_quad(camera, transform, spr->source->atlas, use_dims);*/
 }
 
 const char* sprite_get_current_handle(sprite* spr)

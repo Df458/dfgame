@@ -70,3 +70,20 @@ mat4 transform_get_matrix(transform2D* trans)
 {
     return trans->matrix;
 }
+
+void transform_get_position(transform2D* trans, float* x, float* y)
+{
+    *x = trans->x;
+    *y = trans->y;
+}
+
+void transform_get_angle(transform2D* trans, float* angle)
+{
+    *angle = trans->angle;
+}
+
+void transform_get_scale(transform2D* trans, float* x, float* y)
+{
+    *x = trans->scale_x;
+    *y = trans->scale_y;
+}
