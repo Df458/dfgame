@@ -318,7 +318,7 @@ sprite* create_sprite(spriteset* set)
 
 void destroy_sprite(sprite* spr)
 {
-    stub();
+    free(spr);
 }
 
 bool save_sprite_to_resource(sprite* spr, resource_pair)
