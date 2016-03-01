@@ -4,58 +4,38 @@
 #include <inttypes.h>
 
 #include "resource_def.h"
-#include "texture.h"
+#include "matrix.h"
 
-typedef struct animation
-{
-    uint8_t orients; // 0 for no(1 orient), 1 for 4(grid orient), 2 for(full orient)
-    uint16_t dimensions_x;
-    uint16_t dimensions_y;
-    int16_t origin_x;
-    int16_t origin_y;
-    int8_t length;
-    uint8_t delay;
-    bool loop;
-    bool play;
-    float offset_x; // offset is for the position in the texture atlas
-    float offset_y;
-    float size_x; // size is for the size in the texture atlas
-    float size_y;
-    char* handle;
-} animation;
-
-typedef struct sprite
-{
-    texture* atlas;
-    animation* animations;
-    uint8_t animation_count;
-}
-sprite;
+typedef struct animation animation;
+typedef struct spriteset spriteset;
+typedef struct sprite sprite;
 
 
-/*!
- * Creates an empty sprite
- */
-sprite* create_sprite();
+animation* create_animation();
+void destroy_animation(animation* anim);
+bool save_animation_to_resource(animation* anim, resource_pair);
+animation* load_resource_to_animation(resource_pair);
 
-/*!
- * Frees a sprite and its resources
- */
-void destroy_sprite(sprite* fnt);
+spriteset* create_spriteset();
+void destroy_spriteset(spriteset* spr);
+bool save_spriteset_to_resource(spriteset* spr, resource_pair);
+spriteset* load_resource_to_spriteset(resource_pair);
 
-/*!
- * This loads a sprite file, and constructs a texture atlas from the
- * necessary spritesheets.
- * See get_extended_resource_path(io_util.h) for usage details
- */
+sprite* create_sprite(spriteset* set);
+void destroy_sprite(sprite* spr);
+bool save_sprite_to_resource(sprite* spr, resource_pair);
 sprite* load_resource_to_sprite(resource_pair);
 
-/*!
- * This saves a sprite.
- * See get_extended_resource_path(io_util.h) for usage details
- */
-bool save_sprite_to_resource(sprite* fnt, resource_pair);
 
-int8_t index_by_handle(sprite* spr, const char* handle);
+bool sprite_set_animation(sprite* spr, int16_t index);
+bool sprite_set_animation_handle(sprite* spr, const char* handle);
+void sprite_set_playing(sprite* spr, bool play);
+bool sprite_update(sprite* spr, float delta);
+bool sprite_draw(mat4 camera, mat4 transform, sprite* spr, bool use_dims);
+const char* sprite_get_current_handle(sprite* spr);
+int16_t sprite_get_current_index(sprite* spr);
+
+
+int16_t index_by_handle(spriteset* spr, const char* handle);
 
 #endif

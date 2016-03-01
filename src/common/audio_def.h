@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <vorbis/vorbisfile.h>
 
+bool _checkALError(const char* file, unsigned line);
+
 enum audio_format
 {
     AFMT_INVALID,
@@ -40,6 +42,8 @@ struct player_data
 {
     ALuint source;
     ALuint buffers[2];
+
+    uint64_t position;
 
     bool playing;
     bool stopped;

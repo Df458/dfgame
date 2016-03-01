@@ -6,7 +6,10 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#define STREAM_BUFFER_SIZE 4096
+#define STREAM_BUFFER_SIZE 8192
+
+#define checkALError() _checkALError(__FILE__, __LINE__)
+// TODO: WARN ABOUT NOT INITIALIZING AUDIO WHEN USING AUDIO FUNCTIONS
 
 typedef struct audio audio;
 
@@ -24,7 +27,7 @@ audio* create_audio();
 void   destroy_audio(audio* a);
 bool   save_audio_to_resource(audio* a, resource_pair);
 audio* load_resource_to_audio(resource_pair);
-int8_t stream_audio_to_buffer(audio* a, ALuint buf);
+int8_t stream_audio_to_buffer(audio* a, ALuint buf, uint64_t* position);
 
 // TODO: Player audio should be private in case of simple players
 // TODO: Need to add a function to make a player less simple

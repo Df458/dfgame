@@ -5,8 +5,14 @@
 #include "common/io_util.h"
 #include "common/xml_util.h"
 #include "common/asset_registry.h"
+
 #include "common/audio.h"
 #include "common/texture.h"
 #include "common/sprite.h"
+
+#include "common/matrix.h"
+#include "common/transform.h"
+
+#include "common/render.h"
 
 #endif
