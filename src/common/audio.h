@@ -6,7 +6,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#define STREAM_BUFFER_SIZE 8192
+#define STREAM_BUFFER_SIZE 16384
 
 #define checkALError() _checkALError(__FILE__, __LINE__)
 // TODO: WARN ABOUT NOT INITIALIZING AUDIO WHEN USING AUDIO FUNCTIONS
@@ -65,6 +65,8 @@ void destroy_player(player* p);
  * Plays/pauses an audio player
  */
 void player_set_playing(player* p, bool play);
+
+bool player_get_playing(player* p);
 
 /*!
  * Stops an audio player, resetting it to the beginning

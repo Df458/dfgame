@@ -399,12 +399,20 @@ void player_set_playing(player* p, bool play)
     }
 }
 
+bool player_get_playing(player* p)
+{
+    return p->data->playing;
+}
+
 void player_stop(player* p)
 {
     p->data->playing = false;
     p->data->stopped = true;
     p->data->position = 0;
     alSourceStop(p->data->source);
+    ALuint left;
+    alGetSourcei(p->data->source, AL_BUFFERS_QUEUED, &left);
+    alSourceUnqueueBuffers(p->data->source, left, p->data->buffers);
 }
 
 bool player_update(player* p)
@@ -459,7 +467,7 @@ bool player_update(player* p)
                         /*alSourceQueueBuffers(p->data->source, 2, p->data->buffers);*/
                         /*checkALError();*/
                     /*}*/
-                } else if(queued == 0) {
+                } else {/* if(queued == 0) { */
                     player_stop(p);
                 }
                 break;

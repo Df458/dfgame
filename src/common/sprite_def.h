@@ -22,6 +22,7 @@ struct animation
     uint16_t  delay;
     bool      autoplay;
     bool      autoloop;
+    float     speed_mod;
 
     struct    texture_atlas_box box;
     char*     handle;

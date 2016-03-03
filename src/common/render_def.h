@@ -59,7 +59,7 @@ static const char* quad_fs[] =
     "in  vec2 v_uv;\n"
     "layout(location = 0) out vec4 f_color;\n"
     "void main() {\n"
-    "f_color = texture2D(texture, v_uv) * color;"
+    "f_color = texture2D(texture, v_uv) * color;\n"
     "}\n"
 };
 static const char* quad_untex_fs[] =

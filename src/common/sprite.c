@@ -116,6 +116,7 @@ spriteset* load_resource_to_spriteset(resource_pair)
             spr->animations[spr->animation_count - 1].autoplay = true;
             spr->animations[spr->animation_count - 1].origin_x = 0;
             spr->animations[spr->animation_count - 1].origin_y = 0;
+            spr->animations[spr->animation_count - 1].speed_mod = 1;
             xmlChar* a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"name"))) {
                 spr->animations[spr->animation_count - 1].handle = strdup((char*)a);
