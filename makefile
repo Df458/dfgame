@@ -17,6 +17,7 @@ EDITORBACKTARGET=editor/
 EDITORFRONTTARGET=editor-frontend/
 GAMEBACKTARGET=game/
 GAMEFRONTTARGET=game-frontend/
+TESTTARGET=tests/
 
 # Source Files
 COMMONSRC=$(wildcard ${SRCPATH}${COMMONTARGET}*.c)
@@ -24,17 +25,20 @@ EDITORBACKSRC=$(wildcard ${SRCPATH}${EDITORBACKTARGET}*.c)
 EDITORFRONTSRC=$(wildcard ${SRCPATH}${EDITORFRONTTARGET}*.vala)
 GAMEBACKSRC=$(wildcard ${SRCPATH}${GAMEBACKTARGET}*.c)
 GAMEFRONTSRC=$(wildcard ${SRCPATH}${GAMEFRONTTARGET}*.c)
+TESTSRC=$(wildcard ${SRCPATH}${TESTTARGET}*.c)
 
 COMMONOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(COMMONSRC))
 EDITORBACKOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(EDITORBACKSRC))
 EDITORFRONTOBJ=$(patsubst $(SRCPATH)%.vala,$(OBJPATH)%.vala.o,$(EDITORFRONTSRC))
 GAMEBACKOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(GAMEBACKSRC))
 GAMEFRONTOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(GAMEFRONTSRC))
+TESTOBJ=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(TESTSRC))
 
 COMMONDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(COMMONSRC))
 EDITORBACKDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(EDITORBACKSRC))
 GAMEBACKDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(GAMEBACKSRC))
 GAMEFRONTDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(GAMEFRONTSRC))
+TESTDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(TESTSRC))
 
 # Flags
 VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(EDITORFRONTTARGET) -X -I$(SRCPATH)$(GAMEBACKTARGET) -X -I$(SRCPATH)$(COMMONTARGET) --cc=$(CC) -H $(SRCPATH)dfgame-editor-front.h --vapi=$(VAPIPATH)dfgame-editor-frontend.vapi
@@ -44,13 +48,15 @@ CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(
 CLIBS=`$(PKGCONFIG) --libs glew gl lua openal`
 
 GAMEBACKFLAGS=${CFLAGS}
-GAMEBACKLIBS=${CFLAGS}
+GAMEBACKLIBS=${CLIBS}
 GAMEFRONTFLAGS=${CFLAGS} -I$(SRCPATH)$(GAMEBACKTARGET) ${GAMEBACKLIBS}
-GAMEFRONTLIBS=${CFLAGS} ${GAMEBACKLIBS}
+GAMEFRONTLIBS=${CLIBS} ${GAMEBACKLIBS}
 EDITORBACKFLAGS=${CFLAGS} ${GAMEBACKFLAGS}
-EDITORBACKLIBS=${CFLAGS} ${GAMEBACKLIBS}
+EDITORBACKLIBS=${CLIBS} ${GAMEBACKLIBS}
 EDITORFRONTFLAGS=${CFLAGS} ${EDITORBACKFLAGS} -I${SRCPATH}${EDITORBACKTARGET} -I${SRCPATH}${GAMEBACKTARGET} -L${LIBPATH} `${PKGCONFIG} --cflags glib-2.0 gtk+-3.0 gee-0.8`
-EDITORFRONTLIBS=`${PKGCONFIG} --libs glib-2.0 gtk+-3.0 gee-0.8`
+EDITORFRONTLIBS=${CLIBS} `${PKGCONFIG} --libs glib-2.0 gtk+-3.0 gee-0.8`
+TESTFLAGS=${CFLAGS} -I${SRCPATH}${EDITORBACKTARGET} -I${SRCPATH}${GAMEBACKTARGET} `$(PKGCONFIG) --cflags cmocka`
+TESTLIBS=$(CLIBS) `$(PKGCONFIG) --libs cmocka`
 
 # Directory inits
 $(shell mkdir -p $(OBJPATH))
@@ -61,6 +67,7 @@ $(shell mkdir -p $(OBJPATH)$(EDITORBACKTARGET))
 $(shell mkdir -p $(OBJPATH)$(EDITORFRONTTARGET))
 $(shell mkdir -p $(OBJPATH)$(GAMEBACKTARGET))
 $(shell mkdir -p $(OBJPATH)$(GAMEFRONTTARGET))
+$(shell mkdir -p $(OBJPATH)$(TESTTARGET))
 
 ifeq ($(OS), Linux)
 else ifeq ($(OS), Windows)
@@ -99,6 +106,13 @@ $(OBJPATH)$(GAMEFRONTTARGET)%.depend: $(SRCPATH)$(GAMEFRONTTARGET)%.c
 	sed 's,\($*\)\.o[ :]*,obj/$(GAMEFRONTTARGET)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
+$(OBJPATH)$(TESTTARGET)%.depend: $(SRCPATH)$(TESTTARGET)%.c
+	@echo -e "Building dependecies for \e[1;35m$<\e[0m..."
+	@set -e; rm -f $@; \
+	$(CC) -M $(TESTFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,obj/$(TESTTARGET)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
 $(OBJPATH)$(COMMONTARGET)%.o: $(SRCPATH)$(COMMONTARGET)%.c
 	@echo -e "Building \e[1;35m$<\e[0m..."
 	$(CC) -c $< -o $@ $(CFLAGS)
@@ -115,8 +129,12 @@ $(OBJPATH)$(GAMEFRONTTARGET)%.o: $(SRCPATH)$(GAMEFRONTTARGET)%.c
 	@echo -e "Building \e[1;35m$<\e[0m..."
 	$(CC) -c $< -o $@ $(GAMEFRONTFLAGS)
 
+$(OBJPATH)$(TESTTARGET)%.o: $(SRCPATH)$(TESTTARGET)%.c
+	@echo -e "Building \e[1;35m$<\e[0m..."
+	$(CC) -c $< -o $@ $(TESTFLAGS)
+
 # Target Rules
-all: $(COMMONTARGET) $(GAMEBACKTARGET) $(GAMEFRONTTARGET) $(EDITORBACKTARGET) $(EDITORFRONTTARGET) tags
+all: $(COMMONTARGET) $(GAMEBACKTARGET) $(GAMEFRONTTARGET) $(EDITORBACKTARGET) $(EDITORFRONTTARGET) $(TESTTARGET) tags
 
 $(COMMONTARGET): $(COMMONOBJ)
 	ar -rs $(LIBPATH)libdfgame-common.a $(COMMONOBJ)
@@ -130,17 +148,20 @@ $(EDITORFRONTTARGET): $(COMMONTARGET) $(EDITORBACKTARGET) $(GAMEBACKTARGET) $(ED
 	$(VALAC) $(VFLAGS) $(EDITORFRONTSRC) $(VLIBS)
 	mv *.o $(OBJPATH)/$(EDITORFRONTTARGET)
 	ar -rs $(LIBPATH)libdfgame-editor-front.a $(EDITORFRONTOBJ)
+$(TESTTARGET): $(COMMONTARGET) $(EDITORBACKTARGET) $(GAMEBACKTARGET) $(TESTOBJ)
+	$(CC) -o dfgame-test $(TESTOBJ) $(LIBPATH)libdfgame-common.a $(LIBPATH)libdfgame-game.a $(LIBPATH)libdfgame-editor.a $(TESTLIBS)
 
 -include $(COMMONDEPS)
 -include $(EDITORBACKDEPS)
 -include $(GAMEBACKDEPS)
 -include $(GAMEFRONTDEPS)
+-include $(TESTDEPS)
 
-tags: $(COMMONSRC) $(LIBEDITORSRC) $(LIBGAMESRC) $(EDITORSRC) $(GAMESRC)
+tags: $(COMMONSRC) $(LIBEDITORSRC) $(LIBGAMESRC) $(EDITORSRC) $(GAMESRC) $(TESTSRC)
 	ctags -R $(SRCPATH)
 
-# TODO: Unit tests
 test: all
+	CMOCKA_MESSAGE_OUTPUT=TAP ./dfgame-test
 
 # Clean
 .PHONY: clean
