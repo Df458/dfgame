@@ -84,3 +84,33 @@ void register_log_file(FILE* file)
 {
     current_file = file;
 }
+
+void* _salloc(const char* file, unsigned line, size_t size)
+{
+    void* data = malloc(size);
+    if(!data)
+        _log(file, line, LOG_FATAL, "malloc: Failed to allocate memory");
+    return data;
+}
+
+void* _scalloc(const char* file, unsigned line, size_t nmemb, size_t size)
+{
+    void* data = calloc(nmemb, size);
+    if(!data)
+        _log(file, line, LOG_FATAL, "calloc: Failed to allocate memory");
+    return data;
+}
+
+void* _resalloc(const char* file, unsigned line, void* ptr, size_t size)
+{
+    void* data = realloc(ptr, size);
+    if(!data)
+        _log(file, line, LOG_FATAL, "malloc: Failed to allocate memory");
+    return data;
+}
+
+void _sfree(void* ptr)
+{
+    if(ptr)
+        free(ptr);
+}

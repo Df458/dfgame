@@ -27,6 +27,15 @@ void _log(const char* file, unsigned line, log_level level, char* const message,
 void register_log_handler(log_handler handler);
 void register_log_file(FILE* file);
 
+void* _salloc(const char* file, unsigned line, size_t size);
+void* _scalloc(const char* file, unsigned line, size_t nmemb, size_t size);
+void* _resalloc(const char* file, unsigned line, void* ptr, size_t size);
+void  _sfree(void* ptr);
+#define salloc(size) _salloc(__FILE__, __LINE__, size)
+#define scalloc(nmemb, size) _scalloc(__FILE__, __LINE__, nmemb, size)
+#define resalloc(ptr, size) _resalloc(__FILE__, __LINE__, ptr, size)
+#define sfree(ptr) _sfree(ptr); ptr = NULL;
+
 unsigned char* loadFileContents(const char* const filepath);
 
 #define DEGTORAD 0.01745329251
