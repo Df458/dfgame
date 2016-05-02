@@ -208,6 +208,7 @@ spriteset* load_resource_to_spriteset(resource_pair)
             }
         }
         if(selected == -1) {
+            // TODO: Fix this to resize available boxes
             width += 128;
             height += 128;
             avail_length += 2;

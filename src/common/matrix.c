@@ -43,6 +43,7 @@ void translate(mat4* mat, float position_x, float position_y, uint8_t relative)
     }
 }
 
+// TODO: Relative support
 void rotate(mat4* mat, float angle, uint8_t relative)
 {
     //  cos sin
@@ -57,9 +58,9 @@ void rotate(mat4* mat, float angle, uint8_t relative)
     mat->data[5] =  c;
 }
 
+// TODO: Make relative vs. absolute
 void scale(mat4* mat, float scale_x, float scale_y, uint8_t relative)
 {
-    // TODO: Make relative vs. absolute
     mat->data[0] *= scale_x;
     mat->data[5] *= scale_y;
 }

@@ -84,7 +84,7 @@ bool prepare_wav(audio* a, const char* path)
     }
     fread(&format_size, sizeof(uint32_t), 1, infile);
     if(format_size != 16) {
-        error("Cannot prepare WAV stream: Unrecognized format. (nonstandard formatting length)");
+        error("Cannot prepare WAV stream: Unrecognized format. (nonstandard formatting length: %d)", format_size);
         fclose(infile);
         return false;
     }
@@ -380,17 +380,23 @@ void player_set_playing(player* p, bool play)
         return;
     }
 
+    uint8_t loaded_buffers = 0;
     if(p->data->stopped == true) {
-        if(stream_audio_to_buffer(p->source, p->data->buffers[0], &p->data->position) == AUDIO_STREAM_FAILURE || stream_audio_to_buffer(p->source, p->data->buffers[1], &p->data->position) == AUDIO_STREAM_FAILURE) {
-            error("Can't play: failed to load buffer");
-            return;
+        for(loaded_buffers = 0; loaded_buffers < 2; ++loaded_buffers) {
+            int res = stream_audio_to_buffer(p->source, p->data->buffers[loaded_buffers], &p->data->position);
+            if(res == AUDIO_STREAM_FAILURE) {
+                error("Can't play: failed to load buffer %d", loaded_buffers);
+                return;
+            } else if(res == AUDIO_STREAM_FINISHED)
+                break;
         }
-        p->data->stopped = false;
+        if(loaded_buffers != 0)
+            p->data->stopped = false;
     }
 
     p->data->playing = play;
     if(play) {
-        alSourceQueueBuffers(p->data->source, 2, p->data->buffers);
+        alSourceQueueBuffers(p->data->source, loaded_buffers, p->data->buffers);
         checkALError();
         alSourcePlay(p->data->source);
         checkALError();

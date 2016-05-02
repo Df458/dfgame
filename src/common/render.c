@@ -276,3 +276,5 @@ bool render_quad_subtex(mat4 camera, mat4 transform, texture* tex, bool use_dims
 
     return true;
 }
+
+GLuint get_quad_buffer() { return quad_buffer; }

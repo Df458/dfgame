@@ -20,4 +20,6 @@ bool render_quad(mat4 camera, mat4 transform, texture* tex, bool use_dims);
 bool render_quad_untex(mat4 camera, mat4 transform);
 bool render_quad_subtex(mat4 camera, mat4 transform, texture* tex, bool use_dims, float tx, float ty, float tw, float th);
 
+GLuint get_quad_buffer();
+
 #endif

@@ -1,3 +1,6 @@
+#ifndef DF_AUDIO_DEF
+#define DF_AUDIO_DEF
+
 #include <AL/al.h>
 #include <stdio.h>
 #include <vorbis/vorbisfile.h>
@@ -49,3 +52,5 @@ struct player_data
     bool stopped;
     bool simple;
 };
+
+#endif

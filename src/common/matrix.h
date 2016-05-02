@@ -1,5 +1,5 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#ifndef DF_MATRIX_H
+#define DF_MATRIX_H
 #include <inttypes.h>
 
 typedef struct mat4 { float data[16]; } mat4;
