@@ -1,5 +1,5 @@
-#ifndef PROJECT_H
-#define PROJECT_H
+#ifndef DF_PROJECT_H
+#define DF_PROJECT_H
 #include <stdbool.h>
 
 typedef struct project project;

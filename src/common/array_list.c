@@ -45,6 +45,16 @@ int array_list_add(array_list* list, int index, void* ptr)
     return list->length;
 }
 
+void* array_list_get(array_list* list, int index)
+{
+    if(index == -1)
+        index = list->length - 1;
+
+    if(index > list->length || index < 0)
+        return 0;
+    return list->data[index];
+}
+
 void* array_list_remove_at(array_list* list, int index)
 {
     if(index == -1)

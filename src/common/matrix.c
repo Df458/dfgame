@@ -1,25 +1,31 @@
 #include "matrix.h"
+#include "util.h"
 
 #include <math.h>
 #include <string.h>
 
 mat4 ident_data = ident;
 
-mat4 ortho(float left, float right, float bottom, float top, float near, float far)
+mat4 create_mat4()
 {
-    mat4 mat = ident;
-    mat.data[0]  = 2.0f / (right - left);
-    mat.data[12]  = (right + left) / (right - left) * -1;
-    mat.data[5]  = 2.0f / (top - bottom);
-    mat.data[13]  = (top + bottom) / (top - bottom) * -1;
-    mat.data[10] = 2.0f / (far - near);
-    mat.data[14] = (far + near) / (far - near) * -1;
-    mat.data[15] = 1;
-
+    mat4 mat;
+    mat4_reset(&mat);
     return mat;
 }
 
-mat4 mul(mat4 lv, mat4 rv)
+void mat4_ortho(mat4* mat, float left, float right, float bottom, float top, float near, float far)
+{
+    mat4_reset(mat);
+    mat->data[0]  = 2.0f / (right - left);
+    mat->data[12]  = (right + left) / (right - left) * -1;
+    mat->data[5]  = 2.0f / (top - bottom);
+    mat->data[13]  = (top + bottom) / (top - bottom) * -1;
+    mat->data[10] = 2.0f / (far - near);
+    mat->data[14] = (far + near) / (far - near) * -1;
+    mat->data[15] = 1;
+}
+
+mat4 mat4_mul(mat4 lv, mat4 rv)
 {
     mat4 res;
     for(uint8_t i = 0; i < 4; ++i) {
@@ -32,7 +38,7 @@ mat4 mul(mat4 lv, mat4 rv)
     return res;
 }
 
-void translate(mat4* mat, float position_x, float position_y, uint8_t relative)
+void mat4_translate(mat4* mat, float position_x, float position_y, uint8_t relative)
 {
     if(relative) {
         mat->data[12] += position_x;
@@ -44,7 +50,7 @@ void translate(mat4* mat, float position_x, float position_y, uint8_t relative)
 }
 
 // TODO: Relative support
-void rotate(mat4* mat, float angle, uint8_t relative)
+void mat4_rotate(mat4* mat, float angle, uint8_t relative)
 {
     //  cos sin
     // -sin cos
@@ -59,13 +65,49 @@ void rotate(mat4* mat, float angle, uint8_t relative)
 }
 
 // TODO: Make relative vs. absolute
-void scale(mat4* mat, float scale_x, float scale_y, uint8_t relative)
+void mat4_scale(mat4* mat, float scale_x, float scale_y, uint8_t relative)
 {
     mat->data[0] *= scale_x;
     mat->data[5] *= scale_y;
 }
 
-void mat_reset(mat4* mat)
+void mat4_reset(mat4* mat)
 {
     memcpy(mat->data, ident_data.data, 16 * sizeof(float));
+}
+
+// TODO: Finish implementing this
+void mat4_invert(mat4* mat)
+{
+    float det = mat4_get_determinant(*mat);
+    if(det == 0)
+        return;
+    stub();
+}
+
+float mat4_get_determinant(mat4 mat)
+{
+    return mat.data[12] * mat.data[9] * mat.data[6]  * mat.data[3]  - mat.data[8] * mat.data[13] * mat.data[6]  * mat.data[3]  -
+           mat.data[12] * mat.data[5] * mat.data[10] * mat.data[3]  + mat.data[4] * mat.data[13] * mat.data[10] * mat.data[3]  +
+           mat.data[8]  * mat.data[5] * mat.data[14] * mat.data[3]  - mat.data[4] * mat.data[9]  * mat.data[14] * mat.data[3]  -
+           mat.data[12] * mat.data[9] * mat.data[2]  * mat.data[7]  + mat.data[8] * mat.data[13] * mat.data[2]  * mat.data[7]  +
+           mat.data[12] * mat.data[1] * mat.data[10] * mat.data[7]  - mat.data[0] * mat.data[13] * mat.data[10] * mat.data[7]  -
+           mat.data[8]  * mat.data[1] * mat.data[14] * mat.data[7]  + mat.data[0] * mat.data[9]  * mat.data[14] * mat.data[7]  +
+           mat.data[12] * mat.data[5] * mat.data[2]  * mat.data[11] - mat.data[4] * mat.data[13] * mat.data[2]  * mat.data[11] -
+           mat.data[12] * mat.data[1] * mat.data[6]  * mat.data[11] + mat.data[0] * mat.data[13] * mat.data[6]  * mat.data[11] +
+           mat.data[4]  * mat.data[1] * mat.data[14] * mat.data[11] - mat.data[0] * mat.data[5]  * mat.data[14] * mat.data[11] -
+           mat.data[8]  * mat.data[5] * mat.data[2]  * mat.data[15] + mat.data[4] * mat.data[9]  * mat.data[2]  * mat.data[15] +
+           mat.data[8]  * mat.data[1] * mat.data[6]  * mat.data[15] - mat.data[0] * mat.data[9]  * mat.data[6]  * mat.data[15] -
+           mat.data[4]  * mat.data[1] * mat.data[10] * mat.data[15] + mat.data[0] * mat.data[5]  * mat.data[10] * mat.data[15];
+}
+
+void mat4_transpose(mat4* mat)
+{
+    for(int i = 0; i < 3; ++i) {
+        for(int j = i + 1; j < 4; ++j) {
+            float temp = mat->data[i * 4 + j];
+            mat->data[i * 4 + j] = mat->data[j * 4 + i];
+            mat->data[j * 4 + i] = temp;
+        }
+    }
 }

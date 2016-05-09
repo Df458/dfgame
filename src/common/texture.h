@@ -1,5 +1,5 @@
-#ifndef DFGAME_TEXTURE_H
-#define DFGAME_TEXTURE_H
+#ifndef DF_TEXTURE_H
+#define DF_TEXTURE_H
 #include "resource_def.h"
 
 #include <GL/glew.h>

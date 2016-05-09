@@ -1,5 +1,5 @@
-#ifndef INPUT_SOURCE_H
-#define INPUT_SOURCE_H
+#ifndef DF_INPUT_SOURCE_H
+#define DF_INPUT_SOURCE_H
 #include <stdbool.h>
 #include <inttypes.h>
 #include <GL/glew.h>

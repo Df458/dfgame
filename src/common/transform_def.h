@@ -1,5 +1,5 @@
-#ifndef DF_TRANSFORM_DEF_H
-#define DF_TRANSFORM_DEF_H
+#ifndef DF_TRANSFORM_DEF
+#define DF_TRANSFORM_DEF
 #include "matrix.h"
 
 struct transform2D

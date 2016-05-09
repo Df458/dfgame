@@ -1,5 +1,5 @@
-#ifndef DFGAME_AUDIO_H
-#define DFGAME_AUDIO_H
+#ifndef DF_AUDIO_H
+#define DF_AUDIO_H
 #include "resource_def.h"
 
 #include <AL/al.h>

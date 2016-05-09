@@ -1,5 +1,5 @@
-#ifndef DFGAME_WINDOW_H
-#define DFGAME_WINDOW_H
+#ifndef DF_WINDOW_H
+#define DF_WINDOW_H
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <inttypes.h>

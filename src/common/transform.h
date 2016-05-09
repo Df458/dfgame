@@ -14,5 +14,6 @@ void transform_get_position(transform2D* trans, float* x, float* y);
 void transform_get_angle(transform2D* trans, float* angle);
 void transform_get_scale(transform2D* trans, float* x, float* y);
 mat4 transform_get_matrix(transform2D* trans);
+mat4 transform_get_view_matrix(transform2D* trans);
 
 #endif

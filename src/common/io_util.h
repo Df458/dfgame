@@ -1,5 +1,5 @@
-#ifndef IO_UTIL_H
-#define IO_UTIL_H
+#ifndef DF_IO_UTIL_H
+#define DF_IO_UTIL_H
 #include "resource_def.h"
 #include <stdbool.h>
 #include <stdio.h>

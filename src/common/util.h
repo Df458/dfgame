@@ -1,5 +1,5 @@
-#ifndef DFGAME_UTIL_H
-#define DFGAME_UTIL_H
+#ifndef DF_UTIL_H
+#define DF_UTIL_H
 
 #include <errno.h>
 #include <string.h>

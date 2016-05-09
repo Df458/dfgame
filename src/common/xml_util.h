@@ -1,5 +1,5 @@
-#ifndef XML_UTIL_H
-#define XML_UTIL_H
+#ifndef DF_XML_UTIL_H
+#define DF_XML_UTIL_H
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/uri.h>

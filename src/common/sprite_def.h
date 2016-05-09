@@ -1,5 +1,5 @@
-#ifndef DF_SPRITE_DEF_H
-#define DF_SPRITE_DEF_H
+#ifndef DF_SPRITE_DEF
+#define DF_SPRITE_DEF
 #include "texture.h"
 
 struct texture_atlas_box

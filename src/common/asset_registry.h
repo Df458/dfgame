@@ -1,3 +1,6 @@
+#ifndef DF_ASSET_REGISTRY
+#define DF_ASSET_REGISTRY
+
 #include "io_util.h"
 #include <inttypes.h>
 #include <stdbool.h>
@@ -94,3 +97,5 @@ uint32_t get_failed_count();
  * Note that the calling function is responsible for freeing the data.
  */
 uint32_t* get_failed_ids();
+
+#endif

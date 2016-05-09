@@ -1,5 +1,5 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef DF_SPRITE_H
+#define DF_SPRITE_H
 #include <stdbool.h>
 #include <inttypes.h>
 

@@ -22,6 +22,8 @@ transform2D* create_transform()
     trans->scale_x = 1;
     trans->scale_y = 1;
 
+    recalculate_matrix(trans);
+
     return trans;
 }
 
@@ -86,4 +88,17 @@ void transform_get_scale(transform2D* trans, float* x, float* y)
 {
     *x = trans->scale_x;
     *y = trans->scale_y;
+}
+
+mat4 transform_get_view_matrix(transform2D* trans)
+{
+    mat4 mat = create_mat4();
+    rotate(&mat, trans->angle, 0);
+    mat_transpose(&mat);
+    mat.data[12] = (-trans->x * mat.data[0]) - (trans->y * mat.data[4]);
+    mat.data[13] = (-trans->y * mat.data[0]) + (trans->y * mat.data[4]);
+
+    // TODO: Take scale into account
+
+    return mat;
 }

@@ -1,5 +1,5 @@
-#ifndef DFGAME_LOOP_H
-#define DFGAME_LOOP_H
+#ifndef DF_LOOP_H
+#define DF_LOOP_H
 
 /*!
  * This is a function that runs for each main loop iteration.
