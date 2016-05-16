@@ -2,7 +2,7 @@
 #include "array_list.h"
 #include <stdlib.h>
 
-array_list* array_list_new_size(array_list_size_t size)
+array_list* create_array_list_size(array_list_size_t size)
 {
     array_list* list = salloc(sizeof(array_list));
     if(size <= 0)

@@ -13,8 +13,8 @@ typedef struct array_list
 }
 array_list;
 
-array_list* array_list_new_size(array_list_size_t size);
-#define array_list_new() array_list_new_size(0)
+array_list* create_array_list_size(array_list_size_t size);
+#define create_array_list() create_array_list_size(0)
 void array_list_destroy_full(array_list* list, uint8_t deep);
 #define array_list_destroy(list) { array_list_destroy_full(list, 0); list = 0; }
 #define array_list_destroy_deep(list) { array_list_destroy_full(list, 1); list = 0; }

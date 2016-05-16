@@ -285,6 +285,7 @@ texture* create_texture(uint16_t w, uint16_t h)
 	glBindTexture(GL_TEXTURE_2D, texture_data->handle);
     texture_data->width = w;
     texture_data->height = h;
+    texture_data->type = GL_TEXTURE_2D;
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_data->width, texture_data->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -305,8 +306,9 @@ void destroy_texture(texture* tex)
 
 texture* load_resource_to_texture(resource_pair)
 {
-	texture* texture_data = malloc(sizeof(texture));
+	texture* texture_data = salloc(sizeof(texture));
 	glGenTextures(1, &texture_data->handle);
+    texture_data->type = GL_TEXTURE_2D;
 	glBindTexture(GL_TEXTURE_2D, texture_data->handle);
 	
     uint8_t* image_data = load_resource_to_texture_buffer(resource_location, resource_name, &texture_data->width, &texture_data->height);

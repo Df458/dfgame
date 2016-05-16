@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <inttypes.h>
 
 mat4 ident_data = ident;
 
@@ -38,7 +39,7 @@ mat4 mat4_mul(mat4 lv, mat4 rv)
     return res;
 }
 
-void mat4_translate(mat4* mat, float position_x, float position_y, uint8_t relative)
+void mat4_translate(mat4* mat, float position_x, float position_y, bool relative)
 {
     if(relative) {
         mat->data[12] += position_x;
@@ -50,7 +51,7 @@ void mat4_translate(mat4* mat, float position_x, float position_y, uint8_t relat
 }
 
 // TODO: Relative support
-void mat4_rotate(mat4* mat, float angle, uint8_t relative)
+void mat4_rotate(mat4* mat, float angle, bool relative)
 {
     //  cos sin
     // -sin cos
@@ -65,7 +66,7 @@ void mat4_rotate(mat4* mat, float angle, uint8_t relative)
 }
 
 // TODO: Make relative vs. absolute
-void mat4_scale(mat4* mat, float scale_x, float scale_y, uint8_t relative)
+void mat4_scale(mat4* mat, float scale_x, float scale_y, bool relative)
 {
     mat->data[0] *= scale_x;
     mat->data[5] *= scale_y;

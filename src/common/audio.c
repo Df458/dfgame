@@ -298,10 +298,10 @@ audio* load_resource_to_audio(resource_pair)
     const char* ext = get_extension(resource_name);
 
     if(!strcmp(ext, "wav")) {
-        if(prepare_wav(a, path));
+        if(prepare_wav(a, path))
             a->fmt = AFMT_WAV;
     } else if(!strcmp(ext, "ogg")) {
-        if(prepare_ogg(a, path));
+        if(prepare_ogg(a, path))
             a->fmt = AFMT_OGG;
     } else {
         error("Failed to load texture: File extension %s not recognized", ext);

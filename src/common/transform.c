@@ -6,10 +6,10 @@
 // Private functions
 static void recalculate_matrix(transform2D* trans)
 {
-    mat_reset(&trans->matrix);
-    translate(&trans->matrix, trans->x, trans->y, 0);
-    rotate(&trans->matrix, trans->angle, 0);
-    scale(&trans->matrix, trans->scale_x, trans->scale_y, 0);
+    mat4_reset(&trans->matrix);
+    mat4_translate(&trans->matrix, trans->x, trans->y, 0);
+    mat4_rotate(&trans->matrix, trans->angle, 0);
+    mat4_scale(&trans->matrix, trans->scale_x, trans->scale_y, 0);
 }
 
 // Public functions
@@ -93,8 +93,8 @@ void transform_get_scale(transform2D* trans, float* x, float* y)
 mat4 transform_get_view_matrix(transform2D* trans)
 {
     mat4 mat = create_mat4();
-    rotate(&mat, trans->angle, 0);
-    mat_transpose(&mat);
+    mat4_rotate(&mat, trans->angle, 0);
+    mat4_transpose(&mat);
     mat.data[12] = (-trans->x * mat.data[0]) - (trans->y * mat.data[4]);
     mat.data[13] = (-trans->y * mat.data[0]) + (trans->y * mat.data[4]);
 

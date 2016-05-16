@@ -10,6 +10,7 @@
 typedef struct texture
 {
     GLuint    handle;
+    GLuint    type;
     uint16_t  width;
     uint16_t  height;
 }

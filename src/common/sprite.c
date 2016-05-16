@@ -392,7 +392,7 @@ bool sprite_draw(mat4 camera, mat4 transform, sprite* spr, bool use_dims)
 {
     nulltest(spr);
     nulltest(spr->handle);
-    return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, spr->handle->box.pos_x + (spr->handle->box.size_x * (int)spr->position), spr->handle->box.pos_y, spr->handle->box.size_x, spr->handle->box.size_y);
+    return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, create_vec4_data(spr->handle->box.pos_x + (spr->handle->box.size_x * (int)spr->position), spr->handle->box.pos_y, spr->handle->box.size_x, spr->handle->box.size_y));
 }
 
 const char* sprite_get_current_handle(sprite* spr)

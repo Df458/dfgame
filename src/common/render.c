@@ -1,6 +1,7 @@
 #include "render.h"
 #include "render_def.h"
 #include "util.h"
+#include "program.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Hidden data
@@ -8,23 +9,14 @@
 
 GLuint quad_buffer;
 
-GLuint p_quad;
-GLuint u_quad_transform;
-GLuint u_quad_texture;
-GLuint u_quad_color;
+program p_quad;
 GLuint va_quad_pos;
 GLuint va_quad_uv;
 
-GLuint p_quad_untex;
+program p_quad_untex;
 GLuint va_quad_untex;
-GLuint u_quad_untex_color;
-GLuint u_quad_untex_transform;
 
-GLuint p_quad_subtex;
-GLuint u_quad_subtex_transform;
-GLuint u_quad_subtex_texture;
-GLuint u_quad_subtex_color;
-GLuint u_quad_subtex_offsets;
+program p_quad_subtex;
 GLuint va_quad_subtex_pos;
 GLuint va_quad_subtex_uv;
 
@@ -63,45 +55,6 @@ bool _checkGLError(const char* file, unsigned line)
     return error_found;
 }
 
-// TODO: Improve this with better logging
-bool create_program(GLuint* program, const char** vs, const char** fs, ...)
-{
-    GLuint vertex_shader, fragment_shader;
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    *program = glCreateProgram();
-    glShaderSource(vertex_shader, 1, vs, NULL);
-    glShaderSource(fragment_shader, 1, fs, NULL);
-    GLsizei len;
-    char log[1024];
-
-    glCompileShader(vertex_shader);
-    glCompileShader(fragment_shader);
-    glAttachShader(*program, vertex_shader);
-    glAttachShader(*program, fragment_shader);
-    glLinkProgram(*program);
-    if(checkGLError())
-        return false;
-    glGetShaderInfoLog(vertex_shader, 1024, &len, log);
-    if(len)
-        info("Vertex Shader Log\n%s\n", log);
-    glGetShaderInfoLog(fragment_shader, 1024, &len, log);
-    if(len)
-        info("Fragment Shader Log\n%s\n", log);
-    glGetProgramInfoLog(*program, 1024, &len, log);
-    if(len)
-        info("Program Log\n%s\n", log);
-    if(checkGLError())
-        return false;
-
-    glDetachShader(*program, vertex_shader);
-    glDetachShader(*program, fragment_shader);
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-
-    return true;
-}
-
 bool init_renderer()
 {
     // Buffers
@@ -113,33 +66,24 @@ bool init_renderer()
 
     // TODO: Add variadic uniform/attribute handle retrieval
     // Shaders
-    create_program(&p_quad_untex, quad_untex_vs, quad_untex_fs
+    p_quad_untex = create_program(quad_untex_vs, quad_untex_fs
         /*"transform",  &u_quad_untex_transform,*/
         /*"color",      &u_quad_untex_color,*/
         /*"i_pos",      &va_quad_untex*/
     );
-    u_quad_untex_transform = glGetUniformLocation(p_quad_untex, "transform");
-    u_quad_untex_color = glGetUniformLocation(p_quad_untex, "color");
-    va_quad_untex = glGetAttribLocation(p_quad_untex, "i_pos");
+    va_quad_untex = glGetAttribLocation(p_quad_untex.handle, "i_pos");
     if(checkGLError())
         return false;
 
-    create_program(&p_quad, quad_vs, quad_fs);
-    u_quad_transform = glGetUniformLocation(p_quad, "transform");
-    u_quad_color = glGetUniformLocation(p_quad, "color");
-    u_quad_texture = glGetUniformLocation(p_quad, "texture");
-    va_quad_pos = glGetAttribLocation(p_quad, "i_pos");
-    va_quad_uv = glGetAttribLocation(p_quad, "i_uv");
+    p_quad = create_program(quad_vs, quad_fs);
+    va_quad_pos = glGetAttribLocation(p_quad.handle, "i_pos");
+    va_quad_uv = glGetAttribLocation(p_quad.handle, "i_uv");
     if(checkGLError())
         return false;
 
-    create_program(&p_quad_subtex, quad_subtex_vs, quad_fs);
-    u_quad_subtex_transform = glGetUniformLocation(p_quad_subtex, "transform");
-    u_quad_subtex_offsets = glGetUniformLocation(p_quad_subtex, "uv_offset");
-    u_quad_subtex_color = glGetUniformLocation(p_quad_subtex, "color");
-    u_quad_subtex_texture = glGetUniformLocation(p_quad_subtex, "texture");
-    va_quad_subtex_pos = glGetAttribLocation(p_quad_subtex, "i_pos");
-    va_quad_subtex_uv = glGetAttribLocation(p_quad_subtex, "i_uv");
+    p_quad_subtex = create_program(quad_subtex_vs, quad_fs);
+    va_quad_subtex_pos = glGetAttribLocation(p_quad_subtex.handle, "i_pos");
+    va_quad_subtex_uv = glGetAttribLocation(p_quad_subtex.handle, "i_uv");
     if(checkGLError())
         return false;
 
@@ -149,13 +93,16 @@ bool init_renderer()
 bool cleanup_renderer()
 {
     glDeleteBuffers(1, &quad_buffer);
+    delete_program(&p_quad);
+    delete_program(&p_quad_untex);
+    delete_program(&p_quad_subtex);
 
     return true;
 }
 
-bool render_quad(mat4 camera, mat4 transform, texture* tex, bool use_dims)
+bool render_quad_color(mat4 camera, mat4 transform, texture* tex, bool use_dims, vec4 color)
 {
-    glUseProgram(p_quad);
+    glUseProgram(p_quad.handle);
 
     glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
     glEnableVertexAttribArray(va_quad_pos);
@@ -165,26 +112,21 @@ bool render_quad(mat4 camera, mat4 transform, texture* tex, bool use_dims)
     if(checkGLError())
         return false;
 
-    // TODO: Color
-    /*glUniform4f(u_quad_untex_color, col.r, col.g, col.b, col.a);*/
-    glUniform4f(u_quad_color, 1.0f, 1.0f, 1.0f, 1.0f);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex->handle);
-    glUniform1i(u_quad_texture, 0);
-    if(checkGLError())
+    if(!bind_vec4_to_program(p_quad, "color", color))
+        return false;
+    if(!bind_texture_to_program(p_quad, "texture", tex, GL_TEXTURE0))
         return false;
 
     mat4 tt = ident;
     mat4 rt = ident;
     mat4 st = ident;
-    mat4 final = mul(camera, transform);
+    mat4 final = mat4_mul(camera, transform);
     if(use_dims) {
         mat4 iscale = ident;
-        scale(&iscale, tex->width, tex->height, 0);
-        final = mul(final, iscale);
+        mat4_scale(&iscale, tex->width, tex->height, 0);
+        final = mat4_mul(final, iscale);
     }
-    glUniformMatrix4fv(u_quad_transform, 1, GL_FALSE, final.data);
-    if(checkGLError())
+    if(!bind_mat4_to_program(p_quad, "transform", final))
         return false;
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -197,9 +139,9 @@ bool render_quad(mat4 camera, mat4 transform, texture* tex, bool use_dims)
     return true;
 }
 
-bool render_quad_untex(mat4 camera, mat4 transform)
+bool render_quad_untex_color(mat4 camera, mat4 transform, vec4 color)
 {
-    glUseProgram(p_quad_untex);
+    glUseProgram(p_quad_untex.handle);
 
     glEnableVertexAttribArray(va_quad_untex);
     glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
@@ -207,16 +149,14 @@ bool render_quad_untex(mat4 camera, mat4 transform)
     if(checkGLError())
         return false;
 
-    // TODO: Color
-    /*glUniform4f(u_quad_untex_color, col.r, col.g, col.b, col.a);*/
-    glUniform4f(u_quad_untex_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    if(!bind_vec4_to_program(p_quad_untex, "color", color))
+        return false;
 
     mat4 tt = ident;
     mat4 rt = ident;
     mat4 st = ident;
-    mat4 final = mul(camera, transform);
-    glUniformMatrix4fv(u_quad_untex_transform, 1, GL_FALSE, final.data);
-    if(checkGLError())
+    mat4 final = mat4_mul(camera, transform);
+    if(!bind_mat4_to_program(p_quad_untex, "transform", final))
         return false;
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -228,9 +168,9 @@ bool render_quad_untex(mat4 camera, mat4 transform)
     return true;
 }
 
-bool render_quad_subtex(mat4 camera, mat4 transform, texture* tex, bool use_dims, float tx, float ty, float tw, float th)
+bool render_quad_subtex_color(mat4 camera, mat4 transform, texture* tex, bool use_dims, vec4 uv_rect, vec4 color)
 {
-    glUseProgram(p_quad_subtex);
+    glUseProgram(p_quad_subtex.handle);
 
     glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
     glEnableVertexAttribArray(va_quad_subtex_pos);
@@ -240,30 +180,24 @@ bool render_quad_subtex(mat4 camera, mat4 transform, texture* tex, bool use_dims
     if(checkGLError())
         return false;
 
-    // TODO: Color
-    /*glUniform4f(u_quad_untex_color, col.r, col.g, col.b, col.a);*/
-    glUniform4f(u_quad_subtex_color, 1.0f, 1.0f, 1.0f, 1.0f);
-    if(checkGLError())
+    if(!bind_vec4_to_program(p_quad_subtex, "color", color))
         return false;
-    glUniform4f(u_quad_subtex_offsets, tx, ty, tw, th);
-    if(checkGLError())
+
+    if(!bind_vec4_to_program(p_quad_subtex, "uv_offset", uv_rect))
         return false;
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex->handle);
-    glUniform1i(u_quad_subtex_texture, 0);
-    if(checkGLError())
+    if(!bind_texture_to_program(p_quad_subtex, "texture", tex, GL_TEXTURE0))
         return false;
 
     mat4 tt = ident;
     mat4 rt = ident;
     mat4 st = ident;
-    mat4 final = mul(camera, transform);
+    mat4 final = mat4_mul(camera, transform);
     if(use_dims) {
-        mat4 iscale = ident;
-        scale(&iscale, tex->width * tw, tex->height * th, 0);
-        final = mul(final, iscale);
+        mat4 iscale = create_mat4();
+        mat4_scale(&iscale, tex->width * uv_rect.data[2], tex->height * uv_rect.data[3], 0);
+        final = mat4_mul(final, iscale);
     }
-    glUniformMatrix4fv(u_quad_subtex_transform, 1, GL_FALSE, final.data);
+    bind_mat4_to_program(p_quad_subtex, "transform", final);
     if(checkGLError())
         return false;
 

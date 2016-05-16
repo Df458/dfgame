@@ -19,5 +19,5 @@ void destroy_camera_full(camera* cam)
 // TODO: Only recalculate this matrix if things have changed
 mat4 camera_get_matrix(camera* cam)
 {
-    return mul(cam->projection, transform_get_view_matrix(cam->transform));
+    return mat4_mul(cam->projection, transform_get_view_matrix(cam->transform));
 }
