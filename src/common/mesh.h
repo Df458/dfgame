@@ -12,6 +12,7 @@ typedef struct mesh
     void*    data;
     uint8_t  type_flags;
     uint32_t vertex_count;
+    uint32_t data_size;
     GLuint handle;
 }
 mesh;
@@ -21,5 +22,6 @@ void destroy_mesh_full(mesh* m);
 #define destroy_mesh(m) destroy_mesh_full(m); m = 0;
 mesh* load_resource_to_mesh(resource_pair);
 bool save_mesh_to_resource(resource_pair);
+void mesh_update(mesh* m);
 
 #endif

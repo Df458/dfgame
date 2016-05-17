@@ -121,6 +121,14 @@ $(EDITORTARGET): $(EDITORSRCS)
 $(LIBEDITORTARGET): $(LIBEDITOROBJS) $(LIBEDITORDEPS)
 	ar -rcs $(LIBPATH)/$(LIBEDITORTARGET).a $(LIBEDITOROBJS)
 
+.PHONY: clean
+clean:
+	rm -rf $(OBJPATH)
+	rm -rf $(LIBPATH)
+	rm -rf $(VAPIPATH)
+	rm -rf $(GAMETARGET)
+	rm -rf $(EDITORTARGET)
+
 # Dynamic includes
 -include $(GAMEDEPS)
 -include $(LIBGAMEDEPS)

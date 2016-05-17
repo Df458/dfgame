@@ -11,6 +11,7 @@
 #include "common/audio.h"
 #include "common/texture.h"
 #include "common/sprite.h"
+#include "common/mesh.h"
 
 #include "common/matrix.h"
 #include "common/vector.h"

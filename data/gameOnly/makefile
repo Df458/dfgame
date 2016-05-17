@@ -82,6 +82,12 @@ $(GAMETARGET): $(GAMEOBJS) $(GAMEDEPS)
 $(LIBGAMETARGET): $(LIBGAMEOBJS) $(LIBGAMEDEPS)
 	ar -rcs $(LIBPATH)/$(LIBGAMETARGET).a $(LIBGAMEOBJS)
 
+.PHONY: clean
+clean:
+	rm -rf $(OBJPATH)
+	rm -rf $(LIBPATH)
+	rm -rf $(GAMETARGET)
+
 # Dynamic includes
 -include $(GAMEDEPS)
 -include $(LIBGAMEDEPS)
