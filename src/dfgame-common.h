@@ -18,6 +18,7 @@
 #include "common/transform.h"
 #include "common/camera.h"
 
+#include "common/program.h"
 #include "common/render.h"
 
 #endif

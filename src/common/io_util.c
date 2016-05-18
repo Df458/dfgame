@@ -138,6 +138,20 @@ unsigned char* load_resource_to_buffer(resource_pair)
     return filedata;
 }
 
+char* load_resource_to_string(resource_pair)
+{
+    FILE* file = load_resource_file(resource_location, resource_name, "rb");
+    fseek(file, 0, SEEK_END);
+    size_t filesize = ftell(file) + 1;
+    fseek(file, 0, SEEK_SET);
+    char* filedata = calloc(filesize, sizeof(char));
+    fread(filedata, 1, filesize, file);
+    filedata[filesize - 1] = '\0';
+
+    fclose(file);
+    return filedata;
+}
+
 char* read_string_from_file(FILE* file)
 {
     char* str = 0;

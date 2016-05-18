@@ -3,7 +3,7 @@
 #include "util.h"
 
 // TODO: Improve this with better logging
-program create_program(const char** vs, const char** fs)
+program create_program(const char* const* vs, const char* const* fs)
 {
     program p;
     p.valid = false;
@@ -98,8 +98,6 @@ bool bind_mat4_to_program(program p, const char* name, mat4 mat)
     glUseProgram(p.handle);
     GLuint uni_handle = glGetUniformLocation(p.handle, name);
     glUniformMatrix4fv(uni_handle, 1, GL_FALSE, mat.data);
-    if(checkGLError())
-        return false;
     return true;
 }
 

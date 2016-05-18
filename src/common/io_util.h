@@ -66,6 +66,7 @@ FILE* load_resource_file(resource_pair, const char* mode);
  * See get_extended_resource_path(io_util.h) for usage details
  */
 unsigned char* load_resource_to_buffer(resource_pair);
+char* load_resource_to_string(resource_pair);
 
 /*!
  * This funcion loads a string from a file.

@@ -15,7 +15,7 @@ typedef struct program
 }
 program;
 
-program create_program(const char** vs, const char** fs);
+program create_program(const char* const* vs, const char* const* fs);
 void delete_program(program* p);
 
 bool bind_float_to_program(program p,   const char* name, float f);

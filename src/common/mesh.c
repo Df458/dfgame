@@ -134,7 +134,7 @@ mesh* load_resource_to_mesh(resource_pair)
     mesh* m = create_mesh(index_list->length * 3, type);
     if(type & VT_NORMAL && type & VT_TEXTURE) {
         vt_pnt* data = m->data;
-        for(int i = 0; i < index_list->length; ++i) {
+        for(int i = 0; index_list->length > 0; i += 3) {
             struct mesh_index* in = array_list_pop(index_list);
             vec3* p1 = array_list_get(position_list, in->pos[0]-1);
             vec3* n1 = array_list_get(normal_list, in->norm[0]-1);
@@ -175,7 +175,7 @@ mesh* load_resource_to_mesh(resource_pair)
         }
     } else if(type & VT_NORMAL) {
         vt_pn* data = m->data;
-        for(int i = 0; i < index_list->length; ++i) {
+        for(int i = 0; index_list->length > 0; i += 3) {
             struct mesh_index* in = array_list_pop(index_list);
             vec3* p1 = array_list_get(position_list, in->pos[0]-1);
             vec3* n1 = array_list_get(normal_list, in->norm[0]-1);
@@ -204,7 +204,7 @@ mesh* load_resource_to_mesh(resource_pair)
         }
     } else if(type & VT_TEXTURE) {
         vt_pt* data = m->data;
-        for(int i = 0; i < index_list->length; ++i) {
+        for(int i = 0; index_list->length > 0; i += 3) {
             struct mesh_index* in = array_list_pop(index_list);
             vec3* p1 = array_list_get(position_list, in->pos[0]-1);
             vec2* t1 = array_list_get(uv_list, in->uv[0]-1);
@@ -233,7 +233,7 @@ mesh* load_resource_to_mesh(resource_pair)
         }
     } else {
         vt_p* data = m->data;
-        for(int i = 0; i < index_list->length; ++i) {
+        for(int i = 0; index_list->length > 0; i += 3) {
             struct mesh_index* in = array_list_pop(index_list);
             vec3* p1 = array_list_get(position_list, in->pos[0]-1);
             vec3* p2 = array_list_get(position_list, in->pos[1]-1);
