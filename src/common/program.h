@@ -12,6 +12,7 @@ typedef struct program
 {
     GLuint handle;
     bool   valid;
+    GLuint method; // Draw type passed to glDrawArrays
 }
 program;
 

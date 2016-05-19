@@ -2,6 +2,7 @@
 #include "render_def.h"
 #include "util.h"
 #include "program.h"
+#include "vertex_def.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Hidden data
@@ -98,6 +99,60 @@ bool cleanup_renderer()
     delete_program(&p_quad_subtex);
 
     return true;
+}
+
+bool render_mesh(mat4 camera, mat4 transform, mesh* m, program* p)
+{
+    glUseProgram(p->handle);
+
+    if(!bind_mat4_to_program(*p, "camera", camera))
+        return false;
+    if(!bind_mat4_to_program(*p, "transform", transform))
+        return false;
+
+    glBindBuffer(GL_ARRAY_BUFFER, m->handle);
+    if(m->type_flags & VT_NORMAL) {
+        if(m->type_flags & VT_TEXTURE) {
+            GLuint va_position = glGetAttribLocation(p->handle, "va_position");
+            GLuint va_normal   = glGetAttribLocation(p->handle, "va_normal");
+            GLuint va_texture  = glGetAttribLocation(p->handle, "va_texture");
+            glEnableVertexAttribArray(va_position);
+            glVertexAttribPointer(va_position, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(va_normal);
+            glVertexAttribPointer(va_normal, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(va_texture);
+            glVertexAttribPointer(va_texture, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+            if(checkGLError())
+                return false;
+        } else {
+            GLuint va_position = glGetAttribLocation(p->handle, "va_position");
+            GLuint va_normal   = glGetAttribLocation(p->handle, "va_normal");
+            glEnableVertexAttribArray(va_position);
+            glEnableVertexAttribArray(va_normal);
+            glVertexAttribPointer(va_position, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+            glVertexAttribPointer(va_normal,   3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+            if(checkGLError())
+                return false;
+        }
+    } else if(m->type_flags & VT_TEXTURE) {
+        GLuint va_position = glGetAttribLocation(p->handle, "va_position");
+        GLuint va_texture  = glGetAttribLocation(p->handle, "va_texture");
+        glEnableVertexAttribArray(va_position);
+        glVertexAttribPointer(va_position, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(va_texture);
+        glVertexAttribPointer(va_texture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        if(checkGLError())
+            return false;
+    } else {
+        GLuint va_position = glGetAttribLocation(p->handle, "va_position");
+        glEnableVertexAttribArray(va_position);
+        glVertexAttribPointer(va_position, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        if(checkGLError())
+            return false;
+    }
+
+    glDrawArrays(p->method, 0, m->vertex_count);
+    return !checkGLError();
 }
 
 bool render_quad_color(mat4 camera, mat4 transform, texture* tex, bool use_dims, vec4 color)

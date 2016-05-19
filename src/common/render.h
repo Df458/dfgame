@@ -1,6 +1,8 @@
 #ifndef DF_RENDER_H
 #define DF_RENDER_H
 #include "matrix.h"
+#include "mesh.h"
+#include "program.h"
 #include "texture.h"
 #include "vector.h"
 
@@ -14,6 +16,8 @@ bool _checkGLError(const char* file, unsigned line);
 
 bool init_renderer();
 bool cleanup_renderer();
+
+bool render_mesh(mat4 camera, mat4 transform, mesh* m, program* p);
 
 bool render_quad_color(mat4 camera, mat4 transform, texture* tex, bool use_dims, vec4 color);
 #define render_quad(camera, transform, tex, use_dims) render_quad_color(camera, transform, tex, use_dims, create_vec4_data(1, 1, 1, 1))

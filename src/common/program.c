@@ -7,6 +7,7 @@ program create_program(const char* const* vs, const char* const* fs)
 {
     program p;
     p.valid = false;
+    p.method = GL_TRIANGLES;
 
     GLuint vertex_shader, fragment_shader;
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
