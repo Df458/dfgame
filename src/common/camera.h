@@ -22,5 +22,7 @@ void destroy_camera_full(camera* cam);
 #define camera_get_angle(cam, angle) transform_get_angle(cam->transform, angle);
 #define camera_get_scale(cam, x, y) transform_get_scale(cam->transform, x, y);
 mat4 camera_get_matrix(camera* cam);
+mat4 camera_get_view(camera* cam);
+mat4 camera_get_projection(camera* cam);
 
 #endif

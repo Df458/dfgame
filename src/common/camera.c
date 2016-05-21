@@ -21,3 +21,13 @@ mat4 camera_get_matrix(camera* cam)
 {
     return mat4_mul(cam->projection, transform_get_view_matrix(cam->transform));
 }
+
+mat4 camera_get_view(camera* cam)
+{
+    return transform_get_view_matrix(cam->transform);
+}
+
+mat4 camera_get_projection(camera* cam)
+{
+    return cam->projection;
+}
