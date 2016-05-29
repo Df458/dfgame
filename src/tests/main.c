@@ -1,8 +1,8 @@
-#include "array_list.h"
 #include "camera.h"
 #include "util.h"
 #include "vector.h"
 #include "tests_mesh.h"
+#include "tests_data.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -31,108 +31,6 @@ static void test_vector_new(void** state)
         assert_true(vec_d.data[0] == 3 && vec_d.data[1] == 5 && vec_d.data[2] == 7 && vec_d.data[3] == 9);
     }
 }
-
-static void test_array_list_new_destroy(void** state)
-{
-    array_list* list = create_array_list();
-    assert_non_null(list);
-    assert_int_equal(list->length, 0);
-    assert_int_equal(list->data_size, 1);
-    array_list_destroy(list);
-    assert_null(list);
-}
-
-static void test_create_array_list_size(void** state)
-{
-    array_list* list = create_array_list_size(4);
-    assert_non_null(list);
-    assert_int_equal(list->length, 0);
-    assert_int_equal(list->data_size, 4);
-    array_list_destroy(list);
-}
-
-static void test_array_list_add(void** state)
-{
-    array_list* list = create_array_list();
-    int i;
-    array_list_add(list, 0, &i);
-    assert_int_equal(list->length, 1);
-    array_list_destroy(list);
-}
-
-static void test_array_list_push(void** state)
-{
-    array_list* list = create_array_list();
-    int i;
-    array_list_push(list, &i);
-    assert_int_equal(list->length, 1);
-    array_list_destroy(list);
-}
-
-static void test_create_array_list_destroy_deep(void** state)
-{
-    array_list* list = create_array_list();
-    int* i = salloc(sizeof(int));
-    array_list_push(list, i);
-    array_list_destroy_deep(list);
-}
-
-static void test_array_list_index(void** state)
-{
-    array_list* list = create_array_list();
-    int i, j, k;
-    array_list_push(list, &i);
-    array_list_push(list, &j);
-    array_list_push(list, &k);
-    assert_int_equal(array_list_index(list, &i), 0);
-    assert_int_equal(array_list_index(list, &j), 1);
-    assert_int_equal(array_list_index(list, &k), 2);
-    array_list_destroy(list);
-}
-
-static void test_array_list_remove(void** state)
-{
-    array_list* list = create_array_list();
-    int i, j, k;
-    array_list_push(list, &i);
-    array_list_push(list, &j);
-    array_list_push(list, &k);
-    array_list_remove(list, &j);
-    assert_int_equal(list->length, 2);
-    assert_int_equal(array_list_index(list, &i), 0);
-    assert_int_equal(array_list_index(list, &k), 1);
-    array_list_destroy(list);
-}
-
-static void test_array_list_remove_at(void** state)
-{
-    array_list* list = create_array_list();
-    int i, j, k;
-    array_list_push(list, &i);
-    array_list_push(list, &j);
-    array_list_push(list, &k);
-    array_list_remove_at(list, 1);
-    assert_int_equal(list->length, 2);
-    assert_int_equal(array_list_index(list, &i), 0);
-    assert_int_equal(array_list_index(list, &k), 1);
-    array_list_destroy(list);
-}
-
-static void test_array_list_pop(void** state)
-{
-    array_list* list = create_array_list();
-    int i, j, k;
-    array_list_push(list, &i);
-    array_list_push(list, &j);
-    array_list_push(list, &k);
-    array_list_pop(list);
-    assert_int_equal(list->length, 2);
-    assert_int_equal(array_list_index(list, &i), 0);
-    assert_int_equal(array_list_index(list, &j), 1);
-    array_list_destroy(list);
-}
-
-
 
 static void test_camera_2D_new_destroy(void** state)
 {
@@ -191,17 +89,6 @@ static void test_camera_2D_transforms(void** state)
 
 int main(void)
 {
-    const struct CMUnitTest data_structure_tests[] = {
-        cmocka_unit_test(test_array_list_new_destroy),
-        cmocka_unit_test(test_create_array_list_size),
-        cmocka_unit_test(test_array_list_add),
-        cmocka_unit_test(test_array_list_push),
-        cmocka_unit_test(test_create_array_list_destroy_deep),
-        cmocka_unit_test(test_array_list_index),
-        cmocka_unit_test(test_array_list_remove),
-        cmocka_unit_test(test_array_list_remove_at),
-        cmocka_unit_test(test_array_list_pop),
-    };
     const struct CMUnitTest camera_tests[] = {
         cmocka_unit_test(test_camera_2D_new_destroy),
         cmocka_unit_test(test_camera_2D_get_matrix),
@@ -211,7 +98,7 @@ int main(void)
     const struct CMUnitTest math_tests[] = {
         cmocka_unit_test(test_vector_new),
     };
-    if(cmocka_run_group_tests_name("data structure tests", data_structure_tests, NULL, NULL))
+    if(cmocka_run_group_tests_name("data structure tests", data_tests, NULL, NULL))
         return 1;
     if(cmocka_run_group_tests_name("camera tests", camera_tests, NULL, NULL))
         return 1;

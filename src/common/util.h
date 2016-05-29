@@ -13,7 +13,7 @@ typedef enum
     LOG_FATAL    // This kills the program immediately. Reserved for errors that will guarantee a crash, such as null pointers or out of memory errors.
 } log_level;
 
-typedef void (*log_handler)(const char*, unsigned, log_level, char*);
+typedef void (*log_handler)(const char*, unsigned, log_level, const char*);
 
 void _log(const char* file, unsigned line, log_level level, char* const message, ...);
 #define info(message, ...)  _log(__FILE__, __LINE__, LOG_INFO,    message, ## __VA_ARGS__)

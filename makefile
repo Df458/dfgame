@@ -44,8 +44,8 @@ TESTDEPS=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(TESTSRC))
 VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(EDITORFRONTTARGET) -X -I$(SRCPATH)$(GAMEBACKTARGET) -X -I$(SRCPATH)$(COMMONTARGET) --cc=$(CC) -H $(SRCPATH)dfgame-editor-front.h --vapi=$(VAPIPATH)dfgame-editor-frontend.vapi
 VLIBS=--pkg=glib-2.0 --pkg=gtk+-3.0 --pkg=gee-0.8 --pkg=libxml-2.0 --pkg=dflib --pkg=dfgame-editor --pkg=dfgame-game --pkg=dfgame-common
 
-CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags libxml-2.0 glew gl openal`
-CLIBS=`$(PKGCONFIG) --libs glew gl lua openal`
+CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags libxml-2.0 glew gl openal freetype2`
+CLIBS=`$(PKGCONFIG) --libs glew gl lua openal freetype2`
 
 GAMEBACKFLAGS=${CFLAGS}
 GAMEBACKLIBS=${CLIBS}
