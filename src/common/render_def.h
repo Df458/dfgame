@@ -62,6 +62,18 @@ static const char* quad_fs[] =
     "f_color = texture2D(texture, v_uv) * color;\n"
     "}\n"
 };
+static const char* text_fs[] =
+{
+    "#version 330\n"
+    "uniform sampler2D texture;\n"
+    "uniform vec4 color;\n"
+    "in  vec2 v_uv;\n"
+    "layout(location = 0) out vec4 f_color;\n"
+    "void main() {\n"
+    "f_color = color;\n"
+    "f_color.a = texture2D(texture, v_uv).a;\n"
+    "}\n"
+};
 static const char* quad_untex_fs[] =
 {
     "#version 330\n"

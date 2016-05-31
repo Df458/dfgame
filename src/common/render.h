@@ -1,5 +1,6 @@
 #ifndef DF_RENDER_H
 #define DF_RENDER_H
+#include "font.h"
 #include "matrix.h"
 #include "mesh.h"
 #include "program.h"
@@ -25,6 +26,10 @@ bool render_quad_untex_color(mat4 camera, mat4 transform, vec4 color);
 #define render_quad_untex(camera, transform) render_quad_untex_color(camera, transform, create_vec4_data(1, 1, 1, 1))
 bool render_quad_subtex_color(mat4 camera, mat4 transform, texture* tex, bool use_dims, vec4 uv_rect, vec4 color);
 #define render_quad_subtex(camera, transform, tex, use_dims, uv_rect) render_quad_subtex_color(camera, transform, tex, use_dims, uv_rect, create_vec4_data(1, 1, 1, 1))
+bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph, bool use_dims, vec4 color);
+#define render_text(camera, transform, ft, glyph, use_dims) render_text_color(camera, transform, ft, glyph, use_dims, create_vec4_data(1, 1, 1, 1))
+bool render_text_string_color(mat4 camera, mat4 transform, font* ft, const char* text, ssize_t text_length, bool use_dims, vec4 color);
+#define render_text_string(camera, transform, ft, text, text_length, use_dims) render_text_string_color(camera, transform, ft, text, text_length, use_dims, create_vec4_data(1, 1, 1, 1))
 
 GLuint get_quad_buffer();
 

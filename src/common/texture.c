@@ -1,5 +1,6 @@
 #include "io_util.h"
 #include "texture.h"
+#include "render.h"
 #include "util.h"
 
 #include <stdio.h>
@@ -352,4 +353,23 @@ uint8_t* load_resource_to_texture_buffer(resource_pair, uint16_t* w, uint16_t* h
 
     free(path);
     return buffer;
+}
+
+bool fill_texture(texture* tex, vec4 color)
+{
+    GLubyte* data = scalloc(tex->width * tex->height * 4, sizeof(GLuint));
+    color.data[0] *= 256;
+    color.data[1] *= 256;
+    color.data[2] *= 256;
+    color.data[3] *= 256;
+    for(int i = 0; i < tex->width * tex->height; ++i) {
+        data[i * 4 + 0] = color.data[0];
+        data[i * 4 + 1] = color.data[1];
+        data[i * 4 + 2] = color.data[2];
+        data[i * 4 + 3] = color.data[3];
+    }
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex->width, tex->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    return !checkGLError();
 }

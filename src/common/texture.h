@@ -1,6 +1,7 @@
 #ifndef DF_TEXTURE_H
 #define DF_TEXTURE_H
 #include "resource_def.h"
+#include "vector.h"
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -47,5 +48,7 @@ bool save_texture_to_resource(texture* tex, resource_pair);
  * and w/h are filled with the appropriate dimensions.
  */
 uint8_t* load_resource_to_texture_buffer(resource_pair, uint16_t* w, uint16_t* h);
+
+bool fill_texture(texture* tex, vec4 color);
 
 #endif
