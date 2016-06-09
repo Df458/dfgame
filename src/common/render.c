@@ -17,7 +17,6 @@ GLuint va_quad_uv;
 
 program p_text;
 GLuint va_text_pos;
-GLuint va_text_pos;
 GLuint va_text_uv;
 
 program p_quad_untex;
@@ -88,7 +87,8 @@ bool init_renderer()
     if(checkGLError())
         return false;
 
-    p_text = create_program(quad_subtex_vs, text_fs);
+    /* p_text = create_program_gvf(text_gs, quad_subtex_vs, text_fs); */
+    p_text = create_program(quad_vs, text_fs);
     va_text_pos = glGetAttribLocation(p_text.handle, "i_pos");
     va_text_uv = glGetAttribLocation(p_text.handle, "i_uv");
     if(checkGLError())
@@ -280,7 +280,7 @@ bool render_quad_subtex_color(mat4 camera, mat4 transform, texture* tex, bool us
 
 bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph_id, bool use_dims, vec4 color)
 {
-    glUseProgram(p_text.handle);
+    glUseProgram(p_quad_subtex.handle);
 
     glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
     glEnableVertexAttribArray(va_text_pos);
@@ -290,17 +290,15 @@ bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph_id, bool
     if(checkGLError())
         return false;
 
-    if(!bind_vec4_to_program(p_text, "color", color))
+    if(!bind_vec4_to_program(p_quad_subtex, "color", color))
         return false;
 
-    glyph* gp;
-    if(glyph_id >= BASIC_GLYPHS_START && glyph_id < BASIC_GLYPHS_END)
-        gp = &ft->basic_glyphs[glyph_id - BASIC_GLYPHS_START];
-    else
-        gp = sorted_tree_get(ft->special_glyphs, glyph_id);
-    if(!bind_vec4_to_program(p_text, "uv_offset", create_vec4_data(gp->texture_position.data[0] / (float)GLYPH_ATLAS_SIZE, gp->texture_position.data[1] / (float)GLYPH_ATLAS_SIZE, gp->texture_size.data[0] / (float)GLYPH_ATLAS_SIZE, gp->texture_size.data[1] / (float)GLYPH_ATLAS_SIZE)))
+    glyph* gp = font_get_glyph(ft, glyph_id, false);
+    if(!gp)
         return false;
-    if(!bind_texture_to_program(p_text, "texture", ft->atlas, GL_TEXTURE0))
+    if(!bind_vec4_to_program(p_quad_subtex, "uv_offset", create_vec4_data(gp->texture_position.data[0] / (float)GLYPH_ATLAS_SIZE, gp->texture_position.data[1] / (float)GLYPH_ATLAS_SIZE, gp->texture_size.data[0] / (float)GLYPH_ATLAS_SIZE, gp->texture_size.data[1] / (float)GLYPH_ATLAS_SIZE)))
+        return false;
+    if(!bind_texture_to_program(p_quad_subtex, "texture", ft->atlas, GL_TEXTURE0))
         return false;
 
     mat4 tt = ident;
@@ -312,7 +310,7 @@ bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph_id, bool
         mat4_scale(&iscale, gp->texture_size.data[0], gp->texture_size.data[1], 0);
         final = mat4_mul(final, iscale);
     }
-    bind_mat4_to_program(p_text, "transform", final);
+    bind_mat4_to_program(p_quad_subtex, "transform", final);
     if(checkGLError())
         return false;
 
@@ -326,59 +324,34 @@ bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph_id, bool
     return true;
 }
 
-bool render_text_string_color(mat4 camera, mat4 transform, font* ft, const char* text, ssize_t text_length, bool use_dims, vec4 color)
+bool render_text_string_color(mat4 camera, mat4 transform, text* txt, vec4 color)
 {
     glUseProgram(p_text.handle);
-
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, txt->handle);
     glEnableVertexAttribArray(va_text_pos);
-    glVertexAttribPointer(va_text_pos, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(va_text_pos, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(va_text_uv);
-    glVertexAttribPointer(va_text_uv, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(va_text_uv, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    if(checkGLError())
+        return false;
+
+    mat4 tt = ident;
+    mat4 rt = ident;
+    mat4 st = ident;
+    mat4 final = mat4_mul(camera, transform);
+    bind_mat4_to_program(p_text, "transform", final);
     if(checkGLError())
         return false;
 
     if(!bind_vec4_to_program(p_text, "color", color))
         return false;
 
-    if(!bind_texture_to_program(p_text, "texture", ft->atlas, GL_TEXTURE0))
+    if(!bind_texture_to_program(p_text, "texture", txt->font->atlas, GL_TEXTURE0))
         return false;
 
-    // TODO: Use a geometry shader instead of making tons of draw calls
-    transform2D* t_pen = create_transform();
-    for(int i = 0; i < text_length; ++i) {
-        char glyph_id = text[i];
-        glyph* gp;
-        if(glyph_id >= BASIC_GLYPHS_START && glyph_id < BASIC_GLYPHS_END)
-            gp = &ft->basic_glyphs[glyph_id - BASIC_GLYPHS_START];
-        else
-            gp = sorted_tree_get(ft->special_glyphs, glyph_id);
-
-        transform_set_position(t_pen, gp->bearing.data[0] / 64, -gp->bearing.data[1] / 128, true);
-
-        if(!bind_vec4_to_program(p_text, "uv_offset", create_vec4_data(gp->texture_position.data[0] / (float)GLYPH_ATLAS_SIZE, gp->texture_position.data[1] / (float)GLYPH_ATLAS_SIZE, gp->texture_size.data[0] / (float)GLYPH_ATLAS_SIZE, gp->texture_size.data[1] / (float)GLYPH_ATLAS_SIZE)))
-            return false;
-
-        mat4 tt = ident;
-        mat4 rt = ident;
-        mat4 st = ident;
-        mat4 final = mat4_mul(camera, mat4_mul(transform, transform_get_matrix(t_pen)));
-        if(use_dims) {
-            mat4 iscale = create_mat4();
-            mat4_scale(&iscale, gp->texture_size.data[0], gp->texture_size.data[1], 0);
-            final = mat4_mul(final, iscale);
-        }
-        bind_mat4_to_program(p_text, "transform", final);
-        if(checkGLError())
-            return false;
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        if(checkGLError())
-            return false;
-
-        transform_set_position(t_pen, gp->advance / 64 - gp->bearing.data[0] / 64, gp->bearing.data[1] / 128, true);
-        /* info("%f, %f, %f", gp->bearing.data[0], gp->advance, gp->advance - gp->bearing.data[0]); */
-    }
+    glDrawArrays(GL_TRIANGLES, 0, txt->buflen * 6);
+    if(checkGLError())
+        return false;
 
     glDisableVertexAttribArray(va_text_pos);
     glDisableVertexAttribArray(va_text_uv);

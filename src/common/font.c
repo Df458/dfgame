@@ -52,6 +52,7 @@ font* load_resource_to_font(resource_pair, bool prepare_basic_glyphs, float font
     // TODO: Add HIDPI support
     /* FT_Set_Char_Size(f->font_face, 0, font_height * 64, 0, 0); */
     FT_Set_Pixel_Sizes(f->font_face, 0, font_height);
+    f->height = font_height;
 
     if(prepare_basic_glyphs) {
         for(int i = BASIC_GLYPHS_START; i < BASIC_GLYPHS_END; ++i)
@@ -61,7 +62,7 @@ font* load_resource_to_font(resource_pair, bool prepare_basic_glyphs, float font
     return f;
 }
 
-bool save_font_to_resource(resource_pair)
+bool save_font_to_resource(resource_pair, font* fnt)
 {
     stub(false);
 }
@@ -112,4 +113,22 @@ bool font_prepare_glyph(font* ft, int glyph_id)
         glTexSubImage2D(GL_TEXTURE_2D, 0, gp->texture_position.data[0], gp->texture_position.data[1] + i, gp->texture_size.data[0], 1, GL_ALPHA, GL_UNSIGNED_BYTE, ft->font_face->glyph->bitmap.buffer + ((ft->font_face->glyph->bitmap.rows - i - 1) * ft->font_face->glyph->bitmap.pitch));
     }
     return true;
+}
+
+glyph* font_get_glyph(font* ft, int glyph_id, bool prepare_if_missing)
+{
+    glyph* gp = 0;
+    if(glyph_id >= BASIC_GLYPHS_START && glyph_id < BASIC_GLYPHS_END)
+        gp = &ft->basic_glyphs[glyph_id - BASIC_GLYPHS_START];
+    else
+        gp = sorted_tree_get(ft->special_glyphs, glyph_id);
+    if(!gp && prepare_if_missing && font_prepare_glyph(ft, glyph_id)) {
+        if(glyph_id >= BASIC_GLYPHS_START && glyph_id < BASIC_GLYPHS_END)
+            gp = &ft->basic_glyphs[glyph_id - BASIC_GLYPHS_START];
+        else
+            gp = sorted_tree_get(ft->special_glyphs, glyph_id);
+    }
+        
+
+    return gp;
 }

@@ -16,6 +16,24 @@ static const float QUAD_BUFFER_DATA[] =
 };
 
 // Shaders
+static const char* text_gs[] =
+{
+    "#version 330\n"
+    "layout(points) in;\n"
+    "layout(triangle_strip, max_vertices=4) out;\n"
+    "void main() {\n"
+    "gl_Position = gl_in[0].gl_Position + vec4(-0.5, -0.5, 0, 0);\n"
+    "EmitVertex();\n"
+    "gl_Position = gl_in[0].gl_Position + vec4(0.5, -0.5, 0, 0);\n"
+    "EmitVertex();\n"
+    "gl_Position = gl_in[0].gl_Position + vec4(-0.5, 0.5, 0, 0);\n"
+    "EmitVertex();\n"
+    "gl_Position = gl_in[0].gl_Position + vec4(0.5, 0.5, 0, 0);\n"
+    "EmitVertex();\n"
+    "EndPrimitive();\n"
+    "}\n"
+};
+
 static const char* quad_vs[] =
 {
     "#version 330\n"
@@ -33,7 +51,7 @@ static const char* quad_subtex_vs[] =
     "#version 330\n"
     "uniform mat4 transform;\n"
     "uniform vec4 uv_offset;\n"
-    "layout(location = 0) in  vec3 i_pos;\n"
+    "layout(location = 0) in vec3 i_pos;\n"
     "in  vec2 i_uv;\n"
     "out vec2 v_uv;\n"
     "void main() {\n"

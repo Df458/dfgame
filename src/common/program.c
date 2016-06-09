@@ -3,7 +3,7 @@
 #include "util.h"
 
 // TODO: Improve this with better logging
-program create_program(const char* const* vs, const char* const* fs)
+program create_program_vf(const char* const* vs, const char* const* fs)
 {
     program p;
     p.valid = false;
@@ -39,6 +39,65 @@ program create_program(const char* const* vs, const char* const* fs)
 
     glDetachShader(p.handle, vertex_shader);
     glDetachShader(p.handle, fragment_shader);
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
+
+    p.valid = true;
+
+    return p;
+}
+
+program create_program_gvf(const char* const* gs, const char* const* vs, const char* const* fs)
+{
+    program p;
+    p.valid = false;
+    p.method = GL_TRIANGLES;
+
+    GLuint geometry_shader, vertex_shader, fragment_shader;
+    geometry_shader   = glCreateShader(GL_GEOMETRY_SHADER);
+    vertex_shader   = glCreateShader(GL_VERTEX_SHADER);
+    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    p.handle        = glCreateProgram();
+    glShaderSource(geometry_shader,  1,  gs,  NULL);
+    glShaderSource(vertex_shader,    1,  vs,  NULL);
+    glShaderSource(fragment_shader,  1,  fs,  NULL);
+    GLsizei len;
+    char log[1024];
+
+    if(checkGLError())
+        return p;
+    glCompileShader(geometry_shader);
+    glCompileShader(vertex_shader);
+    glCompileShader(fragment_shader);
+    if(checkGLError())
+        return p;
+    glAttachShader(p.handle, geometry_shader);
+    glAttachShader(p.handle, vertex_shader);
+    glAttachShader(p.handle, fragment_shader);
+    if(checkGLError())
+        return p;
+    glLinkProgram(p.handle);
+    if(checkGLError())
+        return p;
+    glGetShaderInfoLog(geometry_shader, 1024, &len, log);
+    if(len)
+        info("Geometry Shader Log\n%s\n", log);
+    glGetShaderInfoLog(vertex_shader, 1024, &len, log);
+    if(len)
+        info("Vertex Shader Log\n%s\n", log);
+    glGetShaderInfoLog(fragment_shader, 1024, &len, log);
+    if(len)
+        info("Fragment Shader Log\n%s\n", log);
+    glGetProgramInfoLog(p.handle, 1024, &len, log);
+    if(len)
+        info("Program Log\n%s\n", log);
+    if(checkGLError())
+        return p;
+
+    glDetachShader(p.handle, geometry_shader);
+    glDetachShader(p.handle, vertex_shader);
+    glDetachShader(p.handle, fragment_shader);
+    glDeleteShader(geometry_shader);
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
 

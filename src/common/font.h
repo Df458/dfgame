@@ -31,6 +31,7 @@ typedef struct font
     float atlas_xbounds;
     float atlas_ybounds;
     float atlas_ybounds_next;
+    float height;
 }
 font;
 
@@ -42,8 +43,9 @@ void destroy_font_full(font* font);
 #define destroy_font(f) { destroy_font_full(f); f = 0; }
 
 font* load_resource_to_font(resource_pair, bool prepare_basic_glyphs, float font_height);
-bool save_font_to_resource(resource_pair);
+bool save_font_to_resource(resource_pair, font* fnt);
 
 bool font_prepare_glyph(font* ft, int glyph_id);
+glyph* font_get_glyph(font* ft, int glyph_id, bool prepare_if_missing);
 
 #endif
