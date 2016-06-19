@@ -4,6 +4,7 @@
 #include "matrix.h"
 #include "mesh.h"
 #include "program.h"
+#include "particle.h"
 #include "text.h"
 #include "texture.h"
 #include "vector.h"
@@ -31,6 +32,7 @@ bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph, bool us
 #define render_text(camera, transform, ft, glyph, use_dims) render_text_color(camera, transform, ft, glyph, use_dims, create_vec4_data(1, 1, 1, 1))
 bool render_text_string_color(mat4 camera, mat4 transform, text* txt, vec4 color);
 #define render_text_string(camera, transform, txt) render_text_string_color(camera, transform, txt, create_vec4_data(1, 1, 1, 1))
+bool render_particles(mat4 camera, mat4 transform, particleSystem* system);
 
 GLuint get_quad_buffer();
 

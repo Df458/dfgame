@@ -35,7 +35,7 @@ void recalculate_buffer(text* txt)
                     c_w = tg->advance / 64;
                 }
 
-                if(*llen + c_w + counter <= txt->limits.data[0] && last_sep != '\n') {
+                if((*llen + c_w + counter <= txt->limits.data[0] && txt->limits.data[0] != 0) && last_sep != '\n') {
                     *llen += c_w + counter;
                 } else {
                     llen = salloc(sizeof(float));

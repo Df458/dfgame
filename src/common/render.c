@@ -26,6 +26,9 @@ program p_quad_subtex;
 GLuint va_quad_subtex_pos;
 GLuint va_quad_subtex_uv;
 
+program p_particle;
+GLuint va_particle_buffer;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Public functions
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,6 +100,11 @@ bool init_renderer()
     p_quad_subtex = create_program(quad_subtex_vs, quad_fs);
     va_quad_subtex_pos = glGetAttribLocation(p_quad_subtex.handle, "i_pos");
     va_quad_subtex_uv = glGetAttribLocation(p_quad_subtex.handle, "i_uv");
+    if(checkGLError())
+        return false;
+
+    p_particle = create_program_gvf(particle_gs, particle_vs, quad_untex_fs);
+    va_particle_buffer = glGetAttribLocation(p_particle.handle, "texCoord");
     if(checkGLError())
         return false;
 
@@ -355,6 +363,36 @@ bool render_text_string_color(mat4 camera, mat4 transform, text* txt, vec4 color
 
     glDisableVertexAttribArray(va_text_pos);
     glDisableVertexAttribArray(va_text_uv);
+
+    return true;
+}
+
+bool render_particles(mat4 camera, mat4 transform, particleSystem* system)
+{
+    glUseProgram(p_particle.handle);
+    if(checkGLError())
+        return false;
+    glBindBuffer(GL_ARRAY_BUFFER, system->v_buffer);
+    glEnableVertexAttribArray(va_particle_buffer);
+    glVertexAttribPointer(va_particle_buffer, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    if(checkGLError())
+        return false;
+
+    mat4 tt = ident;
+    mat4 rt = ident;
+    mat4 st = ident;
+    mat4 final = mat4_mul(camera, transform);
+    bind_mat4_to_program(p_particle, "transform", final);
+    if(checkGLError())
+        return false;
+
+    if(!bind_vec4_to_program(p_particle, "color", create_vec4_data(1, 0, 1, 1)))
+        return false;
+
+    if(!bind_texture_to_program(p_particle, "data", system->positions[0], GL_TEXTURE0))
+        return false;
+
+    glDrawArrays(GL_POINTS, 0, 1);
 
     return true;
 }

@@ -33,6 +33,24 @@ static const char* text_gs[] =
     "EndPrimitive();\n"
     "}\n"
 };
+static const char* particle_gs[] =
+{
+    "#version 330\n"
+    "layout(points) in;\n"
+    "layout(triangle_strip, max_vertices=4) out;\n"
+    "uniform mat4 transform;\n"
+    "void main() {\n"
+    "gl_Position = gl_in[0].gl_Position + transform * (vec4(-0.5, -0.5, 0, 0));\n"
+    "EmitVertex();\n"
+    "gl_Position = gl_in[0].gl_Position + transform * (vec4(0.5, -0.5, 0, 0));\n"
+    "EmitVertex();\n"
+    "gl_Position = gl_in[0].gl_Position + transform * (vec4(-0.5, 0.5, 0, 0));\n"
+    "EmitVertex();\n"
+    "gl_Position = gl_in[0].gl_Position + transform * (vec4(0.5, 0.5, 0, 0));\n"
+    "EmitVertex();\n"
+    "EndPrimitive();\n"
+    "}\n"
+};
 
 static const char* quad_vs[] =
 {
@@ -66,6 +84,16 @@ static const char* quad_untex_vs[] =
     "layout(location = 0) in vec3 i_pos;\n"
     "void main() {\n"
     "gl_Position = transform * vec4(i_pos, 1.0);\n"
+    "}\n"
+};
+static const char* particle_vs[] =
+{
+    "#version 330\n"
+    "in vec2 texCoord;\n"
+    "uniform sampler2D data;\n"
+    "uniform mat4 transform;\n"
+    "void main() {\n"
+    "gl_Position = transform * vec4(texture2D(data, texCoord).rgb, 1);\n"
     "}\n"
 };
 

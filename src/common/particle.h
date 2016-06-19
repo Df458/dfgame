@@ -1,0 +1,23 @@
+#ifndef DF_PARTICLE_H
+#define DF_PARTICLE_H
+#include "texture.h"
+#include "framebuffer.h"
+
+typedef struct particleSystem
+{
+    texture* positions[2];
+    texture* velocities[2];
+    texture* s_buffer;
+    framebuffer* f_buffer;
+    GLuint   v_buffer;
+}
+particleSystem;
+
+particleSystem* create_particle_system();
+
+void destroy_particle_system_full(particleSystem* sys);
+#define destroy_particle_system(sys) { destroy_particle_system_full(sys); sys = 0; }
+
+void particle_system_update(float dt);
+
+#endif

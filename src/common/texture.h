@@ -21,8 +21,8 @@ texture;
  * Creates an empty texture.
  * w and h define the width and height of the allocated texture
  */
-// TODO: Allow different channel types
-texture* create_texture(uint16_t w, uint16_t h);
+texture* create_texture_storage(uint16_t w, uint16_t h, GLuint in_storage_type, GLuint out_storage_type, GLuint storage_format);
+#define create_texture(w, h) create_texture_storage(w, h, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)
 
 /*!
  * Frees a texture and its resources
