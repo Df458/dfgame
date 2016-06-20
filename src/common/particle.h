@@ -8,8 +8,9 @@ typedef struct particleSystem
     texture* positions[2];
     texture* velocities[2];
     texture* s_buffer;
-    framebuffer* f_buffer;
+    framebuffer* f_buffer[2];
     GLuint   v_buffer;
+    int next;
 }
 particleSystem;
 
@@ -18,6 +19,6 @@ particleSystem* create_particle_system();
 void destroy_particle_system_full(particleSystem* sys);
 #define destroy_particle_system(sys) { destroy_particle_system_full(sys); sys = 0; }
 
-void particle_system_update(float dt);
+void particle_system_update(particleSystem* sys, float dt);
 
 #endif

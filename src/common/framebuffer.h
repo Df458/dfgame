@@ -13,7 +13,7 @@ framebuffer;
 framebuffer* create_framebuffer(uint16_t width, uint16_t height);
 
 void destroy_framebuffer_full(framebuffer* fbo);
-#define destroy_framebuffer(fbo) { destroy_framebuffer_system_full(fbo); fbo = 0; }
+#define destroy_framebuffer(fbo) { destroy_framebuffer_full(fbo); fbo = 0; }
 
 
 #endif

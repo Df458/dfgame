@@ -166,7 +166,7 @@ bool bind_texture_to_program(program p, const char* name, texture* tex, GLuint b
     glActiveTexture(bind_index);
     GLuint uni_handle = glGetUniformLocation(p.handle, name);
     glBindTexture(tex->type, tex->handle);
-    glUniform1i(uni_handle, 0);
+    glUniform1i(uni_handle, bind_index - GL_TEXTURE0);
     if(checkGLError())
         return false;
     return true;

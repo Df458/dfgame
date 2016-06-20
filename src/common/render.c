@@ -389,10 +389,13 @@ bool render_particles(mat4 camera, mat4 transform, particleSystem* system)
     if(!bind_vec4_to_program(p_particle, "color", create_vec4_data(1, 0, 1, 1)))
         return false;
 
-    if(!bind_texture_to_program(p_particle, "data", system->positions[0], GL_TEXTURE0))
+    if(!bind_texture_to_program(p_particle, "data", system->positions[abs(system->next - 1)], GL_TEXTURE0))
         return false;
 
-    glDrawArrays(GL_POINTS, 0, 1);
+    /* if(!bind_texture_to_program(p_particle, "texture", system->positions[abs(system->next - 1)], GL_TEXTURE0)) */
+    /*     return false; */
+
+    glDrawArrays(GL_POINTS, 0, 9);
 
     return true;
 }
