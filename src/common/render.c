@@ -395,7 +395,7 @@ bool render_particles(mat4 camera, mat4 transform, particleSystem* system)
     /* if(!bind_texture_to_program(p_particle, "texture", system->positions[abs(system->next - 1)], GL_TEXTURE0)) */
     /*     return false; */
 
-    glDrawArrays(GL_POINTS, 0, 9);
+    glDrawArrays(GL_POINTS, 0, PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION);
 
     return true;
 }

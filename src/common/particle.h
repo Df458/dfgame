@@ -3,6 +3,8 @@
 #include "texture.h"
 #include "framebuffer.h"
 
+#define PARTICLE_BUFFER_DIMENSION 1024
+
 typedef struct particleSystem
 {
     texture* positions[2];

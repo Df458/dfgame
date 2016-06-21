@@ -17,22 +17,9 @@ static const char* particle_compute_fs[] =
 "void main() {\n"
 "vec4 pi = texture2D(position_in, v_uv);\n"
 "vec4 vi = texture2D(velocity_in, v_uv);\n"
-"position = pi + vi * dt;\n"
-"velocity = vi + vec4(0, 10, 0, 1) * dt;\n"
+"position = pi + (vi * dt);\n"
+"velocity = vi + vec4(0, 10, 0, 0) * dt;\n"
 "}\n"
-};
-
-float test_data[18] =
-{
-    0,0,
-    (1.0f/3.0f),0,
-    (2.0f/3.0f),0,
-    0,(1.0f/3.0f),
-    (1.0f/3.0f),(1.0f/3.0f),
-    (2.0f/3.0f),(1.0f/3.0f),
-    0,(2.0f/3.0f),
-    (1.0f/3.0f),(2.0f/3.0f),
-    (2.0f/3.0f),(2.0f/3.0f),
 };
 
 GLuint att[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
@@ -44,17 +31,29 @@ particleSystem* create_particle_system()
     p_particle_compute = create_program(quad_vs, particle_compute_fs);
 
     particleSystem* sys = salloc(sizeof(particleSystem));
-    sys->positions[0]  = create_texture_storage(3, 3, GL_RGB16F, GL_RGB, GL_FLOAT);
-    sys->positions[1]  = create_texture_storage(3, 3, GL_RGB16F, GL_RGB, GL_FLOAT);
-    sys->velocities[0] = create_texture_storage(3, 3, GL_RGB16F, GL_RGB, GL_FLOAT);
-    sys->velocities[1] = create_texture_storage(3, 3, GL_RGB16F, GL_RGB, GL_FLOAT);
-    sys->s_buffer      = create_texture_storage(1024, 1024, GL_RGB16F, GL_RGB, GL_FLOAT);
+    sys->positions[0]  = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
+    sys->positions[1]  = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
+    sys->velocities[0] = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
+    sys->velocities[1] = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
+    sys->s_buffer      = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
     sys->next = 0;
+
+    float* v_data = scalloc(PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION * 2, sizeof(float));
+    for(int i = 0; i < PARTICLE_BUFFER_DIMENSION; ++i) {
+        for(int j = 0; j < PARTICLE_BUFFER_DIMENSION; ++j) {
+            v_data[(i * PARTICLE_BUFFER_DIMENSION + j) * 2 + 0] = (float)j / (float)PARTICLE_BUFFER_DIMENSION;
+            v_data[(i * PARTICLE_BUFFER_DIMENSION + j) * 2 + 1] = (float)i / (float)PARTICLE_BUFFER_DIMENSION;
+        }
+    }
+
     glGenBuffers(1, &sys->v_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, sys->v_buffer);
-    glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), test_data, GL_DYNAMIC_DRAW);
-    sys->f_buffer[0] = create_framebuffer(3, 3);
-    sys->f_buffer[1] = create_framebuffer(3, 3);
+    glBufferData(GL_ARRAY_BUFFER, PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION * 2 * sizeof(float), v_data, GL_DYNAMIC_DRAW);
+    
+    sfree(v_data);
+
+    sys->f_buffer[0] = create_framebuffer(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION);
+    sys->f_buffer[1] = create_framebuffer(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION);
     glBindFramebuffer(GL_FRAMEBUFFER, sys->f_buffer[0]->handle);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, sys->positions[0]->handle, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, sys->velocities[0]->handle, 0);
@@ -88,7 +87,8 @@ void particle_system_update(particleSystem* sys, float dt)
         return;
     int vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
-    glViewport(0, 0, 3, 3);
+    glViewport(0, 0, PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION);
+    glDisable(GL_BLEND);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // TODO: Render the quad for processing
@@ -125,6 +125,7 @@ void particle_system_update(particleSystem* sys, float dt)
     /* glDisableVertexAttribArray(va_quad_pos); */
     /* glDisableVertexAttribArray(va_quad_uv); */
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glEnable(GL_BLEND);
 
     sys->next = abs(sys->next - 1);
     glViewport(vp[0], vp[1], vp[2], vp[3]);
