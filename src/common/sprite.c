@@ -33,7 +33,7 @@ animation* create_animation()
     a->origin_x     = 0;
     a->origin_y     = 0;
     a->length       = 0;
-    a->delay        = 0;
+    a->delay        = 16;
     a->autoplay     = false;
     a->autoloop     = false;
     a->handle       = 0;
@@ -97,6 +97,7 @@ spriteset* load_resource_to_spriteset(resource_pair)
     spriteset* spr = malloc(sizeof(spriteset));
     spr->animations = malloc(sizeof(struct animation));
     spr->atlas = malloc(sizeof(texture));
+    spr->atlas->type = GL_TEXTURE_2D;
     spr->animation_count = 0;
     uint8_t** buffers = malloc(sizeof(uint8_t*));
     /*struct texture_atlas_box* boxes = malloc(sizeof(struct texture_atlas_box));*/
@@ -111,7 +112,7 @@ spriteset* load_resource_to_spriteset(resource_pair)
             spr->animations[spr->animation_count - 1].handle = "idle";
             spr->animations[spr->animation_count - 1].orients = 0;
             spr->animations[spr->animation_count - 1].length = 1;
-            spr->animations[spr->animation_count - 1].delay = 1;
+            spr->animations[spr->animation_count - 1].delay = 16;
             spr->animations[spr->animation_count - 1].autoloop = false;
             spr->animations[spr->animation_count - 1].autoplay = true;
             spr->animations[spr->animation_count - 1].origin_x = 0;
@@ -128,7 +129,7 @@ spriteset* load_resource_to_spriteset(resource_pair)
                 free(a);
             }
             a = 0;
-            if((a = xmlGetProp(node, (const xmlChar*)"speed"))) {
+            if((a = xmlGetProp(node, (const xmlChar*)"frame_delay"))) {
                 spr->animations[spr->animation_count - 1].delay = atoi((char*)a);
                 free(a);
             }
@@ -370,7 +371,7 @@ bool sprite_update(sprite* spr, float delta)
         return false;
 
     // TODO: Don't hardcode the framerate
-    spr->position += delta * 60;
+    spr->position += delta * (1000.0f / spr->handle->delay);
     if(spr->position >= spr->handle->length) {
         if(spr->handle->autoloop) {
             while(spr->position >= spr->handle->length) {
