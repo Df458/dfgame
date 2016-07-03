@@ -101,6 +101,7 @@ spriteset* load_resource_to_spriteset(resource_pair)
     spr->animation_count = 0;
     uint8_t** buffers = malloc(sizeof(uint8_t*));
     /*struct texture_atlas_box* boxes = malloc(sizeof(struct texture_atlas_box));*/
+    vec2 largest_dims = create_vec2_data(0, 0);
     for(xmlNodePtr node = root->children; node; node = node->next) {
         if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"animation")) {
             spr->animation_count++;
@@ -177,6 +178,13 @@ spriteset* load_resource_to_spriteset(resource_pair)
                     spr->animations = realloc(spr->animations, spr->animation_count * sizeof(struct animation));
                     buffers = realloc(buffers, spr->animation_count * sizeof(uint8_t*));
                 }
+            } else {
+                if(spr->animations[spr->animation_count - 1].box.size_x > largest_dims.data[0]) {
+                    largest_dims.data[0] = spr->animations[spr->animation_count - 1].box.size_x;
+                }
+                if(spr->animations[spr->animation_count - 1].box.size_y > largest_dims.data[1]) {
+                    largest_dims.data[1] = spr->animations[spr->animation_count - 1].box.size_y;
+                }
             }
         }
     }
@@ -194,10 +202,10 @@ spriteset* load_resource_to_spriteset(resource_pair)
     uint16_t avail_length = 1;
     available[0].pos_x = 0;
     available[0].pos_y = 0;
-    available[0].size_x = 1024;
-    available[0].size_y = 1024;
-    uint16_t width = 1024;
-    uint16_t height = 1024;
+    available[0].size_x = next_power_of_two(largest_dims.data[0]);
+    available[0].size_y = next_power_of_two(largest_dims.data[1]);
+    uint16_t width = available[0].size_x;
+    uint16_t height = available[0].size_y;
     uint16_t f_width = 0;
     uint16_t f_height = 0;
 
@@ -267,7 +275,7 @@ spriteset* load_resource_to_spriteset(resource_pair)
         spr->animations[i].box.pos_x    /= (float)f_width;
         spr->animations[i].box.pos_y    /= (float)f_height;
         spr->animations[i].box.size_x   /= (float)f_width * spr->animations[i].length;
-        spr->animations[i].box.size_y   /= (float)f_height;
+        spr->animations[i].box.size_y   /= (float)f_height * spr->animations[i].orients;
         spr->animations[i].dimensions_x = spr->animations[i].box.size_x / spr->animations[i].length;
         spr->animations[i].dimensions_y = spr->animations[i].box.size_y;
     }
@@ -304,6 +312,7 @@ sprite* create_sprite(spriteset* set)
     spr->source = set;
     spr->handle = 0;
 
+    spr->orientation = 0;
     spr->position = 0;
     spr->playing = false;
 
@@ -345,6 +354,10 @@ bool sprite_set_animation(sprite* spr, int16_t index)
     spr->position = 0;
 
     spr->handle = &spr->source->animations[index];
+    if(spr->orientation > spr->handle->orients - 1) {
+        warn("Sprite orientation doesn't match animation orientations, and will be reset");
+        spr->orientation = 0;
+    }
     sprite_set_playing(spr, spr->handle->autoplay);
 
     return true;
@@ -353,6 +366,15 @@ bool sprite_set_animation(sprite* spr, int16_t index)
 bool sprite_set_animation_handle(sprite* spr, const char* handle)
 {
     return sprite_set_animation(spr, index_by_handle(spr->source, handle));
+}
+
+void sprite_set_orientation(sprite* spr, int orientation)
+{
+    if(orientation < 0)
+        warn("Trying to set a negative sprite orientation");
+    if(orientation > spr->handle->orients - 1)
+        warn("Trying to set an orientation greater than the animation's limits");
+    spr->orientation = orientation;
 }
 
 void sprite_set_playing(sprite* spr, bool play)
@@ -393,7 +415,7 @@ bool sprite_draw(mat4 camera, mat4 transform, sprite* spr, bool use_dims)
 {
     nulltest(spr);
     nulltest(spr->handle);
-    return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, create_vec4_data(spr->handle->box.pos_x + (spr->handle->box.size_x * (int)spr->position), spr->handle->box.pos_y, spr->handle->box.size_x, spr->handle->box.size_y));
+    return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, create_vec4_data(spr->handle->box.pos_x + (spr->handle->box.size_x * (int)spr->position), spr->handle->box.pos_y + (spr->handle->box.size_y * spr->orientation), spr->handle->box.size_x, spr->handle->box.size_y));
 }
 
 const char* sprite_get_current_handle(sprite* spr)

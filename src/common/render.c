@@ -103,7 +103,7 @@ bool init_renderer()
     if(checkGLError())
         return false;
 
-    p_particle = create_program_gvf(particle_gs, particle_vs, quad_untex_fs);
+    p_particle = create_program_gvf(particle_gs, particle_vs, particle_fs);
     va_particle_buffer = glGetAttribLocation(p_particle.handle, "texCoord");
     if(checkGLError())
         return false;
@@ -372,7 +372,7 @@ bool render_particles(mat4 camera, mat4 transform, particleSystem* system)
     glUseProgram(p_particle.handle);
     if(checkGLError())
         return false;
-    glBindBuffer(GL_ARRAY_BUFFER, system->v_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, system->vertex_buffer);
     glEnableVertexAttribArray(va_particle_buffer);
     glVertexAttribPointer(va_particle_buffer, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
     if(checkGLError())
@@ -386,14 +386,21 @@ bool render_particles(mat4 camera, mat4 transform, particleSystem* system)
     if(checkGLError())
         return false;
 
-    if(!bind_vec4_to_program(p_particle, "color", create_vec4_data(1, 0, 1, 1)))
+    if(!bind_float_to_program(p_particle, "lifetime", system->lifetime))
         return false;
 
-    if(!bind_texture_to_program(p_particle, "data", system->positions[abs(system->next - 1)], GL_TEXTURE0))
+    if(!bind_texture_to_program(p_particle, "data", system->positions[0], GL_TEXTURE0))
+        return false;
+
+    if(!bind_texture_to_program(p_particle, "s_data", system->s_buffer, GL_TEXTURE1))
         return false;
 
     /* if(!bind_texture_to_program(p_particle, "texture", system->positions[abs(system->next - 1)], GL_TEXTURE0)) */
     /*     return false; */
+    if(!bind_texture_to_program(p_particle, "color", system->color, GL_TEXTURE2))
+        return false;
+    if(!bind_texture_to_program(p_particle, "scale", system->scale, GL_TEXTURE3))
+        return false;
 
     glDrawArrays(GL_POINTS, 0, PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION);
 

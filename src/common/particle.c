@@ -13,12 +13,13 @@ static const char* particle_compute_fs[] =
 "uniform sampler2D position_in;\n"
 "uniform sampler2D velocity_in;\n"
 "uniform float dt;"
+"uniform vec4 acceleration;\n"
 "in vec2 v_uv;\n"
 "void main() {\n"
-"vec4 pi = texture2D(position_in, v_uv);\n"
 "vec4 vi = texture2D(velocity_in, v_uv);\n"
-"position = pi + (vi * dt);\n"
-"velocity = vi + vec4(0, 10, 0, 0) * dt;\n"
+"vec4 pi = texture2D(position_in, v_uv);\n"
+"velocity = vi + vec4(acceleration.xyz * 0.1, 0);\n"
+"position = pi + vec4(velocity.xyz * 0.1, dt);\n"
 "}\n"
 };
 
@@ -36,21 +37,39 @@ particleSystem* create_particle_system()
     sys->velocities[0] = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
     sys->velocities[1] = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
     sys->s_buffer      = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
-    sys->next = 0;
+
+    sys->acceleration = create_vec4_data(0, 0, 0, 0);
+    sys->color = create_texture(1024, 1024);
+    sys->scale = create_texture_storage(1024, 1024, GL_RGBA32F, GL_RGBA, GL_FLOAT);
+    fill_texture(sys->color, create_vec4_data(1, 1, 1, 1));
+    sys->lifetime = 1;
 
     float* v_data = scalloc(PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION * 2, sizeof(float));
+    float* s_data = scalloc(PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION * 4, sizeof(float));
+    float* sc_data = scalloc(PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION * 4, sizeof(float));
     for(int i = 0; i < PARTICLE_BUFFER_DIMENSION; ++i) {
         for(int j = 0; j < PARTICLE_BUFFER_DIMENSION; ++j) {
             v_data[(i * PARTICLE_BUFFER_DIMENSION + j) * 2 + 0] = (float)j / (float)PARTICLE_BUFFER_DIMENSION;
             v_data[(i * PARTICLE_BUFFER_DIMENSION + j) * 2 + 1] = (float)i / (float)PARTICLE_BUFFER_DIMENSION;
+
+            s_data[(i * PARTICLE_BUFFER_DIMENSION + j) * 4 + 0] = (float)(rand() % 1000) * 0.001;
+            s_data[(i * PARTICLE_BUFFER_DIMENSION + j) * 4 + 1] = (float)(rand() % 1000) * 0.001;
+            sc_data[(i * PARTICLE_BUFFER_DIMENSION + j) * 4 + 0] = 1;
+            sc_data[(i * PARTICLE_BUFFER_DIMENSION + j) * 4 + 1] = 10;
         }
     }
 
-    glGenBuffers(1, &sys->v_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, sys->v_buffer);
+    glGenBuffers(1, &sys->vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, sys->vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION * 2 * sizeof(float), v_data, GL_DYNAMIC_DRAW);
-    
+    glBindTexture(GL_TEXTURE_2D, sys->s_buffer->handle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, 0, GL_RGBA, GL_FLOAT, s_data);
+    glBindTexture(GL_TEXTURE_2D, sys->scale->handle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1024, 1024, 0, GL_RGBA, GL_FLOAT, sc_data);
+
     sfree(v_data);
+    sfree(s_data);
+    sfree(sc_data);
 
     sys->f_buffer[0] = create_framebuffer(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION);
     sys->f_buffer[1] = create_framebuffer(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION);
@@ -79,7 +98,7 @@ void destroy_particle_system_full(particleSystem* sys)
 
 void particle_system_update(particleSystem* sys, float dt)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, sys->f_buffer[sys->next]->handle);
+    glBindFramebuffer(GL_FRAMEBUFFER, sys->f_buffer[0]->handle);
     if(checkGLError())
         return;
     glDrawBuffers(2, att);
@@ -91,7 +110,6 @@ void particle_system_update(particleSystem* sys, float dt)
     glDisable(GL_BLEND);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    // TODO: Render the quad for processing
     mat4 t = create_mat4();
     mat4_scale(&t, 2, -2, false);
 
@@ -107,12 +125,15 @@ void particle_system_update(particleSystem* sys, float dt)
     if(checkGLError())
         return;
 
-    if(!bind_texture_to_program(p_particle_compute, "position_in", sys->positions[abs(sys->next - 1)], GL_TEXTURE0))
+    if(!bind_texture_to_program(p_particle_compute, "position_in", sys->positions[1], GL_TEXTURE0))
         return;
-    if(!bind_texture_to_program(p_particle_compute, "velocity_in", sys->velocities[abs(sys->next - 1)], GL_TEXTURE1))
+    if(!bind_texture_to_program(p_particle_compute, "velocity_in", sys->velocities[1], GL_TEXTURE1))
         return;
 
     if(!bind_mat4_to_program(p_particle_compute, "transform", t))
+        return;
+
+    if(!bind_vec4_to_program(p_particle_compute, "acceleration", sys->acceleration))
         return;
 
     if(!bind_float_to_program(p_particle_compute, "dt", dt))
@@ -122,11 +143,13 @@ void particle_system_update(particleSystem* sys, float dt)
     if(checkGLError())
         return;
 
-    /* glDisableVertexAttribArray(va_quad_pos); */
-    /* glDisableVertexAttribArray(va_quad_uv); */
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, sys->f_buffer[0]->handle);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, sys->f_buffer[1]->handle);
+    glBlitFramebuffer(0, 0, PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, 0, 0, PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glEnable(GL_BLEND);
 
-    sys->next = abs(sys->next - 1);
     glViewport(vp[0], vp[1], vp[2], vp[3]);
 }

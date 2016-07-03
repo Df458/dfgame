@@ -6,6 +6,7 @@ GLFWframebuffersizefun user_size_func = 0;
 
 void sizeCallback(GLFWwindow* win, int width, int height)
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height);
     if(user_size_func)
         user_size_func(win, width, height);

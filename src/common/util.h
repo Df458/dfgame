@@ -44,4 +44,6 @@ unsigned char* loadFileContents(const char* const filepath);
 #define macro_str(m) name_str(m)
 #define name_str(m) #m
 
+unsigned int next_power_of_two(int num);
+
 #endif

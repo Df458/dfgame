@@ -10,9 +10,13 @@ typedef struct particleSystem
     texture* positions[2];
     texture* velocities[2];
     texture* s_buffer;
+    GLuint   vertex_buffer;
     framebuffer* f_buffer[2];
-    GLuint   v_buffer;
-    int next;
+
+    vec4  acceleration;
+    float lifetime;
+    texture* color;
+    texture* scale;
 }
 particleSystem;
 

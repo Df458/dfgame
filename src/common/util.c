@@ -114,3 +114,16 @@ void _sfree(void* ptr)
     if(ptr)
         free(ptr);
 }
+
+unsigned int next_power_of_two(int num)
+{
+    if(num < 2)
+        return 1;
+
+    unsigned int n = 2;
+    while(num > n) {
+        n = n << 1;
+    }
+
+    return n;
+}

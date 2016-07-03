@@ -41,6 +41,7 @@ struct sprite
     struct animation* handle;
 
     float position;
+    int   orientation;
     bool  playing;
 };
 #endif

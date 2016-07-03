@@ -29,6 +29,7 @@ sprite* load_resource_to_sprite(resource_pair);
 
 bool sprite_set_animation(sprite* spr, int16_t index);
 bool sprite_set_animation_handle(sprite* spr, const char* handle);
+void sprite_set_orientation(sprite* spr, int orientation);
 void sprite_set_playing(sprite* spr, bool play);
 bool sprite_update(sprite* spr, float delta);
 bool sprite_draw(mat4 camera, mat4 transform, sprite* spr, bool use_dims);
