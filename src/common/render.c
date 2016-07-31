@@ -123,6 +123,8 @@ bool cleanup_renderer()
 
 bool render_mesh(mat4 camera, mat4 transform, mesh* m, program* p)
 {
+    if(checkGLError())
+        return false;
     glUseProgram(p->handle);
 
     if(!bind_mat4_to_program(*p, "camera", camera))
@@ -131,6 +133,8 @@ bool render_mesh(mat4 camera, mat4 transform, mesh* m, program* p)
         return false;
 
     glBindBuffer(GL_ARRAY_BUFFER, m->handle);
+    if(checkGLError())
+        return false;
     if(m->type_flags & VT_NORMAL) {
         if(m->type_flags & VT_TEXTURE) {
             GLuint va_position = glGetAttribLocation(p->handle, "va_position");
@@ -157,6 +161,8 @@ bool render_mesh(mat4 camera, mat4 transform, mesh* m, program* p)
     } else if(m->type_flags & VT_TEXTURE) {
         GLuint va_position = glGetAttribLocation(p->handle, "va_position");
         GLuint va_texture  = glGetAttribLocation(p->handle, "va_texture");
+        if(checkGLError())
+            return false;
         glEnableVertexAttribArray(va_position);
         glVertexAttribPointer(va_position, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(va_texture);
@@ -211,7 +217,7 @@ bool render_quad_color(mat4 camera, mat4 transform, texture* tex, bool use_dims,
     glDisableVertexAttribArray(va_quad_pos);
     glDisableVertexAttribArray(va_quad_uv);
 
-    return true;
+    return !checkGLError();
 }
 
 bool render_quad_untex_color(mat4 camera, mat4 transform, vec4 color)
@@ -240,7 +246,7 @@ bool render_quad_untex_color(mat4 camera, mat4 transform, vec4 color)
 
     glDisableVertexAttribArray(va_quad_untex);
 
-    return true;
+    return !checkGLError();
 }
 
 bool render_quad_subtex_color(mat4 camera, mat4 transform, texture* tex, bool use_dims, vec4 uv_rect, vec4 color)
@@ -283,7 +289,7 @@ bool render_quad_subtex_color(mat4 camera, mat4 transform, texture* tex, bool us
     glDisableVertexAttribArray(va_quad_subtex_pos);
     glDisableVertexAttribArray(va_quad_subtex_uv);
 
-    return true;
+    return !checkGLError();
 }
 
 bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph_id, bool use_dims, vec4 color)
@@ -329,7 +335,7 @@ bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph_id, bool
     glDisableVertexAttribArray(va_text_pos);
     glDisableVertexAttribArray(va_text_uv);
 
-    return true;
+    return !checkGLError();
 }
 
 bool render_text_string_color(mat4 camera, mat4 transform, text* txt, vec4 color)
@@ -364,7 +370,7 @@ bool render_text_string_color(mat4 camera, mat4 transform, text* txt, vec4 color
     glDisableVertexAttribArray(va_text_pos);
     glDisableVertexAttribArray(va_text_uv);
 
-    return true;
+    return !checkGLError();
 }
 
 bool render_particles(mat4 camera, mat4 transform, particleSystem* system)
@@ -404,7 +410,7 @@ bool render_particles(mat4 camera, mat4 transform, particleSystem* system)
 
     glDrawArrays(GL_POINTS, 0, PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION);
 
-    return true;
+    return !checkGLError();
 }
 
 GLuint get_quad_buffer() { return quad_buffer; }

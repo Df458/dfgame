@@ -14,12 +14,14 @@ static const char* particle_compute_fs[] =
 "uniform sampler2D velocity_in;\n"
 "uniform float dt;"
 "uniform vec4 acceleration;\n"
+"uniform float lifetime;"
 "in vec2 v_uv;\n"
 "void main() {\n"
 "vec4 vi = texture2D(velocity_in, v_uv);\n"
 "vec4 pi = texture2D(position_in, v_uv);\n"
 "velocity = vi + vec4(acceleration.xyz * 0.1, 0);\n"
-"position = pi + vec4(velocity.xyz * 0.1, dt);\n"
+"float death_checker = ceil(1 - min(pi.a / lifetime, 1));\n"
+"position = (pi + vec4(velocity.xyz * 0.1, dt)) / death_checker;\n"
 "}\n"
 };
 
@@ -137,6 +139,9 @@ void particle_system_update(particleSystem* sys, float dt)
         return;
 
     if(!bind_float_to_program(p_particle_compute, "dt", dt))
+        return;
+
+    if(!bind_float_to_program(p_particle_compute, "lifetime", sys->lifetime))
         return;
 
     glDrawArrays(GL_TRIANGLES, 0, 6);

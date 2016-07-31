@@ -158,11 +158,14 @@ bool bind_mat4_to_program(program p, const char* name, mat4 mat)
     glUseProgram(p.handle);
     GLuint uni_handle = glGetUniformLocation(p.handle, name);
     glUniformMatrix4fv(uni_handle, 1, GL_FALSE, mat.data);
+    if(checkGLError())
+        return false;
     return true;
 }
 
 bool bind_texture_to_program(program p, const char* name, texture* tex, GLuint bind_index)
 {
+    glUseProgram(p.handle);
     glActiveTexture(bind_index);
     GLuint uni_handle = glGetUniformLocation(p.handle, name);
     glBindTexture(tex->type, tex->handle);
