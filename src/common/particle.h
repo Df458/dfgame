@@ -17,6 +17,7 @@ typedef struct particleSystem
     float lifetime;
     texture* color;
     texture* scale;
+    texture* tex;
 }
 particleSystem;
 

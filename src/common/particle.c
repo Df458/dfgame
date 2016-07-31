@@ -39,6 +39,7 @@ particleSystem* create_particle_system()
     sys->velocities[0] = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
     sys->velocities[1] = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
     sys->s_buffer      = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
+    sys->tex           = 0;
 
     sys->acceleration = create_vec4_data(0, 0, 0, 0);
     sys->color = create_texture(1024, 1024);
