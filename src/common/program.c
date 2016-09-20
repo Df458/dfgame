@@ -123,6 +123,16 @@ bool bind_float_to_program(program p, const char* name, float f)
     return true;
 }
 
+bool bind_int_to_program(program p, const char* name, int i)
+{
+    glUseProgram(p.handle);
+    GLuint uni_handle = glGetUniformLocation(p.handle, name);
+    glUniform1i(uni_handle, i);
+    if(checkGLError())
+        return false;
+    return true;
+}
+
 bool bind_vec2_to_program(program p, const char* name, vec2 v)
 {
     glUseProgram(p.handle);

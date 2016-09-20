@@ -23,6 +23,7 @@ program create_program_gvf(const char* const* gs, const char* const* vs, const c
 void delete_program(program* p);
 
 bool bind_float_to_program(program p,   const char* name, float f);
+bool bind_int_to_program(program p,     const char* name, int i);
 bool bind_vec2_to_program(program p,    const char* name, vec2 v);
 bool bind_vec3_to_program(program p,    const char* name, vec3 v);
 bool bind_vec4_to_program(program p,    const char* name, vec4 v);
