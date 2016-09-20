@@ -279,7 +279,7 @@ uint8_t* load_tiff_to_buffer(const char* path, uint16_t* w, uint16_t* h)
 // Public Functions
 ///////////////////////////////////////////////////////////////////////////////
 
-texture* create_texture_storage(uint16_t w, uint16_t h, GLuint in_storage_type, GLuint out_storage_type, GLuint storage_format)
+texture* create_texture_storage_data(uint16_t w, uint16_t h, GLuint in_storage_type, GLuint out_storage_type, GLuint storage_format, void* data)
 {
 	texture* texture_data = malloc(sizeof(texture));
 	glGenTextures(1, &texture_data->handle);
@@ -288,7 +288,7 @@ texture* create_texture_storage(uint16_t w, uint16_t h, GLuint in_storage_type, 
     texture_data->height = h;
     texture_data->type = GL_TEXTURE_2D;
 
-	glTexImage2D(GL_TEXTURE_2D, 0, in_storage_type, texture_data->width, texture_data->height, 0, out_storage_type, storage_format, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, in_storage_type, texture_data->width, texture_data->height, 0, out_storage_type, storage_format, data);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
