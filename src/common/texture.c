@@ -279,7 +279,7 @@ uint8_t* load_tiff_to_buffer(const char* path, uint16_t* w, uint16_t* h)
 // Public Functions
 ///////////////////////////////////////////////////////////////////////////////
 
-texture* create_texture_storage_data(uint16_t w, uint16_t h, GLuint in_storage_type, GLuint out_storage_type, GLuint storage_format, void* data)
+texture* create_texture_storage_data(uint16_t w, uint16_t h, GLuint in_storage_type, GLuint out_storage_type, GLuint storage_format, const void* data)
 {
 	texture* texture_data = malloc(sizeof(texture));
 	glGenTextures(1, &texture_data->handle);

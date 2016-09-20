@@ -21,7 +21,7 @@ texture;
  * Creates an empty texture.
  * w and h define the width and height of the allocated texture
  */
-texture* create_texture_storage_data(uint16_t w, uint16_t h, GLuint in_storage_type, GLuint out_storage_type, GLuint storage_format, void* data);
+texture* create_texture_storage_data(uint16_t w, uint16_t h, GLuint in_storage_type, GLuint out_storage_type, GLuint storage_format, const void* data);
 #define create_texture_storage(w, h, in_storage_type, out_storage_type, storage_format) create_texture_storage_data(w, h, in_storage_type, out_storage_type, storage_format, NULL)
 #define create_texture_data(w, h, data) create_texture_storage_data(w, h, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, data)
 #define create_texture(w, h) create_texture_storage_data(w, h, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, NULL)
