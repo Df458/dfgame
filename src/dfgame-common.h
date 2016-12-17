@@ -14,6 +14,7 @@
 #include "common/mesh.h"
 #include "common/font.h"
 #include "common/text.h"
+#include "common/vertex_def.h"
 
 #include "common/matrix.h"
 #include "common/vector.h"

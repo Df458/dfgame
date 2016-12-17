@@ -101,7 +101,7 @@ spriteset* load_resource_to_spriteset(resource_pair)
     spr->animation_count = 0;
     uint8_t** buffers = malloc(sizeof(uint8_t*));
     /*struct texture_atlas_box* boxes = malloc(sizeof(struct texture_atlas_box));*/
-    vec2 largest_dims = create_vec2_data(0, 0);
+    vec2 largest_dims;
     for(xmlNodePtr node = root->children; node; node = node->next) {
         if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"animation")) {
             spr->animation_count++;
@@ -415,7 +415,8 @@ bool sprite_draw(mat4 camera, mat4 transform, sprite* spr, bool use_dims)
 {
     nulltest(spr);
     nulltest(spr->handle);
-    return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, create_vec4_data(spr->handle->box.pos_x + (spr->handle->box.size_x * (int)spr->position), spr->handle->box.pos_y + (spr->handle->box.size_y * spr->orientation), spr->handle->box.size_x, spr->handle->box.size_y));
+    vec4 v = (vec4){.x = spr->handle->box.pos_x + (spr->handle->box.size_x * (int)spr->position), .y = spr->handle->box.pos_y + (spr->handle->box.size_y * spr->orientation), .z = spr->handle->box.size_x, .w = spr->handle->box.size_y};
+    return render_quad_subtex(camera, transform, spr->source->atlas, use_dims, v);
 }
 
 const char* sprite_get_current_handle(sprite* spr)

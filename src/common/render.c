@@ -275,7 +275,7 @@ bool render_quad_subtex_color(mat4 camera, mat4 transform, texture* tex, bool us
     mat4 final = mat4_mul(camera, transform);
     if(use_dims) {
         mat4 iscale = create_mat4();
-        mat4_scale(&iscale, tex->width * uv_rect.data[2], tex->height * uv_rect.data[3], 0);
+        mat4_scale(&iscale, tex->width * uv_rect.z, tex->height * uv_rect.w, 0);
         final = mat4_mul(final, iscale);
     }
     bind_mat4_to_program(p_quad_subtex, "transform", final);
@@ -310,7 +310,7 @@ bool render_text_color(mat4 camera, mat4 transform, font* ft, int glyph_id, bool
     glyph* gp = font_get_glyph(ft, glyph_id, false);
     if(!gp)
         return false;
-    if(!bind_vec4_to_program(p_quad_subtex, "uv_offset", create_vec4_data(gp->texture_position.data[0] / (float)GLYPH_ATLAS_SIZE, gp->texture_position.data[1] / (float)GLYPH_ATLAS_SIZE, gp->texture_size.data[0] / (float)GLYPH_ATLAS_SIZE, gp->texture_size.data[1] / (float)GLYPH_ATLAS_SIZE)))
+    if(!bind_vec4_to_program(p_quad_subtex, "uv_offset", (vec4){ .x = gp->texture_position.x / (float)GLYPH_ATLAS_SIZE, .y = gp->texture_position.y / (float)GLYPH_ATLAS_SIZE, .z = gp->texture_size.x / (float)GLYPH_ATLAS_SIZE, .w = gp->texture_size.y / (float)GLYPH_ATLAS_SIZE}))
         return false;
     if(!bind_texture_to_program(p_quad_subtex, "texture", ft->atlas, GL_TEXTURE0))
         return false;

@@ -41,10 +41,10 @@ particleSystem* create_particle_system()
     sys->s_buffer      = create_texture_storage(PARTICLE_BUFFER_DIMENSION, PARTICLE_BUFFER_DIMENSION, GL_RGBA32F, GL_RGBA, GL_FLOAT);
     sys->tex           = 0;
 
-    sys->acceleration = create_vec4_data(0, 0, 0, 0);
+    /* sys->acceleration = create_vec4_data(0, 0, 0, 0); */
     sys->color = create_texture(1024, 1024);
     sys->scale = create_texture_storage(1024, 1024, GL_RGBA32F, GL_RGBA, GL_FLOAT);
-    fill_texture(sys->color, create_vec4_data(1, 1, 1, 1));
+    fill_texture(sys->color, (vec4){ .x = 1, .y = 1, .z = 1, .w = 1 });
     sys->lifetime = 1;
 
     float* v_data = scalloc(PARTICLE_BUFFER_DIMENSION * PARTICLE_BUFFER_DIMENSION * 2, sizeof(float));

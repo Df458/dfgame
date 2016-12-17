@@ -96,8 +96,7 @@ mesh* load_resource_to_mesh(resource_pair)
                 switch(c[1]) {
                     case ' ': {
                         vec3* p = salloc(sizeof(vec3));
-                        *p = create_vec3();
-                        int count = sscanf(c, "v %f %f %f", &p->data[0], &p->data[1], &p->data[2]);
+                        int count = sscanf(c, "v %f %f %f", &p->x, &p->y, &p->z);
                         if(count != 3)
                             error("Malformed mesh %s: Expected 3 position coords in mesh, got %d", resource_name, count);
                         array_list_push(position_list, p);
@@ -105,15 +104,15 @@ mesh* load_resource_to_mesh(resource_pair)
                     case 'p': break; // Ignore Parameter space verts
                     case 't': {
                         vec2* t = salloc(sizeof(vec2));
-                        *t = create_vec2();
-                        int count = sscanf(c, "vt %f %f", &t->data[0], &t->data[1]);
+                        //*t = create_vec2();
+                        int count = sscanf(c, "vt %f %f", &t->x, &t->y);
                         if(count != 2)
                             error("Malformed mesh %s: Expected 2 uv coords in mesh, got %d", resource_name, count);
                         array_list_push(uv_list, t);
                     } break;
                     case 'n': {
                         vec3* n = salloc(sizeof(vec3));
-                        *n = create_vec3();
+                        /* *n = create_vec3(); */
                         int count = sscanf(c, "vn %f %f %f", &n->data[0], &n->data[1], &n->data[2]);
                         if(count != 3)
                             error("Malformed mesh %s: Expected 3 normal coords in mesh, got %d", resource_name, count);

@@ -85,32 +85,32 @@ bool font_prepare_glyph(font* ft, int glyph_id)
     }
 
     // TODO: Make this fit the textures more precisely
-    gp->texture_position.data[0] = 0;
-    gp->texture_position.data[1] = 0;
-    gp->texture_size.data[0] = ft->font_face->glyph->bitmap.width;
-    gp->texture_size.data[1] = ft->font_face->glyph->bitmap.rows;
+    gp->texture_position.x = 0;
+    gp->texture_position.y = 0;
+    gp->texture_size.x = ft->font_face->glyph->bitmap.width;
+    gp->texture_size.y = ft->font_face->glyph->bitmap.rows;
 
-    if(ft->atlas_xbounds + gp->texture_size.data[0] + 1 > GLYPH_ATLAS_SIZE) {
+    if(ft->atlas_xbounds + gp->texture_size.x + 1 > GLYPH_ATLAS_SIZE) {
         ft->atlas_xbounds = 0;
         ft->atlas_ybounds = ft->atlas_ybounds_next + 1;
     }
-    if(ft->atlas_ybounds + gp->texture_size.data[1] + 1 > GLYPH_ATLAS_SIZE) {
+    if(ft->atlas_ybounds + gp->texture_size.y + 1 > GLYPH_ATLAS_SIZE) {
         error("Can't fit glyph in texture atlas: 0x%x", glyph_id);
         return false;
     }
-    if(ft->atlas_ybounds + gp->texture_size.data[1] + 1 > ft->atlas_ybounds_next)
-        ft->atlas_ybounds_next = ft->atlas_ybounds + gp->texture_size.data[1];
+    if(ft->atlas_ybounds + gp->texture_size.y + 1 > ft->atlas_ybounds_next)
+        ft->atlas_ybounds_next = ft->atlas_ybounds + gp->texture_size.y;
 
-    gp->texture_position.data[0] = ft->atlas_xbounds;
-    gp->texture_position.data[1] = ft->atlas_ybounds;
-    ft->atlas_xbounds += gp->texture_size.data[0] + 1;
+    gp->texture_position.x = ft->atlas_xbounds;
+    gp->texture_position.y = ft->atlas_ybounds;
+    ft->atlas_xbounds += gp->texture_size.x + 1;
 
-    gp->bearing.data[0] = ft->font_face->glyph->metrics.horiBearingX;
-    gp->bearing.data[1] = ft->font_face->glyph->metrics.horiBearingY;
+    gp->bearing.x = ft->font_face->glyph->metrics.horiBearingX;
+    gp->bearing.y = ft->font_face->glyph->metrics.horiBearingY;
     gp->advance = ft->font_face->glyph->metrics.horiAdvance;
     for(int i = 0; i < ft->font_face->glyph->bitmap.rows; ++i)
     {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, gp->texture_position.data[0], gp->texture_position.data[1] + i, gp->texture_size.data[0], 1, GL_ALPHA, GL_UNSIGNED_BYTE, ft->font_face->glyph->bitmap.buffer + ((ft->font_face->glyph->bitmap.rows - i - 1) * ft->font_face->glyph->bitmap.pitch));
+        glTexSubImage2D(GL_TEXTURE_2D, 0, gp->texture_position.x, gp->texture_position.y + i, gp->texture_size.x, 1, GL_ALPHA, GL_UNSIGNED_BYTE, ft->font_face->glyph->bitmap.buffer + ((ft->font_face->glyph->bitmap.rows - i - 1) * ft->font_face->glyph->bitmap.pitch));
     }
     return true;
 }

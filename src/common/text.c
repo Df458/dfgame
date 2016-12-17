@@ -35,7 +35,7 @@ void recalculate_buffer(text* txt)
                     c_w = tg->advance / 64;
                 }
 
-                if((*llen + c_w + counter <= txt->limits.data[0] && txt->limits.data[0] != 0) && last_sep != '\n') {
+                if((*llen + c_w + counter <= txt->limits.x && txt->limits.x != 0) && last_sep != '\n') {
                     *llen += c_w + counter;
                 } else {
                     llen = salloc(sizeof(float));
@@ -73,7 +73,7 @@ void recalculate_buffer(text* txt)
             c_w = tg->advance / 64;
         }
 
-        if(*llen + c_w + counter <= txt->limits.data[0] || last_sep == '\n') {
+        if(*llen + c_w + counter <= txt->limits.x || last_sep == '\n') {
             *llen += c_w + counter;
         } else {
             llen = salloc(sizeof(float));
@@ -92,23 +92,23 @@ void recalculate_buffer(text* txt)
     vt_pnt* buffer = scalloc(txt->buflen * 6, sizeof(vt_pnt));
 
     i = 0;
-    vec2 pen = create_vec2_data(0, 0);
+    vec2 pen;
     float xoffset = 0;
     int line_counter = 0;
     if(txt->alignment == TEXT_ALIGN_CENTER)
-        xoffset = txt->limits.data[0] - (*(float*)array_list_get(width_list, line_counter)) * 0.5f;
+        xoffset = txt->limits.x - (*(float*)array_list_get(width_list, line_counter)) * 0.5f;
     else if(txt->alignment == TEXT_ALIGN_END)
-        xoffset = txt->limits.data[0] - (*(float*)array_list_get(width_list, line_counter));
+        xoffset = txt->limits.x - (*(float*)array_list_get(width_list, line_counter));
     for(int j = 0; j < elem_list->length; ++j) {
         struct text_element* e = array_list_get(elem_list, j);
-        if(txt->limits.data[0] != 0 && pen.data[0] != 0 && pen.data[0] + e->width > txt->limits.data[0]) {
-            pen.data[0] = 0;
-            pen.data[1] += txt->font->height;
+        if(txt->limits.x != 0 && pen.x != 0 && pen.x + e->width > txt->limits.x) {
+            pen.x = 0;
+            pen.y += txt->font->height;
             ++line_counter;
             if(txt->alignment == TEXT_ALIGN_CENTER)
-                xoffset = txt->limits.data[0] - (*(float*)array_list_get(width_list, line_counter)) * 0.5f;
+                xoffset = txt->limits.x - (*(float*)array_list_get(width_list, line_counter)) * 0.5f;
             else if(txt->alignment == TEXT_ALIGN_END)
-                xoffset = txt->limits.data[0] - (*(float*)array_list_get(width_list, line_counter));
+                xoffset = txt->limits.x - (*(float*)array_list_get(width_list, line_counter));
         }
         for(int k = 0; k < e->len; ++k) {
             glyph* gp = font_get_glyph(txt->font, e->position[k], true);
@@ -116,18 +116,18 @@ void recalculate_buffer(text* txt)
                 continue;
             }
             float l, r, t, b, lt, rt, tt, bt;
-            float bear = gp->bearing.data[0] / 64;
-            if(pen.data[0] == 0)
+            float bear = gp->bearing.x / 64;
+            if(pen.x == 0)
                 bear = 0;
-            l = pen.data[0] + bear - gp->texture_size.data[0] * 0.5f + xoffset;
-            r = pen.data[0] + bear + gp->texture_size.data[0] * 0.5f + xoffset;
-            t = pen.data[1] - (gp->bearing.data[1] / 128) - gp->texture_size.data[1] * 0.5f;
-            b = pen.data[1] - (gp->bearing.data[1] / 128) + gp->texture_size.data[1] * 0.5f;
-            lt = gp->texture_position.data[0] / (float) GLYPH_ATLAS_SIZE;
-            rt = gp->texture_position.data[0] / (float) GLYPH_ATLAS_SIZE + gp->texture_size.data[0] / (float)GLYPH_ATLAS_SIZE;
-            tt = gp->texture_position.data[1] / (float) GLYPH_ATLAS_SIZE + gp->texture_size.data[1] / (float)GLYPH_ATLAS_SIZE;
-            tt = gp->texture_position.data[1] / (float) GLYPH_ATLAS_SIZE + gp->texture_size.data[1] / (float)GLYPH_ATLAS_SIZE;
-            bt = gp->texture_position.data[1] / (float) GLYPH_ATLAS_SIZE;
+            l = pen.x + bear - gp->texture_size.x * 0.5f + xoffset;
+            r = pen.x + bear + gp->texture_size.x * 0.5f + xoffset;
+            t = pen.y - (gp->bearing.y / 128) - gp->texture_size.y * 0.5f;
+            b = pen.y - (gp->bearing.y / 128) + gp->texture_size.y * 0.5f;
+            lt = gp->texture_position.x / (float) GLYPH_ATLAS_SIZE;
+            rt = gp->texture_position.x / (float) GLYPH_ATLAS_SIZE + gp->texture_size.x / (float)GLYPH_ATLAS_SIZE;
+            tt = gp->texture_position.y / (float) GLYPH_ATLAS_SIZE + gp->texture_size.y / (float)GLYPH_ATLAS_SIZE;
+            tt = gp->texture_position.y / (float) GLYPH_ATLAS_SIZE + gp->texture_size.y / (float)GLYPH_ATLAS_SIZE;
+            bt = gp->texture_position.y / (float) GLYPH_ATLAS_SIZE;
 
             buffer[i * 6 + 0].position[0] = r;
             buffer[i * 6 + 0].position[1] = t;
@@ -222,7 +222,7 @@ text* create_text()
     txt->str  = 0;
     txt->len  = 0;
     txt->alignment = TEXT_ALIGN_START;
-    txt->limits = create_vec2();
+    /* txt->limits = create_vec2(); */
     glGenBuffers(1, &txt->handle);
     checkGLError();
 
