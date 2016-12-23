@@ -1,3 +1,0 @@
-[CCode ()]
-namespace editor {
-}
