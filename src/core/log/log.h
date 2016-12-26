@@ -37,14 +37,4 @@ void _log(const char* file, unsigned line, const char* category, log_level level
 void register_log_handler(log_handler handler);
 void register_log_file(FILE* file);
 
-//unsigned char* loadFileContents(const char* const filepath);
-
-//#define DEGTORAD 0.01745329251
-//#define RADTODEG 57.2957795131
-
-// #define macro_str(m) name_str(m)
-// #define name_str(m) #m
-
-// unsigned int next_power_of_two(int num);
-
 #endif // DF_CORE_LOG

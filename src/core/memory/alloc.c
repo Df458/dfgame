@@ -1,10 +1,10 @@
 // Log category, used to filter logs
 #define LOG_CATEGORY "Core"
 
+#include "alloc.h"
+
 #include "log.h"
 #include <stdlib.h>
-
-#include "alloc.h"
 
 // Allocates memory with malloc, with error logging.
 // NOTE: Don't call this function unless you want to pass a specific position

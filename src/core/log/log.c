@@ -48,7 +48,7 @@ void _log(const char* file, unsigned line, const char* category, log_level level
         fprintf(current_file, "%s:%d, LOG LEVEL FATAL: Cannot write message: Out of memory\n Partial message text: %s\n", __FILE__, __LINE__, message);
         exit(1);
     }
-    snprintf(format, length, log_format, file, line, log_level_names[level], message);
+    snprintf(format, length, log_format, category, file, line, log_level_names[level], message);
 
 	va_start(args, message);
     length = vsnprintf(0, 0, format, args);
