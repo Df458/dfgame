@@ -1,5 +1,6 @@
 #ifndef DF_CORE_TYPES
 #define DF_CORE_TYPES
+
 #include <inttypes.h>
 #include <stdbool.h>
 
