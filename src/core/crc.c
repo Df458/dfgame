@@ -17,11 +17,11 @@ static uint32 crc_reverse(uint32 val) {
 // ----------------------------------------------------------------------------
 
 // Converts data into its respective CRC32 hash.
-uint32 crc32(const byte* data, uint16 size) {
+uint32 crc32(hash_key) {
     uint32 crc = 0xffffffff;
     uint32 val;
-    for(uint16 i = 0; i < size; ++i) {
-        val = crc_reverse(data[i]);
+    for(uint16 i = 0; i < hash_data_size; ++i) {
+        val = crc_reverse(hash_data[i]);
         for(uint16 j = 0; j <= 7; ++j) {
             if((int32)(crc ^ val) < 0)
                 crc = (crc << 1) ^ 0x04C11DB7;

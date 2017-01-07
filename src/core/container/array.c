@@ -75,7 +75,7 @@ static void uarray_resize_if_full(uarray array) {
 }
 
 // Heap-sorts an array, using predicate p to determine ordering.
-static void heap_sort(void** data, uint16 size, comparison_predicate p) {
+static void heap_sort(void** data, uint16 size, comparison_predicate p, void* user) {
     uint16 i, index, back_index;
     void* temp;
     // Build the heap
@@ -84,7 +84,7 @@ static void heap_sort(void** data, uint16 size, comparison_predicate p) {
         back_index = (index - 1) / 2;
         temp = data[index];
 
-        while(index > 0 && p(temp, data[back_index]) == COMPARE_GREATER_THAN) {
+        while(index > 0 && p(temp, data[back_index], user) == COMPARE_GREATER_THAN) {
             data[index] = data[back_index];
             index = back_index;
             back_index = (index - 1) / 2;
@@ -102,9 +102,9 @@ static void heap_sort(void** data, uint16 size, comparison_predicate p) {
         index = 1;
         temp = data[0];
         while(index <= i - 1) {
-            if(index != (i - 1) && p(data[index], data[index + 1]) == COMPARE_LESS_THAN)
+            if(index != (i - 1) && p(data[index], data[index + 1], user) == COMPARE_LESS_THAN)
                 ++index;
-            if(p(temp, data[index]) == COMPARE_LESS_THAN) {
+            if(p(temp, data[index], user) == COMPARE_LESS_THAN) {
                 data[back_index] = data[index];
                 back_index = index;
                 index = 2 * back_index + 1;
@@ -121,7 +121,7 @@ static void heap_sort(void** data, uint16 size, comparison_predicate p) {
 // Creates a new array with enough space allocated to hold up to size members.
 // 0 is a valid size, since it will grow to fit new members.
 sarray sarray_new(uint16 size) {
-    sarray new_array = salloc(sizeof(sarray));
+    sarray new_array = salloc(sizeof(struct sarray));
 
     new_array->data       = NULL;
     new_array->size       = 0;
@@ -133,7 +133,7 @@ sarray sarray_new(uint16 size) {
     return new_array;
 }
 uarray uarray_new(uint16 size) {
-    uarray new_array = salloc(sizeof(uarray));
+    uarray new_array = salloc(sizeof(struct uarray));
 
     new_array->data       = NULL;
     new_array->size       = 0;
@@ -219,11 +219,11 @@ bool uarray_contains(uarray array, void* data) {
 
 // Returns true if data is a member of this array, or false if it isn't. Uses
 // predicate p to check the array for data.
-bool sarray_containsp(sarray array, void* data, equality_predicate p) {
-    return sarray_findp(array, data, p) != -1;
+bool sarray_containsp(sarray array, void* data, equality_predicate p, void* user) {
+    return sarray_findp(array, data, p, user) != -1;
 }
-bool uarray_containsp(uarray array, void* data, equality_predicate p) {
-    return uarray_findp(array, data, p) != -1;
+bool uarray_containsp(uarray array, void* data, equality_predicate p, void* user) {
+    return uarray_findp(array, data, p, user) != -1;
 }
 
 // Returns the position of data in this array, or INVALID_INDEX if array does
@@ -243,15 +243,15 @@ int32 uarray_find(uarray array, void* data) {
 
 // Returns the position of data using predicate p to check the array, or
 // INVALID_INDEX if array does not contain data.
-int32 sarray_findp(sarray array, void* data, equality_predicate p) {
+int32 sarray_findp(sarray array, void* data, equality_predicate p, void* user) {
     for(int32 i = 0; i < array->size; ++i)
-        if(p(array->data[i], data))
+        if(p(array->data[i], data, user))
             return i;
     return INVALID_INDEX;
 }
-int32 uarray_findp(uarray array, void* data, equality_predicate p) {
+int32 uarray_findp(uarray array, void* data, equality_predicate p, void* user) {
     for(int32 i = 0; i < array->size; ++i)
-        if(p(array->data[i], data))
+        if(p(array->data[i], data, user))
             return i;
     return INVALID_INDEX;
 }
@@ -284,8 +284,8 @@ bool uarray_remove(uarray array, void* data) {
 // Tries to remove data from this array, using predicate p to check the data
 // and returning true if it succeeeds. This will remove the first copy of data
 // it finds.
-bool sarray_removep(sarray array, void* data, equality_predicate p) {
-    int32 index = sarray_findp(array, data, p);
+bool sarray_removep(sarray array, void* data, equality_predicate p, void* user) {
+    int32 index = sarray_findp(array, data, p, user);
 
     if(index == INVALID_INDEX) {
         warn("Tried to remove object 0x%x from an sarray, but it couldn't be found", data);
@@ -295,8 +295,8 @@ bool sarray_removep(sarray array, void* data, equality_predicate p) {
 
     return true;
 }
-bool uarray_removep(uarray array, void* data, equality_predicate p) {
-    int32 index = uarray_findp(array, data, p);
+bool uarray_removep(uarray array, void* data, equality_predicate p, void* user) {
+    int32 index = uarray_findp(array, data, p, user);
 
     if(index == INVALID_INDEX) {
         warn("Tried to remove object 0x%x from a uarray, but it couldn't be found", data);
@@ -344,11 +344,53 @@ void uarray_set(uarray array, uint16 position, void* data) {
 }
 
 // Performs a heapsort on array using predicate p for comparison.
-void sarray_sort(sarray array, comparison_predicate p) {
-    heap_sort(array->data, array->size, p);
+void sarray_sort(sarray array, comparison_predicate p, void* user) {
+    heap_sort(array->data, array->size, p, user);
 }
-void uarray_sort(uarray array, comparison_predicate p) {
-    heap_sort(array->data, array->size, p);
+void uarray_sort(uarray array, comparison_predicate p, void* user) {
+    heap_sort(array->data, array->size, p, user);
+}
+
+// Calls d on each object in the array. Values an be replaced
+// by returning a decision of *_REPLACE, and they can be deleted by returning
+// a decision of *_DELETE.
+// Values can be safely deleted without worrying about skipping entries, but
+// users must still free memory as usual.
+void sarray_foreach(sarray array, foreach_delegate d, void* user) {
+    // Call d on each item
+    for(uint16 i = 0; i < array->size; ++i) {
+        iter_result res = d(array->data[i], user);
+
+        // Respond to delete/replace decisions
+        if(res.decision % 3 == 1) { // DELETE or BREAK_DELETE
+            sarray_remove_at(array, i);
+            --i;
+        } else if(res.decision % 3 == 2) { // REPLACE or BREAK_REPLACE
+            sarray_set(array, i, res.replacement_value);
+        }
+
+        // If the decision involves breaking, break
+        if(res.decision >= DECISION_BREAK)
+            break;
+    }
+}
+void uarray_foreach(uarray array, foreach_delegate d, void* user) {
+    // Call d on each item
+    for(uint16 i = 0; i < array->size; ++i) {
+        iter_result res = d(array->data[i], user);
+
+        // Respond to delete/replace decisions
+        if(res.decision % 3 == 1) { // DELETE or BREAK_DELETE
+            uarray_remove_at(array, i);
+            --i;
+        } else if(res.decision % 3 == 2) { // REPLACE or BREAK_REPLACE
+            uarray_set(array, i, res.replacement_value);
+        }
+
+        // If the decision involves breaking, break
+        if(res.decision >= DECISION_BREAK)
+            break;
+    }
 }
 
 #undef LOG_CATEGORY

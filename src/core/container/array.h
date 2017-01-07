@@ -2,7 +2,7 @@
 #define DF_CORE_ARRAY
 
 #include "types.h"
-#include "predicate.h"
+#include "delegate.h"
 
 // Represents an order-preserving auto-resizing array. The order of the contents
 // can only be changed manually.
@@ -66,12 +66,12 @@ bool uarray_contains(uarray array, void* data);
 
 // Returns true if data is a member of this array, or false if it isn't. Uses
 // predicate p to check the array for data.
-#define array_containsp(array, data) _Generic(array,\
-    sarray: sarray_containsp(array, data),\
-    uarray: uarray_containsp(array, data),\
+#define array_containsp(array, data, user) _Generic(array,\
+    sarray: sarray_containsp(array, data, user),\
+    uarray: uarray_containsp(array, data, user),\
 )
-bool sarray_containsp(sarray array, void* data, equality_predicate p);
-bool uarray_containsp(uarray array, void* data, equality_predicate p);
+bool sarray_containsp(sarray array, void* data, equality_predicate p, void* user);
+bool uarray_containsp(uarray array, void* data, equality_predicate p, void* user);
 
 // Returns the position of data in this array, or INVALID_INDEX if array does
 // not contain data.
@@ -84,12 +84,12 @@ int32 uarray_find(uarray array, void* data);
 
 // Returns the position of data using predicate p to check the array, or
 // INVALID_INDEX if array does not contain data.
-#define array_findp(array, data) _Generic(array,\
-    sarray: sarray_findp(array, data),\
-    uarray: uarray_findp(array, data),\
+#define array_findp(array, data, user) _Generic(array,\
+    sarray: sarray_findp(array, data, user),\
+    uarray: uarray_findp(array, data, user),\
 )
-int32 sarray_findp(sarray array, void* data, equality_predicate p);
-int32 uarray_findp(uarray array, void* data, equality_predicate p);
+int32 sarray_findp(sarray array, void* data, equality_predicate p, void* user);
+int32 uarray_findp(uarray array, void* data, equality_predicate p, void* user);
 
 // Tries to remove data from this array, returning true if it succeeeds. This
 // will remove the first copy of data it finds.
@@ -103,12 +103,12 @@ bool uarray_remove(uarray array, void* data);
 // Tries to remove data from this array, using predicate p to check the data
 // and returning true if it succeeeds. This will remove the first copy of data
 // it finds.
-#define array_removep(array, data, p) _Generic(array,\
-    sarray: sarray_removep(array, data, p),\
-    uarray: uarray_removep(array, data, p),\
+#define array_removep(array, data, p, user) _Generic(array,\
+    sarray: sarray_removep(array, data, p, user),\
+    uarray: uarray_removep(array, data, p, user),\
 )
-bool sarray_removep(sarray array, void* data, equality_predicate p);
-bool uarray_removep(uarray array, void* data, equality_predicate p);
+bool sarray_removep(sarray array, void* data, equality_predicate p, void* user);
+bool uarray_removep(uarray array, void* data, equality_predicate p, void* user);
 
 // Removes the element at position in this array.
 #define array_remove_at(array, position) _Generic(array,\
@@ -135,11 +135,23 @@ void sarray_set(sarray array, uint16 position, void* data);
 void uarray_set(uarray array, uint16 position, void* data);
 
 // Performs a heapsort on array using predicate p for comparison.
-#define array_sort(array, p) _Generic(array,\
-    sarray: sarray_sort(array, p),\
-    uarray: uarray_sort(array, p),\
+#define array_sort(array, p, user) _Generic(array,\
+    sarray: sarray_sort(array, p, user),\
+    uarray: uarray_sort(array, p, user),\
 )
-void sarray_sort(sarray array, comparison_predicate p);
-void uarray_sort(uarray array, comparison_predicate p);
+void sarray_sort(sarray array, comparison_predicate p, void* user);
+void uarray_sort(uarray array, comparison_predicate p, void* user);
+
+// Calls d on each object in the array. Values an be replaced
+// by returning a decision of *_REPLACE, and they can be deleted by returning
+// a decision of *_DELETE.
+// Values can be safely deleted without worrying about skipping entries, but
+// users must still free memory as usual.
+#define array_foreach(array, d) _Generic(array,\
+    sarray: sarray_foreach(array, d),\
+    uarray: uarray_foreach(array, d),\
+)
+void sarray_foreach(sarray array, foreach_delegate d, void* user);
+void uarray_foreach(uarray array, foreach_delegate d, void* user);
 
 #endif // DF_CORE_ARRAY

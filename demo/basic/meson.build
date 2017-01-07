@@ -1,6 +1,6 @@
 basicdeps = []
 basicsrc  = [ 'main.c' ]
-basicinc  = [ include_directories('../../src') ]
+basicinc  = [ include_directories('../../src'), include_directories('../../src/core') ]
 basicexe  = executable('demo_basic', basicsrc,
                        include_directories : basicinc,
                        dependencies : basicdeps,
