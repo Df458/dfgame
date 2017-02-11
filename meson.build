@@ -3,13 +3,17 @@ project('dfgame', 'c', 'vala',
         license : 'MIT',
         default_options : ['c_std=c11'])
 
-args = [ '-lm' ]
+compiler = meson.get_compiler('c')
+
+m = compiler.find_library('m', required : false)
+
+args = []
 
 subdir('src/core')
+subdir('src/math')
 #subdir('src/application')
 #subdir('src/audio')
 #subdir('src/editor')
-#subdir('src/math')
 #subdir('src/render')
 #subdir('src/resource')
 
