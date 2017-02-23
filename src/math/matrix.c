@@ -1,114 +1,153 @@
+// Log category, used to filter logs
+#define LOG_CATEGORY "Math"
+
 #include "matrix.h"
-#include "util.h"
 
+#include "quat.h"
+#include "types.h"
+#include "vector.h"
 #include <math.h>
-#include <string.h>
-#include <inttypes.h>
 
-mat4 ident_data = ident;
+// Translates the transformation matrix m by v
+mat4 mat4_translate_vec2(mat4 m, vec2 v) {
+    mat4 m2 = m;
+    m2.data[12] += v.x;
+    m2.data[13] += v.y;
 
-mat4 create_mat4()
-{
-    mat4 mat;
-    mat4_reset(&mat);
-    return mat;
+    return m2;
+}
+mat4 mat4_translate_vec3(mat4 m, vec3 v) {
+    mat4 m2 = m;
+    m2.data[12] += v.x;
+    m2.data[13] += v.y;
+    m2.data[14] += v.z;
+
+    return m2;
+}
+mat4 mat4_translate_vec4(mat4 m, vec4 v) {
+    mat4 m2 = m;
+    m2.data[12] += v.x;
+    m2.data[13] += v.y;
+    m2.data[14] += v.z;
+    m2.data[15] += v.w;
+
+    return m2;
 }
 
-void mat4_ortho(mat4* mat, float left, float right, float bottom, float top, float near, float far)
-{
-    mat4_reset(mat);
-    mat->data[0]  = 2.0f / (right - left);
-    mat->data[12]  = (right + left) / (right - left) * -1;
-    mat->data[5]  = 2.0f / (top - bottom);
-    mat->data[13]  = (top + bottom) / (top - bottom) * -1;
-    mat->data[10] = 2.0f / (far - near);
-    mat->data[14] = (far + near) / (far - near) * -1;
-    mat->data[15] = 1;
+// Rotates the transformation matrix m by r
+mat4 mat4_rotate_2d(mat4 m, float theta) {
+    mat4 m2 = m;
+    float s = sin(theta);
+    float c = cos(theta);
+
+    m2.data[0] +=  c;
+    m2.data[1] +=  s;
+    m2.data[4] += -s;
+    m2.data[5] +=  c;
+
+    return m2;
+}
+mat4 mat4_rotate_3d(mat4 m, vec3 euler) {
+    mat4 m2 = m;
+    float sx = sin(euler.x);
+    float cx = cos(euler.x);
+    float sy = sin(euler.y);
+    float cy = cos(euler.y);
+    float sz = sin(euler.x);
+    float cz = cos(euler.x);
+
+    m2.data[0]  += 1 + cy + cz;
+    m2.data[1]  += sz;
+    m2.data[3]  += sy;
+    m2.data[4]  -= sz;
+    m2.data[5]  += 1 + cx + cz;
+    m2.data[6]  += sx;
+    m2.data[8]  -= sy;
+    m2.data[9]  -= sx;
+    m2.data[10] += 1 + cx + cy;
+
+    return m2;
+}
+mat4 mat4_rotate_3d_quat(mat4 m, quat q) {
+    mat4 m2 = m;
+
+    m2.data[0]  = pow(q.w, 2) + pow(q.x, 2) - pow(q.y, 2) - pow(q.z, 2);
+    m2.data[1]  = (2 * q.x * q.y) - (2 * q.w * q.z);
+    m2.data[2]  = (2 * q.x * q.z) + (2 * q.w * q.y);
+    m2.data[4]  = (2 * q.x * q.y) + (2 * q.w * q.z);
+    m2.data[5]  = pow(q.w, 2) - pow(q.x, 2) + pow(q.y, 2) - pow(q.z, 2);
+    m2.data[6]  = (2 * q.y * q.z) + (2 * q.w * q.x);
+    m2.data[8]  = (2 * q.x * q.z) - (2 * q.w * q.y);
+    m2.data[9]  = (2 * q.y * q.z) - (2 * q.w * q.x);
+    m2.data[10] = pow(q.w, 2) - pow(q.x, 2) - pow(q.y, 2) + pow(q.z, 2);
+
+    return m2;
 }
 
-mat4 mat4_mul(mat4 lv, mat4 rv)
-{
+// Rotates the transformation matrix m by v
+mat4 mat4_scale_vec2(mat4 m, vec2 v) {
+    mat4 m2 = m;
+    m2.data[0] *= v.x;
+    m2.data[5] *= v.y;
+
+    return m2;
+}
+mat4 mat4_scale_vec3(mat4 m, vec3 v) {
+    mat4 m2 = m;
+    m2.data[0]  *= v.x;
+    m2.data[5]  *= v.y;
+    m2.data[10] *= v.z;
+
+    return m2;
+}
+mat4 mat4_scale_vec4(mat4 m, vec4 v) {
+    mat4 m2 = m;
+    m2.data[0]  *= v.x;
+    m2.data[5]  *= v.y;
+    m2.data[10] *= v.z;
+    m2.data[15] *= v.w;
+
+    return m2;
+}
+
+// Multiplies m1 by m2
+mat4 mat4_mul(mat4 m1, mat4 m2) {
     mat4 res;
-    for(uint8_t i = 0; i < 4; ++i) {
-        uint8_t j = i * 4;
-        res.data[j    ] = lv.data[0]*rv.data[j] + lv.data[4]*rv.data[j+1] + lv.data[8]*rv.data[j+2] + lv.data[12]*rv.data[j+3];
-        res.data[j + 1] = lv.data[1]*rv.data[j] + lv.data[5]*rv.data[j+1] + lv.data[9]*rv.data[j+2] + lv.data[13]*rv.data[j+3];
-        res.data[j + 2] = lv.data[2]*rv.data[j] + lv.data[6]*rv.data[j+1] + lv.data[10]*rv.data[j+2] + lv.data[14]*rv.data[j+3];
-        res.data[j + 3] = lv.data[3]*rv.data[j] + lv.data[7]*rv.data[j+1] + lv.data[11]*rv.data[j+2] + lv.data[15]*rv.data[j+3];
+    for(uint8 i = 0; i < 4; ++i) {
+        uint8 j = i * 4;
+        res.data[j    ] = m1.data[0]*m2.data[j] + m1.data[4]*m2.data[j+1] + m1.data[8] *m2.data[j+2]  + m1.data[12]*m2.data[j+3];
+        res.data[j + 1] = m1.data[1]*m2.data[j] + m1.data[5]*m2.data[j+1] + m1.data[9] *m2.data[j+2]  + m1.data[13]*m2.data[j+3];
+        res.data[j + 2] = m1.data[2]*m2.data[j] + m1.data[6]*m2.data[j+1] + m1.data[10]*m2.data[j+2] + m1.data[14]*m2.data[j+3];
+        res.data[j + 3] = m1.data[3]*m2.data[j] + m1.data[7]*m2.data[j+1] + m1.data[11]*m2.data[j+2] + m1.data[15]*m2.data[j+3];
     }
     return res;
 }
 
-void mat4_translate(mat4* mat, float position_x, float position_y, bool relative)
-{
-    if(relative) {
-        mat->data[12] += position_x;
-        mat->data[13] += position_y;
-    } else {
-        mat->data[12] = position_x;
-        mat->data[13] = position_y;
-    }
+// Gets the determinant of m
+float mat4_determinant(mat4 m) {
+    return m.data[12] * m.data[9] * m.data[6]  * m.data[3]  - m.data[8] * m.data[13] * m.data[6]  * m.data[3]  -
+           m.data[12] * m.data[5] * m.data[10] * m.data[3]  + m.data[4] * m.data[13] * m.data[10] * m.data[3]  +
+           m.data[8]  * m.data[5] * m.data[14] * m.data[3]  - m.data[4] * m.data[9]  * m.data[14] * m.data[3]  -
+           m.data[12] * m.data[9] * m.data[2]  * m.data[7]  + m.data[8] * m.data[13] * m.data[2]  * m.data[7]  +
+           m.data[12] * m.data[1] * m.data[10] * m.data[7]  - m.data[0] * m.data[13] * m.data[10] * m.data[7]  -
+           m.data[8]  * m.data[1] * m.data[14] * m.data[7]  + m.data[0] * m.data[9]  * m.data[14] * m.data[7]  +
+           m.data[12] * m.data[5] * m.data[2]  * m.data[11] - m.data[4] * m.data[13] * m.data[2]  * m.data[11] -
+           m.data[12] * m.data[1] * m.data[6]  * m.data[11] + m.data[0] * m.data[13] * m.data[6]  * m.data[11] +
+           m.data[4]  * m.data[1] * m.data[14] * m.data[11] - m.data[0] * m.data[5]  * m.data[14] * m.data[11] -
+           m.data[8]  * m.data[5] * m.data[2]  * m.data[15] + m.data[4] * m.data[9]  * m.data[2]  * m.data[15] +
+           m.data[8]  * m.data[1] * m.data[6]  * m.data[15] - m.data[0] * m.data[9]  * m.data[6]  * m.data[15] -
+           m.data[4]  * m.data[1] * m.data[10] * m.data[15] + m.data[0] * m.data[5]  * m.data[10] * m.data[15];
 }
 
-// TODO: Relative support
-void mat4_rotate(mat4* mat, float angle, bool relative)
-{
-    //  cos sin
-    // -sin cos
-    // ^-Correct matrix layout(upper-left corner)
-    float s = sin(angle);
-    float c = cos(angle);
-
-    mat->data[0] =  c;
-    mat->data[1] =  s;
-    mat->data[4] = -s;
-    mat->data[5] =  c;
-}
-
-// TODO: Make relative vs. absolute
-void mat4_scale(mat4* mat, float scale_x, float scale_y, bool relative)
-{
-    mat->data[0] *= scale_x;
-    mat->data[5] *= scale_y;
-}
-
-void mat4_reset(mat4* mat)
-{
-    memcpy(mat->data, ident_data.data, 16 * sizeof(float));
-}
-
-// TODO: Finish implementing this
-void mat4_invert(mat4* mat)
-{
-    float det = mat4_get_determinant(*mat);
-    if(det == 0)
-        return;
-    stub();
-}
-
-float mat4_get_determinant(mat4 mat)
-{
-    return mat.data[12] * mat.data[9] * mat.data[6]  * mat.data[3]  - mat.data[8] * mat.data[13] * mat.data[6]  * mat.data[3]  -
-           mat.data[12] * mat.data[5] * mat.data[10] * mat.data[3]  + mat.data[4] * mat.data[13] * mat.data[10] * mat.data[3]  +
-           mat.data[8]  * mat.data[5] * mat.data[14] * mat.data[3]  - mat.data[4] * mat.data[9]  * mat.data[14] * mat.data[3]  -
-           mat.data[12] * mat.data[9] * mat.data[2]  * mat.data[7]  + mat.data[8] * mat.data[13] * mat.data[2]  * mat.data[7]  +
-           mat.data[12] * mat.data[1] * mat.data[10] * mat.data[7]  - mat.data[0] * mat.data[13] * mat.data[10] * mat.data[7]  -
-           mat.data[8]  * mat.data[1] * mat.data[14] * mat.data[7]  + mat.data[0] * mat.data[9]  * mat.data[14] * mat.data[7]  +
-           mat.data[12] * mat.data[5] * mat.data[2]  * mat.data[11] - mat.data[4] * mat.data[13] * mat.data[2]  * mat.data[11] -
-           mat.data[12] * mat.data[1] * mat.data[6]  * mat.data[11] + mat.data[0] * mat.data[13] * mat.data[6]  * mat.data[11] +
-           mat.data[4]  * mat.data[1] * mat.data[14] * mat.data[11] - mat.data[0] * mat.data[5]  * mat.data[14] * mat.data[11] -
-           mat.data[8]  * mat.data[5] * mat.data[2]  * mat.data[15] + mat.data[4] * mat.data[9]  * mat.data[2]  * mat.data[15] +
-           mat.data[8]  * mat.data[1] * mat.data[6]  * mat.data[15] - mat.data[0] * mat.data[9]  * mat.data[6]  * mat.data[15] -
-           mat.data[4]  * mat.data[1] * mat.data[10] * mat.data[15] + mat.data[0] * mat.data[5]  * mat.data[10] * mat.data[15];
-}
-
-void mat4_transpose(mat4* mat)
-{
+// Transposes m
+mat4 mat4_transpose(mat4 m) {
+    mat4 m2 = mat4_ident;
     for(int i = 0; i < 3; ++i) {
         for(int j = i + 1; j < 4; ++j) {
-            float temp = mat->data[i * 4 + j];
-            mat->data[i * 4 + j] = mat->data[j * 4 + i];
-            mat->data[j * 4 + i] = temp;
+            m2.data[i * 4 + j] = m.data[j * 4 + i];
+            m2.data[j * 4 + i] = m.data[i * 4 + j];
         }
     }
+
+    return m2;
 }

@@ -1,0 +1,10 @@
+#ifndef DF_CORE_HASHMAP_D
+#define DF_CORE_HASHMAP_D
+
+#include "types.h"
+
+// Represents an associative key-value map that uses crc32 hashes to provide
+// relatively quick access.
+declarep(struct, hashmap)
+
+#endif

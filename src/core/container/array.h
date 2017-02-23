@@ -1,17 +1,9 @@
 #ifndef DF_CORE_ARRAY
 #define DF_CORE_ARRAY
 
+#include "array.hd"
 #include "types.h"
 #include "delegate.h"
-
-// Represents an order-preserving auto-resizing array. The order of the contents
-// can only be changed manually.
-typedef struct sarray* sarray;
-
-// Represents an unsorted auto-resizing array. The order of the contents is
-// subject to change, but this structure is more speed efficient than with an
-// sarray.
-typedef struct uarray* uarray;
 
 // Creates a new array with enough space allocated to hold up to size members.
 // 0 is a valid size, since it will grow to fit new members.

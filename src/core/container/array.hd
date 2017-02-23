@@ -1,0 +1,15 @@
+#ifndef DF_CORE_ARRAY_D
+#define DF_CORE_ARRAY_D
+
+#include "types.h"
+
+// Represents an order-preserving auto-resizing array. The order of the contents
+// can only be changed manually.
+declarep(struct, sarray)
+
+// Represents an unsorted auto-resizing array. The order of the contents is
+// subject to change, but this structure is more speed efficient than with an
+// sarray.
+declarep(struct, uarray)
+
+#endif

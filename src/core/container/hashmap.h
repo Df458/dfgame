@@ -1,6 +1,8 @@
 #ifndef DF_CORE_HASHMAP
 #define DF_CORE_HASHMAP
 
+#include "hashmap.hd"
+
 #include "crc.h"
 #include "types.h"
 #include "delegate.h"
@@ -8,10 +10,6 @@
 // Hashmaps place data into a statically-defined number of buckets. Increasing
 // this value will improve speed, at the cost of memory.
 #define HASHMAP_BUCKET_COUNT 64
-
-// Represents an associative key-value map that uses crc32 hashes to provide
-// relatively quick access.
-typedef struct hashmap* hashmap;
 
 // Creates a new hashmap.
 hashmap hashmap_new();

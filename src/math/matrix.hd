@@ -1,0 +1,9 @@
+#ifndef DF_MATH_MATRIX_D
+#define DF_MATH_MATRIX_D
+
+#include "types.h"
+
+// Represents a 4x4 transformation matrix
+declare(struct, mat4);
+
+#endif

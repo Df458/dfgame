@@ -6,6 +6,9 @@
 
 #define INVALID_INDEX -1
 
+#define declare(type, name) typedef type name name;
+#define declarep(type, name) typedef type name* name;
+
 typedef uint8_t uint8;
 typedef uint8_t ubyte;
 typedef int8_t  int8;

@@ -4,6 +4,7 @@
 #include "vector.h"
 
 #include "log/log.h"
+#include "quat.h"
 #include <math.h>
 
 // Returns the length of the vactor
@@ -109,4 +110,17 @@ float vec4_dot(vec4 v1, vec4 v2) {
 // Returns the cross product of v1 and v2.
 vec3 vec3_cross(vec3 v1, vec3 v2) {
     return (vec3){ .x = (v1.y * v2.z) - (v1.z * v2.y), .y = (v1.z * v2.x) - (v1.x * v2.z), .z = (v1.x * v2.y) - (v1.y * v2.x) };
+}
+
+vec2 vec2_rotate(vec2 v, float angle) {
+    return (vec2) {
+        .x = v.x * cos(angle) - v.y * sin(angle),
+        .y = v.x * sin(angle) + v.y * cos(angle)
+    };
+}
+vec3 vec3_rotate(vec3 v, quat q) {
+    stub(v);
+}
+vec4 vec4_rotate(vec4 v, quat q) {
+    stub(v);
 }

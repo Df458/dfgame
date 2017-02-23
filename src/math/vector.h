@@ -1,6 +1,8 @@
 #ifndef DF_MATH_VECTOR
 #define DF_MATH_VECTOR
 
+#include "quat.hd"
+
 // Represents a 2D vector
 typedef struct vec2 {
     union {
@@ -129,5 +131,15 @@ float vec4_dot(vec4 v1, vec4 v2);
     vec3: vec3_cross(v1, v2),\
 )
 vec3 vec3_cross(vec3 v1, vec3 v2);
+
+#define vec_rotate(v, r) _Generic(v,\
+    vec2: vec2_rotate(v, r),\
+    vec3: vec3_rotate(v, r)\
+    vec4: vec4_rotate(v, r)\
+)
+#define vec2_rotate_deg(v, r) vec2_rotate(v, degtorad(r))
+vec2 vec2_rotate(vec2 v, float angle);
+vec3 vec3_rotate(vec3 v, quat q);
+vec4 vec4_rotate(vec4 v, quat q);
 
 #endif
