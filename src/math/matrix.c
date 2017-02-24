@@ -71,15 +71,15 @@ mat4 mat4_rotate_3d(mat4 m, vec3 euler) {
 mat4 mat4_rotate_3d_quat(mat4 m, quat q) {
     mat4 m2 = m;
 
-    m2.data[0]  = pow(q.w, 2) + pow(q.x, 2) - pow(q.y, 2) - pow(q.z, 2);
+    m2.data[0]  = square(q.w) + square(q.x) - square(q.y) - square(q.z);
     m2.data[1]  = (2 * q.x * q.y) - (2 * q.w * q.z);
     m2.data[2]  = (2 * q.x * q.z) + (2 * q.w * q.y);
     m2.data[4]  = (2 * q.x * q.y) + (2 * q.w * q.z);
-    m2.data[5]  = pow(q.w, 2) - pow(q.x, 2) + pow(q.y, 2) - pow(q.z, 2);
+    m2.data[5]  = square(q.w) - square(q.x) + square(q.y) - square(q.z);
     m2.data[6]  = (2 * q.y * q.z) + (2 * q.w * q.x);
     m2.data[8]  = (2 * q.x * q.z) - (2 * q.w * q.y);
     m2.data[9]  = (2 * q.y * q.z) - (2 * q.w * q.x);
-    m2.data[10] = pow(q.w, 2) - pow(q.x, 2) - pow(q.y, 2) + pow(q.z, 2);
+    m2.data[10]  = square(q.w) - square(q.x) - square(q.y) + square(q.z);
 
     return m2;
 }

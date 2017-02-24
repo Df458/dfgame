@@ -22,13 +22,13 @@ float vec4_len(vec4 v) {
 
 // Returns the squared length of the vactor
 float vec2_len_squared(vec2 v) {
-    return pow(v.x, 2) + pow(v.y, 2);
+    return square(v.x) + square(v.y);
 }
 float vec3_len_squared(vec3 v) {
-    return pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2);
+    return square(v.x) + square(v.y) + square(v.z);
 }
 float vec4_len_squared(vec4 v) {
-    return pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2) + pow(v.w, 2);
+    return square(v.x) + square(v.y) + square(v.z) + square(v.w);
 }
 
 // Normalizes the vector, making its length 1.

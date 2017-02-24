@@ -1,6 +1,7 @@
 #ifndef DF_MATH_VECTOR
 #define DF_MATH_VECTOR
 
+#include "mathutil.h"
 #include "quat.hd"
 
 // Represents a 2D vector

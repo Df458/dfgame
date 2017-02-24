@@ -3,6 +3,8 @@
 
 #include "quat.h"
 
+#include <math.h>
+
 // Converts euler angles in v to a quat
 quat euler_to_quat(vec3 v) {
     float s1 = sin(v.x * 0.5);
@@ -13,19 +15,19 @@ quat euler_to_quat(vec3 v) {
     float c3 = cos(v.z * 0.5);
 
     return (quat) {
-        .w = (c1 * c2 * c3) - (s1 * s2 * c3);
-        .x = (c1 * c2 * s3) + (s1 * s2 * c3);
-        .y = (s1 * c2 * c3) + (c1 * s2 * s3);
-        .z = (c1 * s2 * c3) - (s1 * c2 * c3);
+        .w = (c1 * c2 * c3) - (s1 * s2 * c3),
+        .x = (c1 * c2 * s3) + (s1 * s2 * c3),
+        .y = (s1 * c2 * c3) + (c1 * s2 * s3),
+        .z = (c1 * s2 * c3) - (s1 * c2 * c3)
     };
 }
 
 // Converts q to Euler angles
 vec3 quat_to_euler(quat q) {
     return (vec3) {
-        .x = atan((2 * (w * x + y * z)) / (pow(w, 2) - pow(x, 2) - pow(y, 2) + pow(z, 2))),
-        .y = -asin(2 * (x * z - w * y)),
-        .z = atan((2 * (w * z + x * y)) / (pow(w, 2) + pow(x, 2) - pow(y, 2) - pow(z, 2)))
+        .x = atan((2 * (q.w * q.x + q.y * q.z)) / (pow(q.w, 2) - pow(q.x, 2) - pow(q.y, 2) + pow(q.z, 2))),
+        .y = -asin(2 * (q.x * q.z - q.w * q.y)),
+        .z = atan((2 * (q.w * q.z + q.x * q.y)) / (pow(q.w, 2) + pow(q.x, 2) - pow(q.y, 2) - pow(q.z, 2)))
     };
 }
 

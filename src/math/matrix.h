@@ -1,6 +1,7 @@
 #ifndef DF_MATH_MATRIX
 #define DF_MATH_MATRIX
 
+#include "mathutil.h"
 #include "quat.hd"
 #include "vector.hd"
 
