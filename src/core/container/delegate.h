@@ -4,11 +4,11 @@
 
 // Used to compare elements in a container, returning if the elements are the
 // same.
-typedef bool (*equality_predicate)(void* o1, void* o2, void* user);
+delegate(bool, equality_predicate, void* o1, void* o2, void* user);
 
 // Used to compare elements in a container, returning if the first is greater,
 // less than, or equal to the second.
-typedef comparison (*comparison_predicate)(void* o1, void* o2, void* user);
+delegate(comparison, comparison_predicate, void* o1, void* o2, void* user);
 
 // These are used by the foreach_delegate to communicate with the container
 // that it's iterating
@@ -33,6 +33,6 @@ typedef struct iter_result {
 #define iter_break_replace(data) (iter_result) { decision = DECISION_BREAK_REPLACE; replacement_value = data; }
 
 // Used to iterate a container, performing actions on each.
-typedef iter_result (*foreach_delegate)(void* iter_data, void* user);
+delegate(iter_result, foreach_delegate, void* iter_data, void* user);
 
 #endif // DF_CORE_DELEGATE

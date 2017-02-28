@@ -1,4 +1,4 @@
-audiodeps = []
+audiodeps = [ corelib ]
 audiosrc  = []
 audiolib   = static_library('dfgame_audio', audiosrc,
                          dependencies : audiodeps,

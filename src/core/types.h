@@ -8,6 +8,7 @@
 
 #define declare(type, name) typedef type name name;
 #define declarep(type, name) typedef type name* name;
+#define delegate(type, name, ...) typedef type (*name)(__VA_ARGS__);
 
 typedef uint8_t uint8;
 typedef uint8_t ubyte;

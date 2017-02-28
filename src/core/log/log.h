@@ -6,6 +6,7 @@
 #define LOG_CATEGORY "GENERIC"
 #endif // LOG_CATEGORY
 
+#include "types.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -24,9 +25,9 @@ typedef enum log_level {
                   // that will guarantee a crash, such as memory errors.
 } log_level;
 
-typedef void (*log_handler)(const char*, unsigned, log_level, const char*);
+delegate(void, log_handler, const char*, uint32, log_level, const char*)
 
-void _log(const char* file, unsigned line, const char* category, log_level level, char* const message, ...);
+void _log(const char* file, uint32 line, const char* category, log_level level, char* const message, ...);
 #define info(message, ...)  _log(__FILE__, __LINE__, LOG_CATEGORY, LOG_INFO,    message, ## __VA_ARGS__)
 #define warn(message, ...)  _log(__FILE__, __LINE__, LOG_CATEGORY, LOG_WARNING, message, ## __VA_ARGS__)
 #define error(message, ...) _log(__FILE__, __LINE__, LOG_CATEGORY, LOG_ERROR,   message, ## __VA_ARGS__)

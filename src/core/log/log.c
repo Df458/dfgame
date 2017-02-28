@@ -28,7 +28,7 @@ static FILE* current_file = 0;
 
 static const char* const log_format = "[%s] %s:%d, LOG LEVEL %s: %s\n";
 
-void _log(const char* file, unsigned line, const char* category, log_level level, char* const message, ...)
+void _log(const char* file, uint32 line, const char* category, log_level level, char* const message, ...)
 {
     if(!current_file)
         current_file = stderr;
@@ -88,19 +88,6 @@ void register_log_handler(log_handler handler)
 void register_log_file(FILE* file)
 {
     current_file = file;
-}
-
-unsigned int next_power_of_two(int num)
-{
-    if(num < 2)
-        return 1;
-
-    unsigned int n = 2;
-    while(num > n) {
-        n = n << 1;
-    }
-
-    return n;
 }
 
 #undef LOG_CATEGORY

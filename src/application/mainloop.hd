@@ -1,0 +1,10 @@
+#ifndef DF_APPLICATION_MAINLOOP_D
+#define DF_APPLICATION_MAINLOOP_D
+
+#include "types.h"
+
+// Represents a loop manually-interruptable loop
+declarep(struct, mainloop)
+delegate(bool, loop_func, mainloop loop, float delta_time)
+
+#endif

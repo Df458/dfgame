@@ -6,12 +6,13 @@ project('dfgame', 'c', 'vala',
 compiler = meson.get_compiler('c')
 
 m = compiler.find_library('m', required : false)
+glfw = dependency('glfw3')
 
 args = []
 
 subdir('src/core')
 subdir('src/math')
-#subdir('src/application')
+subdir('src/application')
 #subdir('src/audio')
 #subdir('src/editor')
 #subdir('src/render')
