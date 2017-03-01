@@ -7,6 +7,7 @@ compiler = meson.get_compiler('c')
 
 m = compiler.find_library('m', required : false)
 glfw = dependency('glfw3')
+glew = dependency('glew')
 
 args = []
 

@@ -40,7 +40,9 @@ void mainloop_run(mainloop loop) {
         dt = glfwGetTime();
         glfwSetTime(0);
         glfwPollEvents();
-        loop->func(loop, dt);
+        if(!loop->func(loop, dt)) {
+            mainloop_request_end(loop);
+        }
     }
 
     loop->is_running = false;

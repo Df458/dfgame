@@ -1,5 +1,5 @@
-applicationdeps = [ glfw ]
-applicationsrc  = [ 'mainloop.c' ]
+applicationdeps = [ glfw, glew ]
+applicationsrc  = [ 'mainloop.c', 'window.c' ]
 applicationinc  = [ include_directories('../core') ]
 applicationlib  = static_library('dfgame_application', applicationsrc,
                          include_directories : applicationinc,
