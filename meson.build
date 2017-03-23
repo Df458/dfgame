@@ -11,15 +11,19 @@ glew = dependency('glew')
 
 args = []
 
+subdir('tools/glslc')
+
 subdir('src/core')
 subdir('src/math')
+subdir('src/graphics')
 subdir('src/application')
 #subdir('src/audio')
 #subdir('src/editor')
-#subdir('src/render')
 #subdir('src/resource')
 
 subdir('demo/basic')
+
+run_command('ctags', '-R', '.')
 
 #pkgconfig = import('pkgconfig')
 #pkgconfig.generate(libraries : ,

@@ -1,0 +1,87 @@
+#ifndef DF_GRAPHICS_VERTEX_D
+#define DF_GRAPHICS_VERTEX_D
+
+#include "types.h"
+#include "vector.h"
+
+#include <GL/glew.h>
+#include <GL/gl.h>
+
+// Bitmask enum for defining the contents of vertex buffer
+typedef enum vertex_types
+{
+    VT_POSITION = 0b10000000,
+    VT_NORMAL = 0b01000000,
+    VT_TEXTURE = 0b00100000,
+    VT_COLOR = 0b00010000,
+} vertex_types;
+
+// Vertex with just positional information
+typedef struct vt_p
+{
+    vec3 position;
+}
+vt_p;
+
+// Vertex with position and normals
+typedef struct vt_pn
+{
+    vec3 position;
+    vec3 normal;
+}
+vt_pn;
+
+// Vertex with position and texture coordinates
+typedef struct vt_pt
+{
+    vec3 position;
+    vec2 uv;
+}
+vt_pt;
+
+// Vertex with position, normals, and texture coordinates
+typedef struct vt_pnt
+{
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
+}
+vt_pnt;
+
+// Vertex with position and vertex color
+typedef struct vt_pc
+{
+    vec3 position;
+    GLubyte color[4];
+}
+vt_pc;
+
+// Vertex with position, normals, and vertex color
+typedef struct vt_pnc
+{
+    vec3 position;
+    vec3 normal;
+    GLubyte color[4];
+}
+vt_pnc;
+
+// Vertex with position, texture coordinates, and vertex color
+typedef struct vt_ptc
+{
+    vec3 position;
+    vec2 uv;
+    GLubyte color[4];
+}
+vt_ptc;
+
+// Vertex with position, normals, texture coordinates, and vertex color
+typedef struct vt_pntc
+{
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
+    GLubyte color[4];
+}
+vt_pntc;
+
+#endif

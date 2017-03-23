@@ -1,0 +1,9 @@
+#ifndef DF_GRAPHICS_MESH_D
+#define DF_GRAPHICS_MESH_D
+
+#include "types.h"
+
+// Represents a mesh
+declarep(struct, mesh);
+
+#endif

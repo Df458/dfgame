@@ -7,5 +7,3 @@ mathlib  = static_library('dfgame_math', mathsrc,
                          link_with : corelib,
                          link_args : args,
                          install : true)
-
-run_command('ctags', '-R', '.')

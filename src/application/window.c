@@ -4,6 +4,7 @@
 #include "window.h"
 
 #include "log/log.h"
+#include "graphics_log.h"
 
 static bool glfw_init_called = false;
 
@@ -29,6 +30,14 @@ GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
 
 	if(!glfw_init_called && glewInit() != GLEW_OK) {
         fatal("Failed to initialize GLEW");
+    } else if(!glfw_init_called) {
+        if(!GLEW_KHR_debug)
+            error("Graphics debug logging is not available for your hardware. Graphical errors will not be reported");
+        else
+            glDebugMessageCallback(graphics_log, NULL);
+        GLuint VAO; // Setup default VAO
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
     }
 
     glfw_init_called = true;

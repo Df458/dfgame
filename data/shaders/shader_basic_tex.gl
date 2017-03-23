@@ -1,0 +1,3 @@
+name: basic_tex
+vert: basic_tex.vert
+frag: basic_tex.frag

@@ -6,5 +6,3 @@ corelib  = static_library('dfgame_core', coresrc,
                          dependencies : coredeps,
                          link_args : args,
                          install : true)
-
-run_command('ctags', '-R', '.')
