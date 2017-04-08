@@ -3,9 +3,11 @@
 
 #include "shader.h"
 
+#include "camera.h"
 #include "log/log.h"
 #include "matrix.h"
 #include "mesh.h"
+#include "transform.h"
 #include "vector.h"
 #include "vertex.hd"
 
@@ -114,6 +116,12 @@ void shader_bind_uniform_vec4(GLint handle, vec4 v) {
 void shader_bind_uniform_mat4(GLint handle, mat4 m) {
     glUniformMatrix4fv(handle, 1, false, m.data);
 }
+void shader_bind_uniform_transform(GLint handle, transform m) {
+    glUniformMatrix4fv(handle, 1, false, transform_get_matrix(m).data);
+}
+void shader_bind_uniform_camera(GLint handle, camera m) {
+    glUniformMatrix4fv(handle, 1, false, camera_get_vp(m).data);
+}
 
 // Binds a uniform to shader s using a given name.
 void shader_bind_uniform_float_name(shader s, const char* name, float f) {
@@ -133,6 +141,12 @@ void shader_bind_uniform_vec4_name(shader s,  const char* name, vec4 v) {
 }
 void shader_bind_uniform_mat4_name(shader s,  const char* name, mat4 m) {
     glUniformMatrix4fv(glGetUniformLocation(s.id, name), 1, false, m.data);
+}
+void shader_bind_uniform_transform_name(shader s,  const char* name, transform m) {
+    glUniformMatrix4fv(glGetUniformLocation(s.id, name), 1, false, transform_get_matrix(m).data);
+}
+void shader_bind_uniform_camera_name(shader s,  const char* name, camera m) {
+    glUniformMatrix4fv(glGetUniformLocation(s.id, name), 1, false, camera_get_vp(m).data);
 }
 
 // Binds an attribute to shader s using a given list of names and vertex types.

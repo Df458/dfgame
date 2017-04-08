@@ -1,7 +1,9 @@
 #ifndef DF_GRAPHICS_SHADER
 #define DF_GRAPHICS_SHADER
+#include "camera.hd"
 #include "matrix.hd"
 #include "mesh.hd"
+#include "transform.hd"
 #include "vector.hd"
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -29,7 +31,9 @@ void _shader_free(shader s);
         vec2:  shader_bind_uniform_vec2_name,\
         vec3:  shader_bind_uniform_vec3_name,\
         vec4:  shader_bind_uniform_vec4_name,\
-        mat4:  shader_bind_uniform_mat4_name\
+        mat4:  shader_bind_uniform_mat4_name,\
+        transform:  shader_bind_uniform_transform_name,\
+        camera:  shader_bind_uniform_camera_name\
     )(s, name, v)
 
 // Binds uniform v to the given OpenGL handle
@@ -39,7 +43,9 @@ void _shader_free(shader s);
         vec2:  shader_bind_uniform_vec2,\
         vec3:  shader_bind_uniform_vec3,\
         vec4:  shader_bind_uniform_vec4,\
-        mat4:  shader_bind_uniform_mat4\
+        mat4:  shader_bind_uniform_mat4,\
+        transform:  shader_bind_uniform_transform,\
+        camera:  shader_bind_uniform_camera\
     )(handle, v)
 
 void shader_bind_uniform_float_name(shader s, const char* name, float f);
@@ -48,12 +54,16 @@ void shader_bind_uniform_vec2_name(shader s,  const char* name, vec2 v);
 void shader_bind_uniform_vec3_name(shader s,  const char* name, vec3 v);
 void shader_bind_uniform_vec4_name(shader s,  const char* name, vec4 v);
 void shader_bind_uniform_mat4_name(shader s,  const char* name, mat4 m);
+void shader_bind_uniform_transform_name(shader s,  const char* name, transform m);
+void shader_bind_uniform_camera_name(shader s,  const char* name, camera m);
 void shader_bind_uniform_float(GLint handle, float f);
 void shader_bind_uniform_int(GLint handle, int i);
 void shader_bind_uniform_vec2(GLint handle, vec2 v);
 void shader_bind_uniform_vec3(GLint handle, vec3 v);
 void shader_bind_uniform_vec4(GLint handle, vec4 v);
 void shader_bind_uniform_mat4(GLint handle, mat4 m);
+void shader_bind_uniform_transform(GLint handle, transform m);
+void shader_bind_uniform_camera(GLint handle, camera m);
 
 // Binds an attribute to shader s using a given list of names and vertex types.
 // This function takes a string followed by a vertex_types, and binds that part

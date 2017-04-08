@@ -1,0 +1,10 @@
+#ifndef DF_MATH_TRANSFORM_D
+#define DF_MATH_TRANSFORM_D
+
+#include "types.h"
+
+// Represents a transform, containing both separate components and the
+// resulting transformation matrix.
+declarep(struct, transform);
+
+#endif

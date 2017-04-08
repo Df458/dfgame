@@ -29,4 +29,11 @@ vec3 quat_to_euler(quat q);
 // Multiplies q1 by q2
 quat quat_mul(quat q1, quat q2);
 
+// Normalizes a quaternion
+quat quat_normalize(quat q);
+
+// printf helper macros
+#define quat_printstr "[%f %f %f %f]"
+#define quat_printargs(q) q.data[0], q.data[1], q.data[2], q.data[3]
+
 #endif

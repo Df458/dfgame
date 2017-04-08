@@ -133,14 +133,23 @@ float vec4_dot(vec4 v1, vec4 v2);
 )
 vec3 vec3_cross(vec3 v1, vec3 v2);
 
+// Rotates v by r
 #define vec_rotate(v, r) _Generic(v,\
-    vec2: vec2_rotate(v, r),\
-    vec3: vec3_rotate(v, r)\
-    vec4: vec4_rotate(v, r)\
-)
+    vec2: vec2_rotate,\
+    vec3: vec3_rotate,\
+    vec4: vec4_rotate\
+)(v, r)
 #define vec2_rotate_deg(v, r) vec2_rotate(v, degtorad(r))
 vec2 vec2_rotate(vec2 v, float angle);
 vec3 vec3_rotate(vec3 v, quat q);
 vec4 vec4_rotate(vec4 v, quat q);
+
+// printf helper macros
+#define vec2_printstr "[%f, %f]"
+#define vec3_printstr "[%f, %f, %f]"
+#define vec4_printstr "[%f, %f, %f, %f]"
+#define vec2_printargs(v) v.x, v.y
+#define vec3_printargs(v) v.x, v.y, v.z
+#define vec4_printargs(v) v.x, v.y, v.z, v.w
 
 #endif

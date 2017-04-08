@@ -7,6 +7,7 @@ glslc  = executable('glslc', glslcsrc,
                    install : true)
 glsl_gen = generator(glslc,
                     output: '@BASENAME@.h',
-                    arguments: ['-o', '@OUTPUT@', '@INPUT@'])
+                    arguments: ['-o', '@OUTPUT@', '-d', '@OUTPUT@.d', '@INPUT@'],
+                    depfile: '@BASENAME@.d')
 
 run_command('ctags', '-R', '.')

@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// Represents a quaternion rotation
+// Represents a quaternion
 declare(struct, quat);
 
 #endif

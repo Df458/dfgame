@@ -15,10 +15,10 @@ quat euler_to_quat(vec3 v) {
     float c3 = cos(v.z * 0.5);
 
     return (quat) {
-        .w = (c1 * c2 * c3) - (s1 * s2 * c3),
-        .x = (c1 * c2 * s3) + (s1 * s2 * c3),
-        .y = (s1 * c2 * c3) + (c1 * s2 * s3),
-        .z = (c1 * s2 * c3) - (s1 * c2 * c3)
+        .w = (c1 * c2 * c3) + (s1 * s2 * c3),
+        .x = (s1 * c2 * c3) - (c1 * s2 * s3),
+        .y = (c1 * s2 * c3) + (s1 * c2 * s3),
+        .z = (c1 * c2 * s3) - (s1 * s2 * c3)
     };
 }
 
@@ -32,11 +32,32 @@ vec3 quat_to_euler(quat q) {
 }
 
 // Multiplies q1 by q2
+// NOTE: Copied from [http://www.gamasutra.com/view/feature/131686/rotating_objects_using_quaternions.php]
 quat quat_mul(quat q1, quat q2) {
+    float A, B, C, D, E, F, G, H;
+    A = (q1.w + q1.x)*(q2.w + q2.x);
+    B = (q1.z - q1.y)*(q2.y - q2.z);
+    C = (q1.w - q1.x)*(q2.y + q2.z); 
+    D = (q1.y + q1.z)*(q2.w - q2.x);
+    E = (q1.x + q1.z)*(q2.x + q2.y);
+    F = (q1.x - q1.z)*(q2.x - q2.y);
+    G = (q1.w + q1.y)*(q2.w - q2.z);
+    H = (q1.w - q1.y)*(q2.w + q2.z);
     return (quat) {
-        .w = (q1.w * q2.w) - (q1.x * q2.x) - (q1.y * q2.y) - (q1.z * q2.z),
-        .x = (q1.w * q2.x) - (q1.x * q2.w) - (q1.y * q2.z) - (q1.z * q2.y),
-        .y = (q1.w * q2.y) - (q1.x * q2.z) - (q1.y * q2.w) - (q1.z * q2.x),
-        .z = (q1.w * q2.z) - (q1.x * q2.y) - (q1.y * q2.x) - (q1.z * q2.w)
+        .w = B + (-E - F + G + H)/2,
+            .x = A - (E + F + G + H)/2,
+            .y = C + (E - F + G - H)/2,
+            .z = D + (E - F - G + H)/2
+    };
+}
+
+// Normalizes a quaternion
+quat quat_normalize(quat q) {
+    float norm = sqrt(square(q.w) + square(q.x) + square(q.y) + square(q.z));
+    return (quat) {
+        .w = q.w / norm,
+        .x = q.x / norm,
+        .y = q.y / norm,
+        .z = q.z / norm
     };
 }

@@ -1,7 +1,7 @@
 #version 330
 uniform mat4 transform;
 
-in  vec3 i_pos;
+in vec3 i_pos;
 in vec2 i_uv;
 
 out vec2 v_uv;

@@ -1,5 +1,5 @@
 mathdeps = [ m ]
-mathsrc  = [ 'interpolate.c', 'matrix.c', 'quat.c', 'vector.c' ]
+mathsrc  = [ 'interpolate.c', 'matrix.c', 'quat.c', 'transform.c', 'vector.c' ]
 mathinc  = [ include_directories('../core') ]
 mathlib  = static_library('dfgame_math', mathsrc,
                          include_directories : mathinc,

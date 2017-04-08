@@ -12,6 +12,12 @@ struct option options[] = {
         has_arg: 0,
         flag:    NULL,
         val:     'h'
+    },
+    {
+        name:    "depfile",
+        has_arg: 1,
+        flag:    NULL,
+        val:     'd'
     }
 };
 
@@ -104,7 +110,7 @@ void make_path_relative(const char* base_path, char** rel_path) {
     }
 }
 
-void parse_definitions(const char* filename, char** vs, char** fs, char** gs, char** ts, char** name) {
+void parse_definitions(const char* filename, char** vs, char** fs, char** gs, char** ts, char** name, const char* deppath) {
     FILE* infile = fopen(filename, "r");
     if(!infile) {
         fprintf(stderr, "Error: Can't open shader definition file %s: %s\n", filename, strerror(errno));
@@ -228,17 +234,24 @@ int main(int argc, char* argv[]) {
     }
 
     const char* output = NULL;
+    const char* deppath = NULL;
 
     int c;
-    while((c = getopt_long(argc, argv, "ho:", options, NULL)) != -1) {
+    while((c = getopt_long(argc, argv, "hd:o:", options, NULL)) != -1) {
         switch(c) {
             case '?':
             case 'h':
                 print_info();
                 return 0;
 
+            case 'd':
+                deppath = optarg;
+                fprintf(stderr, "d %s\n", deppath);
+                break;
+
             case 'o':
                 output = optarg;
+                fprintf(stderr, "o %s\n", output);
                 break;
 
             default:
@@ -257,26 +270,49 @@ int main(int argc, char* argv[]) {
     char* gsfile = NULL;
     char* tsfile = NULL;
     char* name   = NULL;
-    parse_definitions(argv[optind], &vsfile, &fsfile, &gsfile, &tsfile, &name);
+    parse_definitions(argv[optind], &vsfile, &fsfile, &gsfile, &tsfile, &name, deppath);
 
     FILE* outfile = output == NULL ? stdout : fopen(output, "w");
     if(!vsfile && !fsfile && !gsfile && !tsfile) {
         fprintf(stderr, "Error: Shader definition file contains no shaders\n");
     }
+
+    FILE* depfile = deppath ? fopen(deppath, "w") : NULL;
+    if(!depfile) {
+        fprintf(stderr, "Error: Can't open shader dependency file %s: %s\n", deppath, strerror(errno));
+        exit(1);
+    }
+
+    if(depfile)
+        fprintf(depfile, "%s: ", output);
+
     const char* fn = name == NULL ? output == NULL ? argv[optind] : output : name;
-    fprintf(stderr, "%s\n", output);
     start_file(outfile, fn);
     if(vsfile)
+    {
         write_file(outfile, vsfile, fn, "vs");
+        fprintf(depfile, "%s ", vsfile);
+    }
     if(fsfile)
+    {
         write_file(outfile, fsfile, fn, "fs");
+        fprintf(depfile, "%s ", fsfile);
+    }
     if(gsfile)
+    {
         write_file(outfile, gsfile, fn, "gs");
+        fprintf(depfile, "%s ", gsfile);
+    }
     if(tsfile)
+    {
         write_file(outfile, tsfile, fn, "ts");
+        fprintf(depfile, "%s ", tsfile);
+    }
     end_file(outfile, fn, vsfile, fsfile, gsfile, tsfile);
     fclose(outfile);
 
+    if(depfile)
+        fclose(depfile);
 
     return 0;
 }
