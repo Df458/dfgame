@@ -60,9 +60,9 @@ void transform_rotate_2d(transform t, float theta, bool relative) {
 }
 void transform_rotate_3d(transform t, vec3 v, bool relative) {
     if(relative)
-        t->orientation = quat_mul(euler_to_quat(v), t->orientation);
+        t->orientation = quat_mul(quat_normalize(euler_to_quat(v)), t->orientation);
     else
-        t->orientation = euler_to_quat(v);
+        t->orientation = quat_normalize(euler_to_quat(v));
 
     recalculate_matrix(t);
 }

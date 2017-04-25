@@ -9,6 +9,8 @@
 #define declare(type, name) typedef type name name;
 #define declarep(type, name) typedef type name* name;
 #define delegate(type, name, ...) typedef type (*name)(__VA_ARGS__);
+#define event(type, name, ...) typedef type (*name_func)(__VA_ARGS__, void* user); typedef struct name { name_func func; void* user; } name;
+#define call_event(ev, ...) if(ev->func) { ev->func(__VA_ARGS__, ev->user); }
 
 typedef uint8_t uint8;
 typedef uint8_t ubyte;

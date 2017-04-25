@@ -14,4 +14,6 @@
 #define degtorad(theta) (theta * 0.01745329251)
 #define radtodeg(theta) (theta * 57.2957795131)
 
+#define PI 3.14159265358979323846
+
 #endif

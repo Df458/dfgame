@@ -9,16 +9,16 @@
 quat euler_to_quat(vec3 v) {
     float s1 = sin(v.x * 0.5);
     float c1 = cos(v.x * 0.5);
-    float s2 = sin(v.y * 0.5);
-    float c2 = cos(v.y * 0.5);
-    float s3 = sin(v.z * 0.5);
-    float c3 = cos(v.z * 0.5);
+    float s2 = sin(v.z * 0.5);
+    float c2 = cos(v.z * 0.5);
+    float s3 = sin(v.y * 0.5);
+    float c3 = cos(v.y * 0.5);
 
     return (quat) {
-        .w = (c1 * c2 * c3) + (s1 * s2 * c3),
-        .x = (s1 * c2 * c3) - (c1 * s2 * s3),
-        .y = (c1 * s2 * c3) + (s1 * c2 * s3),
-        .z = (c1 * c2 * s3) - (s1 * s2 * c3)
+        .w = (c1 * c2 * c3) - (s1 * s2 * s3),
+        .x = (s1 * s2 * c3) + (c1 * c2 * s3),
+        .y = (s1 * c2 * c3) + (c1 * s2 * s3),
+        .z = (c1 * s2 * c3) - (s1 * c2 * s3)
     };
 }
 

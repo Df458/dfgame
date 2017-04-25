@@ -3,6 +3,7 @@
 
 #include "mainloop.h"
 
+#include "input.h"
 #include "memory/alloc.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -40,6 +41,7 @@ void mainloop_run(mainloop loop) {
         dt = glfwGetTime();
         glfwSetTime(0);
         glfwPollEvents();
+        update_input();
         if(!loop->func(loop, dt)) {
             mainloop_request_end(loop);
         }

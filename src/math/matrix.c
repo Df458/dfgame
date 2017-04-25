@@ -80,23 +80,14 @@ mat4 mat4_rotate_3d(mat4 m, vec3 euler) {
 mat4 mat4_rotate_3d_quat(mat4 m, quat q) {
     mat4 m2 = m;
 
-    /* m2.data[0]  += square(q.w) + square(q.x) - square(q.y) - square(q.z); */
-    /* m2.data[1]  += (2 * q.x * q.y) - (2 * q.w * q.z); */
-    /* m2.data[2]  += (2 * q.x * q.z) + (2 * q.w * q.y); */
-    /* m2.data[4]  += (2 * q.x * q.y) + (2 * q.w * q.z); */
-    /* m2.data[5]  += square(q.w) - square(q.x) + square(q.y) - square(q.z); */
-    /* m2.data[6]  += (2 * q.y * q.z) + (2 * q.w * q.x); */
-    /* m2.data[8]  += (2 * q.x * q.z) - (2 * q.w * q.y); */
-    /* m2.data[9]  += (2 * q.y * q.z) - (2 * q.w * q.x); */
-    /* m2.data[10] += square(q.w) - square(q.x) - square(q.y) + square(q.z); */
     m2.data[0]  -= (2 * square(q.y)) + (2 * square(q.z));
-    m2.data[1]  += (2 * q.x * q.y) - (2 * q.w * q.z);
-    m2.data[2]  += (2 * q.x * q.z) + (2 * q.w * q.y);
-    m2.data[4]  += (2 * q.x * q.y) + (2 * q.w * q.z);
+    m2.data[1]  += (2 * q.x * q.y)   - (2 * q.w * q.z);
+    m2.data[2]  += (2 * q.x * q.z)   + (2 * q.w * q.y);
+    m2.data[4]  += (2 * q.x * q.y)   + (2 * q.w * q.z);
     m2.data[5]  -= (2 * square(q.x)) + (2 * square(q.z));
-    m2.data[6]  += (2 * q.y * q.z) - (2 * q.w * q.x);
-    m2.data[8]  += (2 * q.x * q.z) - (2 * q.w * q.y);
-    m2.data[9]  += (2 * q.y * q.z) - (2 * q.w * q.x);
+    m2.data[6]  += (2 * q.y * q.z)   - (2 * q.w * q.x);
+    m2.data[8]  += (2 * q.x * q.z)   - (2 * q.w * q.y);
+    m2.data[9]  += (2 * q.y * q.z)   + (2 * q.w * q.x);
     m2.data[10] -= (2 * square(q.x)) + (2 * square(q.y));
 
     return m2;
@@ -186,17 +177,53 @@ mat4 mat4_invert(mat4 m) {
         ((m.data[ 1]*m.data[11]*m.data[14]) + (m.data[ 2]*m.data[ 9]*m.data[15]) + (m.data[ 3]*m.data[10]*m.data[13]) - (m.data[ 1]*m.data[10]*m.data[15]) - (m.data[ 2]*m.data[11]*m.data[13]) - (m.data[ 3]*m.data[ 9]*m.data[14])) * invdet,
         ((m.data[ 1]*m.data[ 6]*m.data[15]) + (m.data[ 2]*m.data[ 7]*m.data[13]) + (m.data[ 3]*m.data[ 5]*m.data[14]) - (m.data[ 1]*m.data[ 7]*m.data[14]) - (m.data[ 2]*m.data[ 5]*m.data[15]) - (m.data[ 3]*m.data[ 6]*m.data[13])) * invdet,
         ((m.data[ 1]*m.data[ 7]*m.data[10]) + (m.data[ 2]*m.data[ 5]*m.data[11]) + (m.data[ 3]*m.data[ 6]*m.data[ 9]) - (m.data[ 1]*m.data[ 6]*m.data[11]) - (m.data[ 2]*m.data[ 7]*m.data[ 9]) - (m.data[ 3]*m.data[ 5]*m.data[10])) * invdet,
+
         ((m.data[ 4]*m.data[11]*m.data[14]) + (m.data[ 6]*m.data[ 8]*m.data[15]) + (m.data[ 7]*m.data[10]*m.data[12]) - (m.data[ 4]*m.data[10]*m.data[15]) - (m.data[ 6]*m.data[11]*m.data[12]) - (m.data[ 7]*m.data[ 8]*m.data[14])) * invdet,
         ((m.data[ 0]*m.data[10]*m.data[15]) + (m.data[ 2]*m.data[11]*m.data[12]) + (m.data[ 3]*m.data[ 8]*m.data[14]) - (m.data[ 0]*m.data[11]*m.data[14]) - (m.data[ 2]*m.data[ 8]*m.data[15]) - (m.data[ 3]*m.data[10]*m.data[12])) * invdet,
         ((m.data[ 0]*m.data[ 7]*m.data[14]) + (m.data[ 2]*m.data[ 4]*m.data[15]) + (m.data[ 3]*m.data[ 6]*m.data[12]) - (m.data[ 0]*m.data[ 6]*m.data[15]) - (m.data[ 2]*m.data[ 7]*m.data[12]) - (m.data[ 3]*m.data[ 4]*m.data[14])) * invdet,
         ((m.data[ 0]*m.data[ 6]*m.data[11]) + (m.data[ 2]*m.data[ 7]*m.data[ 8]) + (m.data[ 3]*m.data[ 4]*m.data[10]) - (m.data[ 0]*m.data[ 7]*m.data[10]) - (m.data[ 2]*m.data[ 4]*m.data[11]) - (m.data[ 3]*m.data[ 6]*m.data[ 8])) * invdet,
+
         ((m.data[ 4]*m.data[ 9]*m.data[15]) + (m.data[ 5]*m.data[11]*m.data[12]) + (m.data[ 7]*m.data[ 8]*m.data[13]) - (m.data[ 4]*m.data[11]*m.data[13]) - (m.data[ 5]*m.data[ 8]*m.data[15]) - (m.data[ 7]*m.data[ 9]*m.data[12])) * invdet,
         ((m.data[ 0]*m.data[11]*m.data[13]) + (m.data[ 1]*m.data[ 8]*m.data[15]) + (m.data[ 3]*m.data[ 9]*m.data[12]) - (m.data[ 0]*m.data[ 9]*m.data[15]) - (m.data[ 1]*m.data[11]*m.data[12]) - (m.data[ 3]*m.data[ 8]*m.data[13])) * invdet,
         ((m.data[ 0]*m.data[ 5]*m.data[15]) + (m.data[ 1]*m.data[ 7]*m.data[12]) + (m.data[ 3]*m.data[ 4]*m.data[13]) - (m.data[ 0]*m.data[ 7]*m.data[13]) - (m.data[ 1]*m.data[ 4]*m.data[15]) - (m.data[ 3]*m.data[ 5]*m.data[12])) * invdet,
         ((m.data[ 0]*m.data[ 7]*m.data[ 9]) + (m.data[ 1]*m.data[ 4]*m.data[11]) + (m.data[ 3]*m.data[ 5]*m.data[ 8]) - (m.data[ 0]*m.data[ 5]*m.data[11]) - (m.data[ 1]*m.data[ 7]*m.data[ 8]) - (m.data[ 3]*m.data[ 4]*m.data[ 9])) * invdet,
+
         ((m.data[ 4]*m.data[10]*m.data[13]) + (m.data[ 5]*m.data[ 8]*m.data[14]) + (m.data[ 6]*m.data[ 9]*m.data[12]) - (m.data[ 4]*m.data[ 9]*m.data[14]) - (m.data[ 5]*m.data[10]*m.data[12]) - (m.data[ 6]*m.data[ 8]*m.data[13])) * invdet,
         ((m.data[ 0]*m.data[ 9]*m.data[14]) + (m.data[ 1]*m.data[10]*m.data[12]) + (m.data[ 2]*m.data[ 8]*m.data[13]) - (m.data[ 0]*m.data[10]*m.data[13]) - (m.data[ 1]*m.data[ 8]*m.data[14]) - (m.data[ 2]*m.data[ 9]*m.data[12])) * invdet,
         ((m.data[ 0]*m.data[ 6]*m.data[13]) + (m.data[ 1]*m.data[ 4]*m.data[14]) + (m.data[ 2]*m.data[ 5]*m.data[12]) - (m.data[ 0]*m.data[ 5]*m.data[14]) - (m.data[ 1]*m.data[ 6]*m.data[12]) - (m.data[ 2]*m.data[ 4]*m.data[13])) * invdet,
         ((m.data[ 0]*m.data[ 5]*m.data[10]) + (m.data[ 1]*m.data[ 6]*m.data[ 8]) + (m.data[ 2]*m.data[ 4]*m.data[ 9]) - (m.data[ 0]*m.data[ 6]*m.data[ 9]) - (m.data[ 1]*m.data[ 4]*m.data[10]) - (m.data[ 2]*m.data[ 5]*m.data[ 8])) * invdet
     }};
+}
+
+// Creates a new projection matrix using the provided settings
+mat4 mat4_projection(projection_settings settings) {
+    mat4 m = mat4_ident;
+
+    if(settings.is_ortho)
+    {
+        m.data[0]  = -2.0f / (settings.dims.x);
+        m.data[5]  = -2.0f / (-settings.dims.y);
+        m.data[10] = -2.0f / (settings.dims.w - settings.dims.z);
+        m.data[14] = (settings.dims.w + settings.dims.z) / (settings.dims.w - settings.dims.z) * -1;
+        m.data[15] = 1;
+    }
+    else
+    {
+        float ratio = settings.dims.x / settings.dims.y;
+        float tfov  = 1.0f / tan(degtorad(settings.fov * 0.5f));
+        float near  = settings.dims.z;
+        float far   = settings.dims.w;
+        float zdiff = 1.0f/ (near - far);
+
+        m.data[0]  = tfov / ratio;
+        m.data[5]  = tfov;
+        m.data[10] = (near + far) * zdiff;
+        m.data[11] = -1;
+        m.data[14] = 2.0f * far * near * zdiff;
+        m.data[15] = 0;
+        info("r: %f tf: %f zd: %f", ratio, tfov, zdiff);
+        info(mat4_printstr, mat4_printargs(m));
+    }
+
+    return m;
 }

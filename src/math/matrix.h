@@ -10,6 +10,13 @@ typedef struct mat4 {
     float data[16];
 } mat4;
 
+// Settings for creating a projection matrix
+typedef struct projection_settings {
+    vec4 dims;
+    bool is_ortho;
+    float fov;
+} projection_settings;
+
 #define mat4_ident (mat4){ {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1} }
 
 // Translates the transformation matrix m by v
@@ -59,6 +66,9 @@ mat4 mat4_transpose(mat4 m);
 
 // Inverts m
 mat4 mat4_invert(mat4 m);
+
+// Creates a new projection matrix using the provided settings
+mat4 mat4_projection(projection_settings settings);
 
 // printf helper macros
 #define mat4_printstr "[%f %f %f %f\n %f %f %f %f\n %f %f %f %f\n %f %f %f %f]"

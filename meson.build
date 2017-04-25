@@ -15,6 +15,7 @@ subdir('tools/glslc')
 
 subdir('src/core')
 subdir('src/math')
+subdir('src/gameplay')
 subdir('src/graphics')
 subdir('src/application')
 #subdir('src/audio')

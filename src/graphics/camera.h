@@ -2,17 +2,21 @@
 #define DF_GRAPHICS_CAMERA
 #include "camera.hd"
 
-#include "matrix.hd"
+#include "matrix.h"
 #include "transform.hd"
+#include "vector.h"
 
 // Creates a new camera
-camera camera_new();
+camera camera_new(projection_settings settings);
 
 // Gets the transform attached to c
 transform camera_get_transform(camera c);
 
 // Returns the projection matrix associated with c
 mat4 camera_get_projection(camera c);
+
+// Sets the camera's projection from the provided settings
+void camera_set_projection(camera c, projection_settings settings);
 
 // Calculates and returns the view matrix of c
 mat4 camera_get_view(camera c);

@@ -11,14 +11,14 @@ uint8 next_power_of_two_8(uint8 val) {
     assert(val <= UINT8_MAX / 2);
 
     // __builtin_clzll counts the leading zeroes in a number (gcc)
-    return 1 << (8 - __builtin_clz(val));
+    return 1 << (32 - __builtin_clz(val));
 }
 uint16 next_power_of_two_16(uint16 val) {
     assert(val > 0);
     assert(val <= UINT16_MAX / 2);
 
     // __builtin_clzll counts the leading zeroes in a number (gcc)
-    return 1 << (16 - __builtin_clz(val));
+    return 1 << (32 - __builtin_clz(val));
 }
 uint32 next_power_of_two_32(uint32 val) {
     assert(val > 0);

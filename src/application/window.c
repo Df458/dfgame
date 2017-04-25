@@ -3,12 +3,13 @@
 
 #include "window.h"
 
+#include "input.h"
 #include "log/log.h"
 #include "graphics_log.h"
 
 static bool glfw_init_called = false;
 
-// Creates a new GLFWwindow with an OpenGL context.
+// Creates a new GLFWwindow with an OpenGL context and input callbacks.
 // This also calls glfwInit and glewInit the first time that it's called.
 GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
     if(!glfw_init_called)
@@ -23,6 +24,10 @@ GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
     GLFWwindow* win = glfwCreateWindow(width, height, title, NULL, NULL);
+    glfwSetKeyCallback(win, input_key_callback);
+    glfwSetMouseButtonCallback(win, input_mouse_button_callback);
+    glfwSetScrollCallback(win, input_mouse_scroll_callback);
+    glfwSetCursorPosCallback(win, input_mouse_position_callback);
 
     if(!win)
         fatal("Failed to create a new window");
