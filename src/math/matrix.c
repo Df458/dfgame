@@ -221,8 +221,6 @@ mat4 mat4_projection(projection_settings settings) {
         m.data[11] = -1;
         m.data[14] = 2.0f * far * near * zdiff;
         m.data[15] = 0;
-        info("r: %f tf: %f zd: %f", ratio, tfov, zdiff);
-        info(mat4_printstr, mat4_printargs(m));
     }
 
     return m;

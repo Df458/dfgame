@@ -30,7 +30,7 @@ mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data) {
     if(vertex_type & VT_TEXTURE)
         vt_size += sizeof(float) * 2;
     if(vertex_type & VT_COLOR)
-        vt_size += sizeof(GLubyte) * 4;
+        vt_size += sizeof(float) * 4;
 
     mesh m = salloc(sizeof(struct mesh));
     m->data = scalloc(size, vt_size);

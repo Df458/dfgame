@@ -52,7 +52,7 @@ vt_pnt;
 typedef struct vt_pc
 {
     vec3 position;
-    GLubyte color[4];
+    vec4 color;
 }
 vt_pc;
 
@@ -61,7 +61,7 @@ typedef struct vt_pnc
 {
     vec3 position;
     vec3 normal;
-    GLubyte color[4];
+    vec4 color;
 }
 vt_pnc;
 
@@ -70,7 +70,7 @@ typedef struct vt_ptc
 {
     vec3 position;
     vec2 uv;
-    GLubyte color[4];
+    vec4 color;
 }
 vt_ptc;
 
@@ -80,7 +80,7 @@ typedef struct vt_pntc
     vec3 position;
     vec3 normal;
     vec2 uv;
-    GLubyte color[4];
+    vec4 color;
 }
 vt_pntc;
 

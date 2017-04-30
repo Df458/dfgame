@@ -191,7 +191,7 @@ void _shader_bind_attribute_mesh(shader s, mesh m, ...) {
             case VT_COLOR:
                 data_size = 4;
 
-                data_type = GL_UNSIGNED_BYTE;
+                data_type = GL_FLOAT;
                 break;
         }
 

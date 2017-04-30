@@ -22,6 +22,8 @@ GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    glfwSwapInterval(0);
     
     GLFWwindow* win = glfwCreateWindow(width, height, title, NULL, NULL);
     glfwSetKeyCallback(win, input_key_callback);
