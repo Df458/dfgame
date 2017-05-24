@@ -158,6 +158,17 @@ void _uarray_free(uarray array) {
     sfree(array);
 }
 
+void _sarray_free_deep(sarray array) {
+    for(int i = 0; i < array->size; ++i)
+        sfree(array->data[i]);
+    _sarray_free(array);
+}
+void _uarray_free_deep(uarray array) {
+    for(int i = 0; i < array->size; ++i)
+        sfree(array->data[i]);
+    _uarray_free(array);
+}
+
 // Returns the number of actual members stored in this array.
 uint16 sarray_size(sarray array) {
     return array->size;
@@ -341,6 +352,24 @@ void uarray_set(uarray array, uint16 position, void* data) {
     assert(position < array->size);
 
     array->data[position] = data;
+}
+
+// Removes the element at the end of this array and returns it
+void* sarray_pop(sarray array) {
+    assert(array->size > 0);
+
+    void* data = array->data[array->size - 1];
+    sarray_remove_at(array, array->size - 1);
+
+    return data;
+}
+void* uarray_pop(uarray array) {
+    assert(array->size > 0);
+
+    void* data = array->data[array->size - 1];
+    uarray_remove_at(array, array->size - 1);
+
+    return data;
 }
 
 // Performs a heapsort on array using predicate p for comparison.

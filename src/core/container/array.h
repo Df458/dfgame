@@ -11,17 +11,30 @@ sarray sarray_new(uint16 size);
 uarray uarray_new(uint16 size);
 
 // Frees the array, and sets array to NULL to make it harder to double-free.
-#define array_free(array) _Generic(array,\
-    sarray: { _sarray_free(array); array = NULL; },\
-    uarray: { _uarray_free(array); array = NULL; },\
-)
-#define sarray_free { _sarray_free(array); array = NULL; }
-#define uarray_free { _uarray_free(array); array = NULL; }
+#define array_free(array) { _Generic(array,\
+    sarray: _sarray_free,\
+    uarray: _uarray_free\
+)(array); array = NULL; }
+#define sarray_free(array) { _sarray_free(array); array = NULL; }
+#define uarray_free(array) { _uarray_free(array); array = NULL; }
 
 // Frees the array. NOTE: Don't call these functions. Use the macros without
 // the leading _ instead, as they also NULL your pointer.
 void _sarray_free(sarray array);
 void _uarray_free(uarray array);
+
+// Frees the array and all pointers contained within it, then sets array to NULL to make it harder to double-free.
+#define array_free_deep(array) { _Generic(array,\
+    sarray: _sarray_free_deep,\
+    uarray: _uarray_free_deep\
+)(array); array = NULL; }
+#define sarray_free_deep(array) { _sarray_free_deep(array); array = NULL; }
+#define uarray_free_deep(array) { _uarray_free_deep(array); array = NULL; }
+
+// frees the array and all pointers contained within it. NOTE: Don't call these functions. Use the macros without
+// the leading _ instead, as they also NULL your pointer.
+void _sarray_free_deep(sarray array);
+void _uarray_free_deep(uarray array);
 
 // Returns the number of actual members stored in this array.
 #define array_size(array) _Generic(array,\
@@ -125,6 +138,14 @@ void* uarray_get(uarray array, uint16 position);
 )(array, position, data)
 void sarray_set(sarray array, uint16 position, void* data);
 void uarray_set(uarray array, uint16 position, void* data);
+
+// Removes the element at the end of this array and returns it
+#define array_pop(array) _Generic(array,\
+    sarray: sarray_pop,\
+    uarray: uarray_pop\
+)(array)
+void* sarray_pop(sarray array);
+void* uarray_pop(uarray array);
 
 // Performs a heapsort on array using predicate p for comparison.
 #define array_sort(array, p, user) _Generic(array,\

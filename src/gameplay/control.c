@@ -45,11 +45,7 @@ action_id create_action(action_event* event) {
         return -1;
     }
     action_id id = action_count;
-    if(event) {
-        action_list[id].event = salloc(sizeof(action_event));
-        action_list[id].event = memcpy(action_list[id].event, event, sizeof(action_event));
-    } else
-        action_list[id].event = NULL;
+    bind_event(action_event, action_list[id].event, event);
 
     action_count++;
 

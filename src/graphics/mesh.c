@@ -41,8 +41,7 @@ mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data) {
     m->data_size = vt_size;
 
     glGenBuffers(1, &m->handle);
-    glBindBuffer(GL_ARRAY_BUFFER, m->handle);
-    glBufferData(GL_ARRAY_BUFFER, m->vertex_count * m->data_size, m->data, GL_DYNAMIC_DRAW);
+    mesh_update(m);
 
     return m;
 }
@@ -72,6 +71,22 @@ bool mesh_has_vertex_data(mesh m, vertex_types type) {
 // Returns the size of a vertex in the mesh, in bytes.
 uint32 mesh_get_data_size(mesh m) {
     return m->data_size;
+}
+
+// Returns the type of a vertex in the mesh, in bytes.
+uint8 mesh_get_data_type(mesh m) {
+    return m->type_flags;
+}
+
+// Returns the contents of the mesh.
+void* mesh_get_data(mesh m) {
+    return m->data;
+}
+
+// Updates the mesh for rendering
+void mesh_update(mesh m) {
+    glBindBuffer(GL_ARRAY_BUFFER, m->handle);
+    glBufferData(GL_ARRAY_BUFFER, m->vertex_count * m->data_size, m->data, GL_DYNAMIC_DRAW);
 }
 
 // Returns the offset in bytes of the vertex data described in type.

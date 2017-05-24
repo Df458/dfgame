@@ -4,6 +4,12 @@
 // Ensures that v is between the range of low and hi.
 #define clamp(v, low, hi) (v > low ? (v > hi ? hi : v) : low)
 
+// Returns the lesser value of a and b
+#define min(a, b) (a < b ? a : b)
+
+// Returns the lesser value of a and b
+#define max(a, b) (a > b ? a : b)
+
 // pow() is slower than normal multiplication. so we can use these for low
 // powers.
 #define square(v) (v * v)

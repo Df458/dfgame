@@ -5,7 +5,7 @@
 typedef int16 action_id;
 typedef int16 axis_id;
 
-event(void, action_event, action_id id)
+event(action_event, action_id id)
 
 void update_controls();
 

@@ -3,6 +3,7 @@
 #include "camera.hd"
 #include "matrix.hd"
 #include "mesh.hd"
+#include "texture.h"
 #include "transform.hd"
 #include "vector.hd"
 #include <GL/glew.h>
@@ -56,6 +57,7 @@ void shader_bind_uniform_vec4_name(shader s,  const char* name, vec4 v);
 void shader_bind_uniform_mat4_name(shader s,  const char* name, mat4 m);
 void shader_bind_uniform_transform_name(shader s,  const char* name, transform m);
 void shader_bind_uniform_camera_name(shader s,  const char* name, camera m);
+void shader_bind_uniform_texture_name(shader s, const char* name, gltex t, GLuint bind_index);
 void shader_bind_uniform_float(GLint handle, float f);
 void shader_bind_uniform_int(GLint handle, int i);
 void shader_bind_uniform_vec2(GLint handle, vec2 v);
@@ -64,6 +66,7 @@ void shader_bind_uniform_vec4(GLint handle, vec4 v);
 void shader_bind_uniform_mat4(GLint handle, mat4 m);
 void shader_bind_uniform_transform(GLint handle, transform m);
 void shader_bind_uniform_camera(GLint handle, camera m);
+void shader_bind_uniform_texture(GLint handle, gltex t, GLuint bind_index);
 
 // Binds an attribute to shader s using a given list of names and vertex types.
 // This function takes a string followed by a vertex_types, and binds that part

@@ -7,7 +7,7 @@
 
 // Creates a new mesh struct.
 // setting data to NULL creates an empty mesh struct
-mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data);
+mesh mesh_new_type(uint32 size, uint8 vertex_type, void* data);
 
 #define mesh_new(size, data) _Generic(data,\
     vt_p*: mesh_new_type(size, VT_POSITION, data),\
@@ -37,6 +37,15 @@ bool mesh_has_vertex_data(mesh m, vertex_types type);
 
 // Returns the size of a vertex in the mesh, in bytes.
 uint32 mesh_get_data_size(mesh m);
+
+// Returns the type of a vertex in the mesh, in bytes.
+uint8 mesh_get_data_type(mesh m);
+
+// Returns the contents of the mesh.
+void* mesh_get_data(mesh m);
+
+// Updates the mesh for rendering
+void mesh_update(mesh m);
 
 // Returns the offset in bytes of the vertex data described in type.
 // Return value is an integer typed as GLvoid* in order to satisfy the

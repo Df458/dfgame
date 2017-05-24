@@ -122,6 +122,11 @@ void shader_bind_uniform_transform(GLint handle, transform m) {
 void shader_bind_uniform_camera(GLint handle, camera m) {
     glUniformMatrix4fv(handle, 1, false, camera_get_vp(m).data);
 }
+void shader_bind_uniform_texture(GLint handle, gltex t, GLuint bind_index) {
+    glActiveTexture(bind_index);
+    glBindTexture(t.type, t.handle);
+    glUniform1i(handle, bind_index - GL_TEXTURE0);
+}
 
 // Binds a uniform to shader s using a given name.
 void shader_bind_uniform_float_name(shader s, const char* name, float f) {
@@ -147,6 +152,11 @@ void shader_bind_uniform_transform_name(shader s,  const char* name, transform m
 }
 void shader_bind_uniform_camera_name(shader s,  const char* name, camera m) {
     glUniformMatrix4fv(glGetUniformLocation(s.id, name), 1, false, camera_get_vp(m).data);
+}
+void shader_bind_uniform_texture_name(shader s, const char* name, gltex t, GLuint bind_index) {
+    glActiveTexture(bind_index);
+    glBindTexture(t.type, t.handle);
+    glUniform1i(glGetUniformLocation(s.id, name), bind_index - GL_TEXTURE0);
 }
 
 // Binds an attribute to shader s using a given list of names and vertex types.

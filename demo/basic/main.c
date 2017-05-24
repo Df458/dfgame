@@ -1,6 +1,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "audio_loader.h"
+#include "audio_player.h"
+#include "audio_source.h"
+#include "audio_system.h"
 #include "camera.h"
 #include "input.h"
 #include "interpolate.h"
@@ -9,9 +13,12 @@
 #include "matrix.h"
 #include "memory/alloc.h"
 #include "mesh.h"
+#include "mesh_loader.h"
+#include "paths.h"
 #include "quat.h"
 #include "shader_init.h"
 #include "shader.h"
+#include "texture_loader.h"
 #include "transform.h"
 #include "types.h"
 #include "vertex.hd"
@@ -26,7 +33,7 @@ transform player_transform;
 transform ball1_transform;
 transform ball2_transform;
 transform tri_transform;
-shader s;
+shader s, s2;
 vec4 start_color = (vec4){.data={2, 2, 2, 1}};
 vec4 end_color = (vec4){.data={0.5, 0.5, 0.5, 1}};
 float timer = 0;
@@ -36,6 +43,11 @@ axis_id mouselook_axis_x;
 axis_id mouselook_axis_y;
 axis_id movement_axis_x;
 axis_id movement_axis_y;
+gltex png_tex;
+gltex jpeg_tex;
+gltex tiff_tex;
+gltex tga_tex;
+audio_player aplayer;
 
 vec2 camera_orient = {0};
 vec2 camera_target = {0};
@@ -44,10 +56,10 @@ bool is_ortho = false;
 float fov = 60;
 float fov_target = 60;
 
-vt_pc tri[] = {
-    {.position={.data={ 0,   1, 0}}, .color={.data={1,0,0}}},
-    {.position={.data={-1,  -1, 0}}, .color={.data={0,1,0}}},
-    {.position={.data={ 1,  -1, 0}}, .color={.data={0,0,1}}}
+vt_pt tri[] = {
+    {.position={.data={ 0,   1, 0}}, .uv={.data={0.5,1}}},
+    {.position={.data={-1,  -1, 0}}, .uv={.data={0,0}}},
+    {.position={.data={ 1,  -1, 0}}, .uv={.data={1,0}}}
 };
 vt_pc level[] = {
 // Floor    
@@ -228,6 +240,8 @@ bool loop(mainloop l, float dt) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(s.id);
 
+    audio_player_update(aplayer, dt);
+
     timer += dt;
     if(get_axis_value(mouselook_axis_x) != 0)
         camera_target.x = camera_orient.x + degtorad(get_axis_value(mouselook_axis_x));
@@ -259,19 +273,24 @@ bool loop(mainloop l, float dt) {
     }
     transform_translate(player_transform, position, true);
 
+    audio_update_listener(transform_get_position(player_transform), quat_to_euler(transform_get_orientation(player_transform)), position);
+
     shader_bind_uniform_name(s, "transform", camera_get_vp(player_camera));
     shader_bind_attribute_mesh(s, level_mesh, "i_pos", VT_POSITION, "i_color", VT_COLOR);
     mesh_render(level_mesh, GL_TRIANGLES);
-
-    shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), transform_get_matrix(tri_transform)));
-    shader_bind_attribute_mesh(s, tri_mesh, "i_pos", VT_POSITION, "i_color", VT_COLOR);
-    mesh_render(tri_mesh, GL_TRIANGLES);
 
     shader_bind_attribute_mesh(s, circle_mesh, "i_pos", VT_POSITION, "i_color", VT_COLOR);
     shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), transform_get_matrix(ball1_transform)));
     mesh_render(circle_mesh, GL_TRIANGLES);
     shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), transform_get_matrix(ball2_transform)));
     mesh_render(circle_mesh, GL_TRIANGLES);
+
+    glUseProgram(s.id);
+    shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), transform_get_matrix(tri_transform)));
+    /* shader_bind_uniform_texture_name(s2, "u_texture", tga_tex, GL_TEXTURE0); */
+    shader_bind_attribute_mesh(s, tri_mesh, "i_pos", VT_POSITION, "i_color", VT_NORMAL);
+    mesh_render(tri_mesh, GL_TRIANGLES);
+
     glfwSwapBuffers(win);
     return !glfwWindowShouldClose(win);
 }
@@ -281,13 +300,28 @@ int main(int argc, char** argv) {
     win = window_new_default(1280, 720, "Test Window");
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     shaders_init();
+    audio_init();
+    init_base_resource_path(NULL);
     s = shader_basic_untex_get();
-    tri_mesh = mesh_new(3, tri);
+    s2 = shader_basic_tex_get();
+    /* tri_mesh = mesh_new(3, tri); */
+    tri_mesh = load_mesh(assets_path("test.obj", NULL));
     level_mesh = mesh_new(108, level);
 
     vt_pc* temp_data = make_shape(32);
     circle_mesh = mesh_new(96, temp_data);
     sfree(temp_data);
+
+    aplayer = audio_player_new(load_audio_source(assets_path("test.wav", NULL), true));
+    /* audio_player_set_position(aplayer, 0.45f); */
+    audio_player_set_translation(aplayer, (vec3){.x=10.5,.y=1.85,.z=1});
+    audio_player_set_playing(aplayer, true);
+    audio_player_set_loop(aplayer, true);
+
+    png_tex = load_texture_gl(assets_path("test.png", NULL));
+    jpeg_tex = load_texture_gl(assets_path("test.jpeg", NULL));
+    tiff_tex = load_texture_gl(assets_path("test.tiff", NULL));
+    tga_tex = load_texture_gl(assets_path("test.tga", NULL));
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);

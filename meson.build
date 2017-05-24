@@ -1,13 +1,20 @@
 project('dfgame', 'c', 'vala',
         version : '0.0.1',
         license : 'MIT',
-        default_options : ['c_std=c11'])
+        default_options : ['c_std=gnu11'])
 
 compiler = meson.get_compiler('c')
 
 m = compiler.find_library('m', required : false)
 glfw = dependency('glfw3')
 glew = dependency('glew')
+jpeg = dependency('libjpeg')
+png = dependency('libpng')
+tiff = dependency('libtiff-4')
+tga = compiler.find_library('libtga')
+openal = dependency('openal')
+ogg = dependency('ogg')
+vorbis = dependency('vorbisfile')
 
 args = []
 
@@ -18,9 +25,9 @@ subdir('src/math')
 subdir('src/gameplay')
 subdir('src/graphics')
 subdir('src/application')
-#subdir('src/audio')
+subdir('src/audio')
+subdir('src/resource')
 #subdir('src/editor')
-#subdir('src/resource')
 
 subdir('demo/basic')
 
