@@ -165,10 +165,7 @@ mat4 mat4_transpose(mat4 m) {
 mat4 mat4_invert(mat4 m) {
     float det = mat4_determinant(m);
 
-    if(det == 0) {
-        error("Cannot invert matrix: Matrix is non-invertible");
-        return mat4_ident;
-    }
+    check_return(det != 0, "Cannot invert matrix: Matrix is non-invertible", mat4_ident);
 
     float invdet = 1.0f / det;
 

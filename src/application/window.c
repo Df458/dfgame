@@ -3,6 +3,7 @@
 
 #include "window.h"
 
+#include "check.h"
 #include "input.h"
 #include "log/log.h"
 #include "graphics_log.h"
@@ -12,12 +13,7 @@ static bool glfw_init_called = false;
 // Creates a new GLFWwindow with an OpenGL context and input callbacks.
 // This also calls glfwInit and glewInit the first time that it's called.
 GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
-    if(!glfw_init_called)
-    {
-        if(!glfwInit()) {
-            fatal("Failed to intialize GLFW.");
-        }
-    }
+    check_kill(glfw_init_called || glfwInit(), "Failed to intialize GLFW.");
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -31,17 +27,14 @@ GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
     glfwSetScrollCallback(win, input_mouse_scroll_callback);
     glfwSetCursorPosCallback(win, input_mouse_position_callback);
 
-    if(!win)
-        fatal("Failed to create a new window");
+    check_kill(win, "Failed to create a new window");
     glfwMakeContextCurrent(win);
 
-	if(!glfw_init_called && glewInit() != GLEW_OK) {
-        fatal("Failed to initialize GLEW");
-    } else if(!glfw_init_called) {
-        if(!GLEW_KHR_debug)
-            error("Graphics debug logging is not available for your hardware. Graphical errors will not be reported");
-        else
+    check_kill(glfw_init_called || glewInit() == GLEW_OK, "Failed to initialize GLEW");
+    if(!glfw_init_called) {
+        if(!check_error(GLEW_KHR_debug, "Graphics debug logging is not available for your hardware. Graphical errors will not be reported"))
             glDebugMessageCallback(graphics_log, NULL);
+
         GLuint VAO; // Setup default VAO
         glGenVertexArrays(1, &VAO);
         glBindVertexArray(VAO);

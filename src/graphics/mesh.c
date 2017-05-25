@@ -3,7 +3,7 @@
 
 #include "mesh.h"
 
-#include "log/log.h"
+#include "check.h"
 #include "memory/alloc.h"
 #include <inttypes.h>
 #include <stdbool.h>
@@ -21,9 +21,8 @@ typedef struct mesh {
 // Creates a new mesh struct.
 // setting data to NULL creates an empty mesh struct
 mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data) {
-    if(!(vertex_type & VT_POSITION)) {
-        fatal("Unsupported vertex type %u: Type must contain position.");
-    }
+    check_return(vertex_type & VT_POSITION, "Unsupported vertex type %u: Type must contain position.", NULL, vertex_type);
+
     uint32 vt_size = sizeof(float) * 3;
     if(vertex_type & VT_NORMAL)
         vt_size += sizeof(float) * 3;

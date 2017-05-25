@@ -35,30 +35,21 @@ float vec4_len_squared(vec4 v) {
 vec2 vec2_normalize(vec2 v) {
     float len = vec2_len(v);
 
-    if(len == 0) {
-        error("Attempting to normalize a vec2 of 0 length is undefined.");
-        return (vec2){ 0 };
-    }
+    check_return(len > 0, "Attempting to normalize a vec2 of 0 length is undefined.", (vec2){ 0 });
 
     return (vec2){ .x = v.x / len, .y = v.y / len };
 }
 vec3 vec3_normalize(vec3 v) {
     float len = vec3_len(v);
 
-    if(len == 0) {
-        error("Attempting to normalize a vec3 of 0 length is undefined.");
-        return (vec3){ 0 };
-    }
+    check_return(len > 0, "Attempting to normalize a vec3 of 0 length is undefined.", (vec3){ 0 });
 
     return (vec3){ .x = v.x / len, .y = v.y / len, .z = v.z / len };
 }
 vec4 vec4_normalize(vec4 v) {
     float len = vec4_len(v);
 
-    if(len == 0) {
-        error("Attempting to normalize a vec4 of 0 length is undefined.");
-        return (vec4){ 0 };
-    }
+    check_return(len > 0, "Attempting to normalize a vec4 of 0 length is undefined.", (vec4){ 0 });
 
     return (vec4){ .x = v.x / len, .y = v.y / len, .z = v.z / len, .w = v.w / len };
 }

@@ -4,7 +4,7 @@
 #include "array.h"
 
 #include "alloc.h"
-#include "log.h"
+#include "check.h"
 #include "power.h"
 #include <assert.h>
 
@@ -52,8 +52,7 @@ static void shift(void** data, uint16 start, uint16 end) {
 // data to the next power of two spaces. Obviously, the size should be updated
 // before this function is called.
 static void sarray_resize_if_full(sarray array) {
-    if(array->size > array->alloc_size)
-    {
+    if(array->size > array->alloc_size) {
         if(array->alloc_size == 0)
             array->alloc_size = 1;
         else
@@ -63,8 +62,7 @@ static void sarray_resize_if_full(sarray array) {
     }
 }
 static void uarray_resize_if_full(uarray array) {
-    if(array->size > array->alloc_size)
-    {
+    if(array->size > array->alloc_size) {
         if(array->alloc_size == 0)
             array->alloc_size = 1;
         else
@@ -79,6 +77,7 @@ static void heap_sort(void** data, uint16 size, comparison_predicate p, void* us
     uint16 i, index, back_index;
     void* temp;
     // Build the heap
+
     for(i = 0; i < size; ++i) {
         index = i;
         back_index = (index - 1) / 2;
@@ -272,10 +271,8 @@ int32 uarray_findp(uarray array, void* data, equality_predicate p, void* user) {
 bool sarray_remove(sarray array, void* data) {
     int32 index = sarray_find(array, data);
 
-    if(index == INVALID_INDEX) {
-        warn("Tried to remove object 0x%x from an sarray, but it couldn't be found", data);
-        return false;
-    }
+    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an sarray, but it couldn't be found", false, data);
+
     sarray_remove_at(array, index);
 
     return true;
@@ -283,10 +280,8 @@ bool sarray_remove(sarray array, void* data) {
 bool uarray_remove(uarray array, void* data) {
     int32 index = uarray_find(array, data);
 
-    if(index == INVALID_INDEX) {
-        warn("Tried to remove object 0x%x from a uarray, but it couldn't be found", data);
-        return false;
-    }
+    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an sarray, but it couldn't be found", false, data);
+
     uarray_remove_at(array, index);
 
     return true;
@@ -298,10 +293,8 @@ bool uarray_remove(uarray array, void* data) {
 bool sarray_removep(sarray array, void* data, equality_predicate p, void* user) {
     int32 index = sarray_findp(array, data, p, user);
 
-    if(index == INVALID_INDEX) {
-        warn("Tried to remove object 0x%x from an sarray, but it couldn't be found", data);
-        return false;
-    }
+    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an sarray, but it couldn't be found", false, data);
+
     sarray_remove_at(array, index);
 
     return true;
@@ -309,10 +302,8 @@ bool sarray_removep(sarray array, void* data, equality_predicate p, void* user) 
 bool uarray_removep(uarray array, void* data, equality_predicate p, void* user) {
     int32 index = uarray_findp(array, data, p, user);
 
-    if(index == INVALID_INDEX) {
-        warn("Tried to remove object 0x%x from a uarray, but it couldn't be found", data);
-        return false;
-    }
+    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an sarray, but it couldn't be found", false, data);
+
     uarray_remove_at(array, index);
 
     return true;

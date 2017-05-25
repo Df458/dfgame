@@ -3,6 +3,7 @@
 
 #include "input.h"
 
+#include "check.h"
 #include "container/array.h"
 #include "log/log.h"
 #include "memory/alloc.h"
@@ -31,10 +32,7 @@ static axis_binding key_axis_bindings[GLFW_KEY_LAST + 1] = {0};
 static axis_binding mouse_button_axis_bindings[GLFW_MOUSE_BUTTON_LAST + 1] = {0};
 
 void input_bind_key_action(int key, action_id id) {
-    if(key > GLFW_KEY_LAST) {
-        error("Can't bind key: Index is out of range");
-        return;
-    }
+    check_return(key <= GLFW_KEY_LAST, "Can't bind key: Index is out of range", );
 
     if(!key_bindings[key].actions)
         key_bindings[key].actions = uarray_new(1);
@@ -43,10 +41,7 @@ void input_bind_key_action(int key, action_id id) {
     array_add(key_bindings[key].actions, aid);
 }
 void input_bind_mouse_button_action(int button, action_id id) {
-    if(button > GLFW_MOUSE_BUTTON_LAST) {
-        error("Can't bind mouse button: Index is out of range");
-        return;
-    }
+    check_return(button <= GLFW_MOUSE_BUTTON_LAST, "Can't bind mouse button: Index is out of range", )
 
     if(!mouse_button_bindings[button].actions)
         mouse_button_bindings[button].actions = uarray_new(1);

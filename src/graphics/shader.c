@@ -4,7 +4,7 @@
 #include "shader.h"
 
 #include "camera.h"
-#include "log/log.h"
+#include "check.h"
 #include "matrix.h"
 #include "mesh.h"
 #include "transform.h"
@@ -172,10 +172,8 @@ void _shader_bind_attribute_mesh(shader s, mesh m, ...) {
     while(name) {
         vertex_types type = va_arg(args, vertex_types);
 
-        if(!mesh_has_vertex_data(m, type)) {
-            warn("Mesh does not contain vertex type 0x%x. Attribute %s will not be bound.\n", type, name);
+        if(check_warn(mesh_has_vertex_data(m, type), "Mesh does not contain vertex type 0x%x. Attribute %s will not be bound.\n", type, name))
             continue;
-        }
 
         GLvoid* offset = mesh_get_element_offset(m, type);
         int pack_distance = mesh_get_data_size(m);
@@ -185,22 +183,18 @@ void _shader_bind_attribute_mesh(shader s, mesh m, ...) {
         switch(type) {
             case VT_POSITION:
                 data_size = 3;
-
                 data_type = GL_FLOAT;
             break;
             case VT_NORMAL:
                 data_size = 3;
-
                 data_type = GL_FLOAT;
             break;
             case VT_TEXTURE:
                 data_size = 2;
-
                 data_type = GL_FLOAT;
             break;
             case VT_COLOR:
                 data_size = 4;
-
                 data_type = GL_FLOAT;
                 break;
         }

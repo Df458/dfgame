@@ -3,7 +3,7 @@
 
 #include "control.h"
 
-#include "log/log.h"
+#include "check.h"
 #include "mathutil.h"
 #include "memory/alloc.h"
 
@@ -40,10 +40,8 @@ void update_controls() {
 }
 
 action_id create_action(action_event* event) {
-    if(action_count >= 256) {
-        error("Can't create action: Maximum number of actions created");
-        return -1;
-    }
+    check_return(action_count < 256, "Can't create action: Maximum number of actions created", -1);
+
     action_id id = action_count;
     bind_event(action_event, action_list[id].event, event);
 
@@ -53,9 +51,7 @@ action_id create_action(action_event* event) {
 }
 
 void activate_action(action_id id) {
-    if(id >= action_count) {
-        error("Can't access action: Index is out of range");
-    }
+    check_return(id < action_count, "Can't access action: Index is out of range", );
 
     if(!action_list[id].active)
         call_event(action_list[id].event, id);
@@ -65,19 +61,14 @@ void activate_action(action_id id) {
 }
 
 bool action_is_active(action_id id) {
-    if(id >= action_count) {
-        error("Can't access action: Index is out of range");
-        return false;
-    }
+    check_return(id < action_count, "Can't access action: Index is out of range", false);
 
     return action_list[id].active;
 }
 
 axis_id create_axis(float limit) {
-    if(axis_count >= 256) {
-        error("Can't create axis: Maximum number of axes created");
-        return -1;
-    }
+    check_return(axis_count < 256, "Can't create axis: Maximum number of axes created", -1);
+
     axis_id id = axis_count;
     axis_list[id].limit = limit;
 
@@ -87,19 +78,14 @@ axis_id create_axis(float limit) {
 }
 
 void set_axis_value(axis_id id, float value) {
-    if(id >= axis_count) {
-        error("Can't access axis: Index is out of range");
-    }
+    check_return(id < axis_count, "Can't access axis: Index is out of range", );
 
     axis_list[id].value  = value;
     axis_list[id].set    = true;
 }
 
 float get_axis_value(axis_id id) {
-    if(id >= axis_count) {
-        error("Can't access axis: Index is out of range");
-        return false;
-    }
+    check_return(id < axis_count, "Can't access axis: Index is out of range", false);
 
     if(axis_list[id].limit != 0)
         return clamp(axis_list[id].value, -axis_list[id].limit, axis_list[id].limit);

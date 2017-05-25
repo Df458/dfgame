@@ -3,7 +3,7 @@
 
 #include "alloc.h"
 
-#include "log.h"
+#include "check.h"
 #include <stdlib.h>
 
 // Allocates memory with malloc, with error logging.
@@ -11,13 +11,9 @@
 //       in code for logging purposes. Use the salloc macro instead.
 void* _salloc(const char* file, unsigned line, size_t size)
 {
-    if(size == 0)
-        _log(file, line, LOG_CATEGORY, LOG_FATAL, "salloc: Can't allocate a pointer with 0 bytes");
-
+    _check(file, line, LOG_CATEGORY, size > 0, LOG_FATAL, "salloc: Can't allocate a pointer with 0 bytes");
     void* data = malloc(size);
-
-    if(data == NULL)
-        _log(file, line, LOG_CATEGORY, LOG_FATAL, "salloc: Failed to allocate memory");
+    _check(file, line, LOG_CATEGORY, data, LOG_FATAL, "salloc: Failed to allocate memory");
 
     return data;
 }
@@ -27,13 +23,9 @@ void* _salloc(const char* file, unsigned line, size_t size)
 //       in code for logging purposes. Use the scalloc macro instead.
 void* _scalloc(const char* file, unsigned line, size_t nmemb, size_t size)
 {
-    if(nmemb == 0 || size == 0)
-        _log(file, line, LOG_CATEGORY, LOG_FATAL, "scalloc: Can't allocate a pointer with 0 bytes");
-
+    _check(file, line, LOG_CATEGORY, nmemb > 0 && size > 0, LOG_FATAL, "scalloc: Can't allocate a pointer with 0 bytes");
     void* data = calloc(nmemb, size);
-
-    if(data == NULL)
-        _log(file, line, LOG_CATEGORY, LOG_FATAL, "scalloc: Failed to allocate memory");
+    _check(file, line, LOG_CATEGORY, data, LOG_FATAL, "scalloc: Failed to allocate memory");
 
     return data;
 }
@@ -43,17 +35,12 @@ void* _scalloc(const char* file, unsigned line, size_t nmemb, size_t size)
 //       in code for logging purposes. Use the resalloc macro instead.
 void* _resalloc(const char* file, unsigned line, void* ptr, size_t size)
 {
-    if(size == 0) {
-        _log(file, line, LOG_CATEGORY, LOG_ERROR, "resalloc: Size of 0 bytes received. Calling sfree...");
+    if(_check(file, line, LOG_CATEGORY, size > 0, LOG_ERROR, "resalloc: Size of 0 bytes received. Calling sfree...")) {
         _sfree(file, line, ptr);
-
         return NULL;
     }
-
     void* data = realloc(ptr, size);
-
-    if(data == NULL)
-        _log(file, line, LOG_CATEGORY, LOG_FATAL, "resalloc: Failed to reallocate memory");
+    _check(file, line, LOG_CATEGORY, data, LOG_FATAL, "resalloc: Failed to allocate memory");
 
     return data;
 }
@@ -63,9 +50,7 @@ void* _resalloc(const char* file, unsigned line, void* ptr, size_t size)
 //       in code for logging purposes. Use the sfree macro instead.
 void _sfree(const char* file, unsigned line, void* ptr)
 {
-    if(ptr == NULL)
-        _log(file, line, LOG_CATEGORY, LOG_WARNING, "sfree: Can't free a null pointer");
-    else
+    if(!_check(file, line, LOG_CATEGORY, ptr != NULL, LOG_WARNING, "sfree: Can't free a null pointer"))
         free(ptr);
 }
 
