@@ -178,30 +178,25 @@ void _shader_bind_attribute_mesh(shader s, mesh m, ...) {
         GLvoid* offset = mesh_get_element_offset(m, type);
         int pack_distance = mesh_get_data_size(m);
         int data_size = 0;
-        GLenum data_type;
 
         switch(type) {
             case VT_POSITION:
                 data_size = 3;
-                data_type = GL_FLOAT;
             break;
             case VT_NORMAL:
                 data_size = 3;
-                data_type = GL_FLOAT;
             break;
             case VT_TEXTURE:
                 data_size = 2;
-                data_type = GL_FLOAT;
             break;
             case VT_COLOR:
                 data_size = 4;
-                data_type = GL_FLOAT;
                 break;
         }
 
         GLuint attrib = glGetAttribLocation(s.id, name);
         glEnableVertexAttribArray(attrib);
-        glVertexAttribPointer(attrib, data_size, data_type, GL_FALSE, pack_distance, (GLvoid*)offset);
+        glVertexAttribPointer(attrib, data_size, GL_FLOAT, GL_FALSE, pack_distance, offset);
         name = va_arg(args, const char*);
     }
 

@@ -5,7 +5,6 @@
 #include "container/array.h"
 #include "check.h"
 #include "data_loader.h"
-#include "log/log.h"
 #include "memory/alloc.h"
 #include "mesh.h"
 #include "paths.h"

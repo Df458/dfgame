@@ -18,6 +18,8 @@ typedef struct audio_source {
     ALenum channels;
     uint32 sample_rate;
 
+    float length_mod; // Single-channel audio needs to be passed half the length
+
     audio_source_type type;
 
     union {
@@ -33,6 +35,10 @@ audio_source audio_source_new_buffer(byte* data, uint32 length, ALenum channels,
     src->buffer = data;
     src->length = length;
     src->channels = channels;
+    if(src->channels == AL_FORMAT_MONO8 || src->channels == AL_FORMAT_MONO16)
+        src->length_mod = 0.5f;
+    else
+        src->length_mod = 1.0f;
     src->sample_rate = sample_rate;
 
     return src;
@@ -44,6 +50,10 @@ audio_source audio_source_new_stream(audio_stream_event* ev, uint32 length, ALen
     bind_event(audio_stream_event, src->ev, ev);
     src->length = length;
     src->channels = channels;
+    if(src->channels == AL_FORMAT_MONO8 || src->channels == AL_FORMAT_MONO16)
+        src->length_mod = 0.5f;
+    else
+        src->length_mod = 1.0f;
     src->sample_rate = sample_rate;
 
     return src;
@@ -75,7 +85,7 @@ bool audio_source_get_next_buffer(audio_source src, ALuint buffer, uint32 pos, u
     byte* data = audio_source_get_next(src, pos, &size);
 
     if(size) {
-        AL_CALL(alBufferData(buffer, src->channels, data, size, src->sample_rate), false);
+        AL_CALL(alBufferData(buffer, src->channels, data, size * src->length_mod, src->sample_rate), false);
 
         if(length)
             *length = size;

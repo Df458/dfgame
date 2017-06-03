@@ -4,7 +4,7 @@
 
 #include <AL/al.h>
 
-#define AUDIO_BUFFER_SIZE 16384
+#define AUDIO_BUFFER_SIZE 32000
 
 event(audio_stream_event, byte** data, uint32 position, uint32 desired_length, uint32* final_length)
 

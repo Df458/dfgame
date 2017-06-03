@@ -23,8 +23,9 @@ void audio_init() {
     AL_CALL(alListener3f(AL_VELOCITY, 0, 0, 0), );
 }
 
-void audio_update_listener(vec3 position, vec3 orientation, vec3 velocity) {
+void audio_update_listener(vec3 position, vec3 forward, vec3 up, vec3 velocity) {
     alListenerfv(AL_POSITION, position.data);
-    alListenerfv(AL_ORIENTATION, orientation.data);
+    vec3 orient[2] = { forward, up };
+    alListenerfv(AL_ORIENTATION, (float*)orient);
     alListenerfv(AL_VELOCITY, velocity.data);
 }

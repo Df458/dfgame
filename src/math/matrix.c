@@ -3,7 +3,7 @@
 
 #include "matrix.h"
 
-#include "log/log.h"
+#include "check.h"
 #include "quat.h"
 #include "types.h"
 #include "vector.h"
