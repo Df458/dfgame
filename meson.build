@@ -6,6 +6,7 @@ project('dfgame', 'c', 'vala',
 compiler = meson.get_compiler('c')
 
 m = compiler.find_library('m', required : false)
+freetype = dependency('freetype2')
 glfw = dependency('glfw3')
 glew = dependency('glew')
 jpeg = dependency('libjpeg')
