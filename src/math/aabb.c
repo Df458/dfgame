@@ -85,3 +85,10 @@ aabb_3d aabb_get_intersection_3d(aabb_3d box1, aabb_3d box2) {
         }
     };
 }
+
+comparison aabb_comparison_2d(aabb_2d box1, aabb_2d box2) {
+    return compare(aabb_area_2d(box1), aabb_area_2d(box2));
+}
+comparison aabb_comparison_3d(aabb_3d box1, aabb_3d box2) {
+    return compare(aabb_volume_3d(box1), aabb_volume_3d(box2));
+}

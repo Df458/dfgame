@@ -94,6 +94,14 @@ mat4 mat4_rotate_3d_quat(mat4 m, quat q) {
 }
 
 // Rotates the transformation matrix m by v
+mat4 mat4_scale_f(mat4 m, float v) {
+    mat4 m2 = m;
+    m2.data[0]  *= v;
+    m2.data[5]  *= v;
+    m2.data[10] *= v;
+
+    return m2;
+}
 mat4 mat4_scale_vec2(mat4 m, vec2 v) {
     mat4 m2 = m;
     m2.data[0] *= v.x;
@@ -198,9 +206,9 @@ mat4 mat4_projection(projection_settings settings) {
 
     if(settings.is_ortho)
     {
-        m.data[0]  = -2.0f / (settings.dims.x);
-        m.data[5]  = -2.0f / (-settings.dims.y);
-        m.data[10] = -2.0f / (settings.dims.w - settings.dims.z);
+        m.data[0]  = 2.0f / (settings.dims.x);
+        m.data[5]  = 2.0f / (-settings.dims.y);
+        m.data[10] = 2.0f / (settings.dims.w - settings.dims.z);
         m.data[14] = (settings.dims.w + settings.dims.z) / (settings.dims.w - settings.dims.z) * -1;
         m.data[15] = 1;
     }

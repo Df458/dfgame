@@ -1,0 +1,9 @@
+#ifndef DF_GRAPHICS_RENDERPASS_D
+#define DF_GRAPHICS_RENDERPASS_D
+
+#include "types.h"
+
+// Represents a rendering pass, either for normal rendering or post-processing
+declarep(struct, renderpass)
+
+#endif

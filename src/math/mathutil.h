@@ -10,6 +10,8 @@
 // Returns the lesser value of a and b
 #define max(a, b) (a > b ? a : b)
 
+#define compare(a, b) (a < b ? COMPARE_LESS_THAN : a == b ? COMPARE_EQUAL_TO : COMPARE_GREATER_THAN)
+
 // pow() is slower than normal multiplication. so we can use these for low
 // powers.
 #define square(v) (v * v)

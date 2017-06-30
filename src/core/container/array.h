@@ -45,6 +45,14 @@ uint16 sarray_size(sarray array);
 uint16 uarray_size(uarray array);
 
 // Adds a new member to the end of this array, resizing it if necessary.
+#define array_copyadd(array, data, size) _Generic(array,\
+    sarray: sarray_copyadd,\
+    uarray: uarray_copyadd\
+)(array, data, size)
+void sarray_copyadd(sarray array, void* data, uint32 size);
+void uarray_copyadd(uarray array, void* data, uint32 size);
+
+// Adds a new member to the end of this array, resizing it if necessary.
 #define array_add(array, data) _Generic(array,\
     sarray: sarray_add,\
     uarray: uarray_add\
@@ -89,10 +97,10 @@ int32 uarray_find(uarray array, void* data);
 
 // Returns the position of data using predicate p to check the array, or
 // INVALID_INDEX if array does not contain data.
-#define array_findp(array, data, user) _Generic(array,\
+#define array_findp(array, data, p, user) _Generic(array,\
     sarray: sarray_findp,\
     uarray: uarray_findp\
-)(array, data, user)
+)(array, data, p, user)
 int32 sarray_findp(sarray array, void* data, equality_predicate p, void* user);
 int32 uarray_findp(uarray array, void* data, equality_predicate p, void* user);
 

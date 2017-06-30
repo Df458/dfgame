@@ -19,68 +19,106 @@ typedef enum vertex_types
 // Vertex with just positional information
 typedef struct vt_p
 {
-    vec3 position;
+    union {
+        vec3 position;
+        float data[3];
+    };
 }
 vt_p;
 
 // Vertex with position and normals
 typedef struct vt_pn
 {
-    vec3 position;
-    vec3 normal;
+    union {
+        struct{
+            vec3 position;
+            vec3 normal;
+        };
+        float data[6];
+    };
 }
 vt_pn;
 
 // Vertex with position and texture coordinates
 typedef struct vt_pt
 {
-    vec3 position;
-    vec2 uv;
+    union {
+        struct {
+            vec3 position;
+            vec2 uv;
+        };
+        float data[5];
+    };
 }
 vt_pt;
 
 // Vertex with position, normals, and texture coordinates
 typedef struct vt_pnt
 {
-    vec3 position;
-    vec3 normal;
-    vec2 uv;
+    union {
+        struct {
+            vec3 position;
+            vec3 normal;
+            vec2 uv;
+        };
+        float data[8];
+    };
 }
 vt_pnt;
 
 // Vertex with position and vertex color
 typedef struct vt_pc
 {
-    vec3 position;
-    vec4 color;
+    union {
+        struct {
+            vec3 position;
+            vec4 color;
+        };
+        float data[7];
+    };
 }
 vt_pc;
 
 // Vertex with position, normals, and vertex color
 typedef struct vt_pnc
 {
-    vec3 position;
-    vec3 normal;
-    vec4 color;
+    union {
+        struct {
+            vec3 position;
+            vec3 normal;
+            vec4 color;
+        };
+        float data[10];
+    };
 }
 vt_pnc;
 
 // Vertex with position, texture coordinates, and vertex color
 typedef struct vt_ptc
 {
-    vec3 position;
-    vec2 uv;
-    vec4 color;
+    union {
+        struct {
+            vec3 position;
+            vec2 uv;
+            vec4 color;
+        };
+        float data[9];
+    };
 }
 vt_ptc;
 
 // Vertex with position, normals, texture coordinates, and vertex color
 typedef struct vt_pntc
 {
-    vec3 position;
-    vec3 normal;
-    vec2 uv;
-    vec4 color;
+    union {
+        struct {
+            vec3 position;
+            vec3 normal;
+            vec2 uv;
+            vec4 color;
+        };
+        float data[12];
+    };
 }
 vt_pntc;
 

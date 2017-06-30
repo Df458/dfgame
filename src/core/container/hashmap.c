@@ -118,6 +118,13 @@ void hashmap_set(hashmap map, hash_key, void* value) {
     }
 }
 
+void hashmap_copyset(hashmap map, hash_key, void* value, uint32 size) {
+    void* data = salloc(size);
+    memcpy(data, value, size);
+
+    hashmap_set(map, hash_key_data, data);
+}
+
 // Returns whether or not hash_key is present in the map
 bool hashmap_has_key(hashmap map, hash_key) {
     uint32 crc = make_crc();

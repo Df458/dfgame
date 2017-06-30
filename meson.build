@@ -10,12 +10,15 @@ freetype = dependency('freetype2')
 glfw = dependency('glfw3')
 glew = dependency('glew')
 jpeg = dependency('libjpeg')
+openal = dependency('openal')
+ogg = dependency('ogg')
 png = dependency('libpng')
 tiff = dependency('libtiff-4')
 tga = compiler.find_library('libtga')
-openal = dependency('openal')
-ogg = dependency('ogg')
 vorbis = dependency('vorbisfile')
+xml = dependency('libxml-2.0')
+
+add_project_arguments('-I/usr/include/freetype2', language: 'c')
 
 args = []
 

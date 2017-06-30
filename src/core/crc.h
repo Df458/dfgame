@@ -2,6 +2,7 @@
 #define DF_CORE_CRC
 
 #include "types.h"
+#include <string.h>
 
 // Add this macro to a function to add a hash key as an argument
 #define hash_key const byte* hash_data, uint16 hash_data_size
@@ -19,9 +20,9 @@
 )
 
 // This macro calls crc32 on the arguments provided by hash_key
-#define make_crc() crc32(hash_data, hash_data_size)
+#define make_crc() df_crc32(hash_data, hash_data_size)
 
 // Converts data into its respective CRC32 hash.
-uint32 crc32(hash_key);
+uint32 df_crc32(hash_key);
 
 #endif // DF_CORE_CRC

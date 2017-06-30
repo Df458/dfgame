@@ -1,0 +1,3 @@
+name: wave
+vert: basic_tex.vert
+frag: wave.frag

@@ -51,7 +51,10 @@ typedef struct vec4 {
         float data[4];
         vec3 xyz;
         vec3 rgb;
-        vec2 xy;
+        struct {
+            vec2 xy;
+            vec2 zw;
+        };
     };
 } vec4;
 

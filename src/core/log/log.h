@@ -27,7 +27,7 @@ typedef enum log_level {
                   // that will guarantee a crash, such as memory errors.
 } log_level;
 
-delegate(void, log_handler, const char*, uint32, log_level, const char*)
+event(log_handler, const char*, uint32, log_level, const char*);
 
 void _log(const char* file, uint32 line, const char* category, log_level level, const char* message, ...);
 void _log_va(const char* file, uint32 line, const char* category, log_level level, const char* message, va_list args);
@@ -43,7 +43,7 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
 #define nulltest(ptr) if(!ptr) fatal("Unexpected null pointer")
 #define stub(ret) { warn("%s stub!", __FUNCTION__); return ret; }
 
-void register_log_handler(log_handler handler);
+void register_log_handler(log_handler* handler);
 void register_log_file(FILE* file);
 
 #endif // DF_CORE_LOG

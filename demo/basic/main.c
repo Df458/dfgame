@@ -6,6 +6,8 @@
 #include "audio_source.h"
 #include "audio_system.h"
 #include "camera.h"
+#include "font_loader.h"
+#include "font.h"
 #include "input.h"
 #include "interpolate.h"
 #include "log/log.h"
@@ -16,8 +18,13 @@
 #include "mesh_loader.h"
 #include "paths.h"
 #include "quat.h"
+#include "renderpass.h"
 #include "shader_init.h"
 #include "shader.h"
+#include "sprite_loader.h"
+#include "spriteset.h"
+#include "sprite.h"
+#include "text.h"
 #include "texture_loader.h"
 #include "transform.h"
 #include "types.h"
@@ -28,26 +35,15 @@ GLFWwindow* win;
 
 camera player_camera;
 transform player_transform;
-audio_player step_players[7];
-audio_player jump_player;
 
-mesh radio_mesh;
-gltex radio_tex;
-transform radio_transform;
-audio_player music_player;
+font test_font;
+text test_text;
+spriteset test_spriteset;
+sprite test_sprite;
+renderpass test_rpass1;
+renderpass test_rpass2;
 
-mesh suzanne_mesh;
-gltex suzanne_tex;
-transform suzanne_transform;
-
-mesh df_mesh;
-gltex df_tex;
-transform df_transform;
-
-mesh level_mesh;
-gltex level_tex;
-
-shader s;
+shader s, s2, s3;
 
 action_id jump_action;
 axis_id mouselook_axis_x;
@@ -57,18 +53,20 @@ axis_id movement_axis_y;
 
 vec2 camera_orient = {0};
 vec2 camera_target = {0};
+vec2 ball_position = {0};
 float y_vel = 0;
-bool is_ortho = false;
+bool is_ortho = true;
 float fov = 60;
 float fov_target = 60;
 float dist = 0;
+float val = 0;
 
 projection_settings build_projection() {
     projection_settings settings = (projection_settings) {
         .dims=(vec4) {
-            .x=is_ortho ? -6 : 6,
-            .y=3.5,
-            .z=0.1,
+            .x=1280,
+            .y=720,
+            .z=-1,
             .w=100.0
         },
         .fov = fov,
@@ -77,13 +75,6 @@ projection_settings build_projection() {
     return settings;
 }
 
-void jump(action_id action, void* user) {
-    float y = transform_get_position(player_transform).y;
-    if(y <= 1.86) {
-        y_vel = 0.25;
-        audio_player_set_playing(jump_player, true);
-    }
-}
 void toggle_ortho(action_id action, void* user) {
     is_ortho = !is_ortho;
     camera_set_projection(player_camera, build_projection());
@@ -96,41 +87,27 @@ void toggle_fov(action_id action, void* user) {
 }
 
 bool loop(mainloop l, float dt) {
-    if(!audio_player_get_playing(music_player))
-        audio_player_set_playing(music_player, true);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    if(get_axis_value(mouselook_axis_x) != 0)
-        camera_target.x = camera_orient.x + degtorad(get_axis_value(mouselook_axis_x));
-    if(get_axis_value(mouselook_axis_y) != 0)
-        camera_target.y = camera_orient.y + degtorad(get_axis_value(mouselook_axis_y));
-    camera_orient.x = lerp(camera_orient.x, camera_target.x, 0.5f);
-    camera_orient.y = clamp(lerp(camera_orient.y, camera_target.y, 0.5f), -PI*0.5f, PI*0.5f);
-    if(fov != fov_target) {
-        fov = lerp(fov, fov_target, 0.15);
-        camera_set_projection(player_camera, build_projection());
-    }
-    transform_rotate(player_transform, (vec3){.x=camera_orient.x}, false);
-    transform_rotate(player_transform, (vec3){.y=camera_orient.y}, true);
-
-    vec3 position = (vec3){ .x=(sin(camera_orient.x) * get_axis_value(movement_axis_y)) + (cos(camera_orient.x) * get_axis_value(movement_axis_x)), .z=-cos(camera_orient.x) * get_axis_value(movement_axis_y) + (sin(camera_orient.x) * get_axis_value(movement_axis_x)) };
-    vec3 p = transform_get_position(player_transform);
-    if(p.y + y_vel <= 1.85 && p.x > -2 && p.x < 39 && p.z > -21 && p.z < 21) {
-        position.y = 1.85-p.y;
-        y_vel = 0;
-
-        if(position.x != 0 || position.z != 0)
-            dist += dt * 5;
-        if(dist > 1.1) {
-            dist = 0;
-            audio_player_set_playing(step_players[rand() % 7], true);
+    float vx = get_axis_value(movement_axis_x);
+    float vy = get_axis_value(movement_axis_y);
+    if(sprite_get_anim_id(test_sprite) != 2) {
+        if(vx != 0 || vy != 0) {
+            sprite_set_animation(test_sprite, "move", false);
+            if(vx != 0)
+                sprite_set_orientation(test_sprite, vx < 0 ? 3 : 1);
+            else
+                sprite_set_orientation(test_sprite, vy < 0 ? 0 : 2);
+        } else {
+            sprite_set_animation(test_sprite, "move", true);
         }
-    } else {
-        position.y = y_vel;
-        y_vel -= 0.015;
     }
-    transform_translate(player_transform, position, true);
+
+    ball_position = vec2_add(ball_position, (vec2){.x=vx, .y=vy});
+
+    val += dt;
+
+    char data[26];
+    snprintf(data, 25, "Hello, %2d World", rand() % 100);
+    test_text = text_new(test_font, data);
 
     quat q = transform_get_orientation(player_transform);
     vec3 forward = (vec3){.x=0, .y=0, .z=-1};
@@ -138,32 +115,37 @@ bool loop(mainloop l, float dt) {
     forward = vec_rotate(forward, q);
     forward.x *= -1;
     up = vec_rotate(up, q);
-    audio_update_listener(transform_get_position(player_transform), forward, up, position);
-    for(int i = 0; i < 7; ++i)
-        audio_player_update(step_players[i], dt);
-    audio_player_update(jump_player, dt);
-    audio_player_update(music_player, dt);
+
+    sprite_update(test_sprite, dt);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    /* renderpass_start(test_rpass1); */
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(s.id);
-    shader_bind_uniform_name(s, "transform", camera_get_vp(player_camera));
-    shader_bind_attribute_mesh(s, level_mesh, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
-    shader_bind_uniform_texture_name(s, "u_texture", level_tex, GL_TEXTURE0);
-    mesh_render(level_mesh, GL_TRIANGLES);
+    shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), mat4_ident));
+    shader_bind_attribute_mesh(s, text_get_mesh(test_text), "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
+    shader_bind_uniform_texture_name(s, "u_texture", font_get_texture(test_font), GL_TEXTURE0);
+    vec2 v0 = (vec2){.x=0,.y=0};
+    vec2 v1 = (vec2){.x=1,.y=1};
+    shader_bind_uniform_name(s, "uv_offset", v0);
+    shader_bind_uniform_name(s, "uv_scale", v1);
+    mesh_render(text_get_mesh(test_text), GL_TRIANGLES);
 
-    shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), transform_get_matrix(radio_transform)));
-    shader_bind_attribute_mesh(s, radio_mesh, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
-    shader_bind_uniform_texture_name(s, "u_texture", radio_tex, GL_TEXTURE0);
-    mesh_render(radio_mesh, GL_TRIANGLES);
+    aabb_2d box = sprite_get_box(test_sprite);
+    shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), mat4_translate(mat4_scale(mat4_ident, box.dimensions), ball_position)));
+    shader_bind_attribute_mesh(s, mesh_quad(), "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
+    shader_bind_uniform_texture_name(s, "u_texture", sprite_get_texture(test_sprite), GL_TEXTURE0);
+    box.vec = vec4_mul(box.vec, 1.0f / sprite_get_texture(test_sprite).width);
+    shader_bind_uniform_name(s, "uv_offset", box.position);
+    shader_bind_uniform_name(s, "uv_scale", box.dimensions);
+    mesh_render(mesh_quad(), GL_TRIANGLES);
 
-    shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), transform_get_matrix(suzanne_transform)));
-    shader_bind_attribute_mesh(s, suzanne_mesh, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
-    shader_bind_uniform_texture_name(s, "u_texture", suzanne_tex, GL_TEXTURE0);
-    mesh_render(suzanne_mesh, GL_TRIANGLES);
-
-    shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), transform_get_matrix(df_transform)));
-    shader_bind_attribute_mesh(s, df_mesh, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
-    shader_bind_uniform_texture_name(s, "u_texture", df_tex, GL_TEXTURE0);
-    mesh_render(df_mesh, GL_TRIANGLES);
+    glUseProgram(s2.id);
+    shader_bind_uniform_name(s2, "u_time", val);
+    /* renderpass_next(test_rpass2, s2); */
+    /* renderpass_next(NULL, s3); */
 
     glfwSwapBuffers(win);
     return !glfwWindowShouldClose(win);
@@ -172,71 +154,41 @@ bool loop(mainloop l, float dt) {
 int main(int argc, char** argv) {
     // Set up graphics
     win = window_new_default(1280, 720, "Test Window");
-    glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     shaders_init();
     audio_init();
     init_base_resource_path(NULL);
 
     s = shader_basic_tex_get();
+    s2 = shader_wave_get();
+    s3 = shader_blur_get();
 
-    // Load meshes
-    radio_mesh = load_mesh(assets_path("radio.obj", NULL));
-    suzanne_mesh = load_mesh(assets_path("centerpiece.obj", NULL));
-    df_mesh = load_mesh(assets_path("plane.obj", NULL));
-    level_mesh = load_mesh(assets_path("room.obj", NULL));
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Load audio
-    for(int i = 0; i < 7; ++i) {
-        char name[9] = "";
-        sprintf(name, "step%1d.wav", i + 1);
-        step_players[i] = audio_player_new(load_audio_source(assets_path(name, NULL), true));
-    }
-    jump_player = audio_player_new(load_audio_source(assets_path("jump.wav", NULL), true));
-    music_player = audio_player_new(load_audio_source(assets_path("music.ogg", NULL), false));
-    audio_player_set_distances(music_player, 10, 30);
+    test_font = load_font(assets_path("test.ttf", NULL), 64);
+    test_text = text_new(test_font, "Hello, World");
 
-    // Load textures
-    radio_tex = load_texture_gl(assets_path("radio.png", NULL));
-    suzanne_tex = load_texture_gl(assets_path("suzanne.png", NULL));
-    df_tex = load_texture_gl(assets_path("dflogo.png", NULL));
-    level_tex = load_texture_gl(assets_path("RoomTex.png", NULL));
+    test_spriteset = load_spriteset(assets_path("test.xml", NULL));
+    test_sprite = sprite_new(test_spriteset);
+    sprite_set_animation(test_sprite, "move", true);
+    sprite_set_playing(test_sprite, true);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glClearColor(0.5, 0.5, 0.5, 1);
 
     // Set up player
     player_camera = camera_new(build_projection());
     player_transform = camera_get_transform(player_camera);
-    transform_translate(player_transform, (vec3){.x=5.0,.y=1.85,.z=0}, false);
-    vec3 r = (vec3){.x=degtorad(90),.y=degtorad(-4),.z=0 };
-    camera_orient = r.xy;
-    camera_target = r.xy;
-    transform_rotate(player_transform, r, false);
-
-    // Set up transforms
-    radio_transform   = transform_new();
-    transform_translate(radio_transform, (vec3){.x=0.97,.y=0.95,.z=0}, false);
-    transform_scale(radio_transform, (vec3){.x=0.4,.y=0.4,.z=0.4}, false);
-    audio_player_set_translation(music_player, transform_get_position(radio_transform));
-
-    suzanne_transform = transform_new();
-    df_transform      = transform_new();
-    vec3 r3 = (vec3){.x=0,.y=degtorad(180), .z=0 };
-    transform_rotate_2d(df_transform, degtorad(90), false);
-    transform_rotate(df_transform, r3, true);
-    transform_translate(df_transform, (vec3){.x=6,.y=2,.z=0}, false);
-    transform_scale(df_transform, (vec3){.x=.1,.y=.1,.z=.1}, false);
 
     // Set up input
-    jump_action = input_add_key_action(GLFW_KEY_SPACE, &(action_event){.func=jump});
-    input_add_key_action(GLFW_KEY_Q, &(action_event){.func=toggle_ortho});
-    input_add_key_action(GLFW_KEY_E, &(action_event){.func=toggle_fov});
-    mouselook_axis_x = input_add_mouse_position_axis(false, 0, -1.0f);
-    mouselook_axis_y = input_add_mouse_position_axis(true, 0, -1.0f);
-    movement_axis_x = input_add_key_axis(GLFW_KEY_D, 0, 0.1f);
-    input_bind_key_axis(GLFW_KEY_A, movement_axis_x, -0.1f);
-    movement_axis_y = input_add_key_axis(GLFW_KEY_W, 0, 0.1f);
-    input_bind_key_axis(GLFW_KEY_S, movement_axis_y, -0.1f);
+    movement_axis_x = input_add_key_axis(GLFW_KEY_D, 0, 2.0f, false);
+    input_bind_key_axis(GLFW_KEY_A, movement_axis_x, -2.0f);
+    movement_axis_y = input_add_key_axis(GLFW_KEY_W, 0, -2.0f, false);
+    input_bind_key_axis(GLFW_KEY_S, movement_axis_y, 2.0f);
+
+    test_rpass1 = renderpass_new(1280, 720);
+    test_rpass2 = renderpass_new(1280, 720);
 
     // Run the demo
     mainloop l = mainloop_new(loop);
@@ -245,11 +197,6 @@ int main(int argc, char** argv) {
     // Cleanup
     mainloop_free(l);
     shaders_cleanup();
-
-    mesh_free(radio_mesh);
-    mesh_free(suzanne_mesh);
-    mesh_free(df_mesh);
-    mesh_free(level_mesh);
 
     window_free_final(win);
 

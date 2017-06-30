@@ -98,26 +98,26 @@ void input_bind_mouse_position_axis(bool vertical, axis_id id, float mod) {
     ax->mod = mod;
     array_add(mouse_position_axis_bindings[index].axes, ax);
 }
-axis_id input_add_key_axis(int key, float limit, float mod) {
-    axis_id id = create_axis(limit);
+axis_id input_add_key_axis(int key, float limit, float mod, bool digital) {
+    axis_id id = create_axis(limit, digital);
     input_bind_key_axis(key, id, mod);
 
     return id;
 }
-axis_id input_add_mouse_button_axis(int button, float limit, float mod) {
-    axis_id id = create_axis(limit);
+axis_id input_add_mouse_button_axis(int button, float limit, float mod, bool digital) {
+    axis_id id = create_axis(limit, digital);
     input_bind_mouse_button_axis(button, id, mod);
 
     return id;
 }
-axis_id input_add_mouse_scroll_axis(bool vertical, float limit, float mod) {
-    axis_id id = create_axis(limit);
+axis_id input_add_mouse_scroll_axis(bool vertical, float limit, float mod, bool digital) {
+    axis_id id = create_axis(limit, digital);
     input_bind_mouse_scroll_axis(vertical, id, mod);
 
     return id;
 }
-axis_id input_add_mouse_position_axis(bool vertical, float limit, float mod) {
-    axis_id id = create_axis(limit);
+axis_id input_add_mouse_position_axis(bool vertical, float limit, float mod, bool digital) {
+    axis_id id = create_axis(limit, digital);
     input_bind_mouse_position_axis(vertical, id, mod);
 
     return id;
@@ -133,7 +133,7 @@ iter_result axis_value_foreach(void* iter_data, void* user) {
     if(user)
         value = *(float*)user;
     axis* a = (axis*)iter_data;
-    set_axis_value(a->id, value * a->mod);
+    set_axis_value(a->id, value * a->mod, user == NULL);
 
     return iter_continue;
 }

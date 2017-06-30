@@ -17,7 +17,7 @@ typedef struct projection_settings {
     float fov;
 } projection_settings;
 
-#define mat4_ident (mat4){ {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1} }
+#define mat4_ident ((mat4){ {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1} })
 
 // Translates the transformation matrix m by v
 #define mat4_translate(m, v) _Generic(v,\
@@ -47,10 +47,14 @@ mat4 mat4_rotate_3d_quat(mat4 m, quat q);
 
 // Rotates the transformation matrix m by v
 #define mat4_scale(m, v) _Generic(v,\
+    double: mat4_scale_f,\
+    float: mat4_scale_f,\
+    int: mat4_scale_f,\
     vec2: mat4_scale_vec2,\
     vec3: mat4_scale_vec3,\
     vec4: mat4_scale_vec4\
 )(m, v)
+mat4 mat4_scale_f(mat4 m, float v);
 mat4 mat4_scale_vec2(mat4 m, vec2 v);
 mat4 mat4_scale_vec3(mat4 m, vec3 v);
 mat4 mat4_scale_vec4(mat4 m, vec4 v);

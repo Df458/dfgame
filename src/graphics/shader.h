@@ -3,6 +3,7 @@
 #include "camera.hd"
 #include "matrix.hd"
 #include "mesh.hd"
+#include "text.h"
 #include "texture.h"
 #include "transform.hd"
 #include "vector.hd"

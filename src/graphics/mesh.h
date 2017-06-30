@@ -20,10 +20,10 @@ mesh mesh_new_type(uint32 size, uint8 vertex_type, void* data);
     vt_pntc*: mesh_new_type(size, VT_POSITION | VT_NORMAL | VT_TEXTURE | VT_COLOR, data)\
 )
 
+void mesh_render(mesh m, GLenum mode);
+
 // Frees the mesh and sets it to NULL to make it harder to double-free.
 #define mesh_free(m) { _mesh_free(m); m = NULL; }
-
-void mesh_render(mesh m, GLenum mode);
 
 // Frees the mesh. NOTE: Don't call this function. Use the macro without
 // the leading _ instead, as it also NULLs your pointer.
@@ -51,5 +51,7 @@ void mesh_update(mesh m);
 // Return value is an integer typed as GLvoid* in order to satisfy the
 // requirements of glVertexAttribPointer.
 GLvoid* mesh_get_element_offset(mesh m, vertex_types type);
+
+mesh mesh_quad();
 
 #endif

@@ -4,6 +4,6 @@
 #include "types.h"
 
 // Represents a texture atlas
-declarep(struct, texture_atlas)
+declarep(struct, texture_atlas);
 
 #endif

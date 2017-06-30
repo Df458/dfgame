@@ -4,6 +4,8 @@
 #include "control.h"
 
 #include "check.h"
+#include "interpolate.h"
+#include <stdlib.h>
 #include "mathutil.h"
 #include "memory/alloc.h"
 
@@ -15,9 +17,11 @@ typedef struct action {
 } action;
 
 typedef struct axis {
-    float value;
+    float digital_value;
+    float effective_value;
     float limit;
     bool set;
+    bool is_digital;
 } axis;
 
 static action action_list[256];
@@ -33,8 +37,16 @@ void update_controls() {
         action_list[i].set = false;
     }
     for(int i = 0; i < axis_count; ++i) {
-        if(!axis_list[i].set)
-            axis_list[i].value = 0;
+        if(!axis_list[i].set) {
+            axis_list[i].digital_value = 0;
+            if(axis_list[i].is_digital)
+                axis_list[i].effective_value = 0;
+        }
+        if(!axis_list[i].is_digital && axis_list[i].effective_value != axis_list[i].digital_value) {
+            axis_list[i].effective_value = lerp(axis_list[i].effective_value, axis_list[i].digital_value, 0.1);
+            if(abs(axis_list[i].digital_value - axis_list[i].effective_value) < 0.01)
+                axis_list[i].effective_value = axis_list[i].digital_value;
+        }
         axis_list[i].set = false;
     }
 }
@@ -66,29 +78,33 @@ bool action_is_active(action_id id) {
     return action_list[id].active;
 }
 
-axis_id create_axis(float limit) {
+axis_id create_axis(float limit, bool digital) {
     check_return(axis_count < 256, "Can't create axis: Maximum number of axes created", -1);
 
     axis_id id = axis_count;
     axis_list[id].limit = limit;
+    axis_list[id].is_digital = digital;
 
     axis_count++;
 
     return id;
 }
 
-void set_axis_value(axis_id id, float value) {
+void set_axis_value(axis_id id, float value, bool digital) {
     check_return(id < axis_count, "Can't access axis: Index is out of range", );
 
-    axis_list[id].value  = value;
-    axis_list[id].set    = true;
+    axis_list[id].digital_value = value;
+    if(axis_list[id].is_digital || !digital) {
+        axis_list[id].effective_value = value;
+    }
+    axis_list[id].set = true;
 }
 
 float get_axis_value(axis_id id) {
     check_return(id < axis_count, "Can't access axis: Index is out of range", false);
 
     if(axis_list[id].limit != 0)
-        return clamp(axis_list[id].value, -axis_list[id].limit, axis_list[id].limit);
+        return clamp(axis_list[id].effective_value, -axis_list[id].limit, axis_list[id].limit);
     else
-        return axis_list[id].value;
+        return axis_list[id].effective_value;
 }

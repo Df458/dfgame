@@ -22,7 +22,7 @@ static const char* const log_level_names[4] =
     "FATAL",
 };
 
-static log_handler current_handler = 0;
+static log_handler* current_handler;
 static FILE* current_file = 0;
 
 static const char* const log_format = "[%s] %s:%d, LOG LEVEL %s: %s\n";
@@ -69,10 +69,8 @@ void _log(const char* file, uint32 line, const char* category, log_level level, 
 
     fprintf(current_file, final_message);
 
-    if(current_handler != 0) 
-        current_handler(file, line, level, message);
-    else
-        free(final_message);
+    call_event(current_handler, file, line, level, final_message);
+    free(final_message);
 
     if(level == LOG_FATAL)
         exit(1);
@@ -120,19 +118,16 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
 
     fprintf(current_file, final_message);
 
-    if(current_handler != 0) 
-        current_handler(file, line, level, message);
-    else
-        free(final_message);
+    call_event(current_handler, file, line, level, final_message);
+    free(final_message);
 
     if(level == LOG_FATAL)
         exit(1);
 }
 
-// TODO: Pass in user pointer
-void register_log_handler(log_handler handler)
+void register_log_handler(log_handler* handler)
 {
-    current_handler = handler;
+    bind_event(log_handler, current_handler, handler);
 }
 
 void register_log_file(FILE* file)

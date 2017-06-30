@@ -28,6 +28,8 @@ uint16 hashmap_size(hashmap map);
 // Setting value to NULL will automatically unmap hash_key.
 void hashmap_set(hashmap map, hash_key, void* value);
 
+void hashmap_copyset(hashmap map, hash_key, void* value, uint32 size);
+
 // Returns whether or not hash_key is present in the map
 bool hashmap_has_key(hashmap map, hash_key);
 

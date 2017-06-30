@@ -11,9 +11,13 @@ typedef struct gltex {
     uint16 height;
 } gltex;
 typedef struct rawtex {
-    uint8* data;
+    ubyte* data;
     uint16 width;
     uint16 height;
+    uint8  elements;
 } rawtex;
+
+gltex gltex_new(GLenum type, uint16 w, uint16 h);
+rawtex rawtex_new(uint16 w, uint16 h, uint8 elements);
 
 #endif

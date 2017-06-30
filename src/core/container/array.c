@@ -177,6 +177,20 @@ uint16 uarray_size(uarray array) {
 }
 
 // Adds a new member to the end of this array, resizing it if necessary.
+void sarray_copyadd(sarray array, void* data, uint32 size) {
+    void* copy = salloc(size);
+    memcpy(copy, data, size);
+
+    sarray_add(array, copy);
+}
+void uarray_copyadd(uarray array, void* data, uint32 size) {
+    void* copy = salloc(size);
+    memcpy(copy, data, size);
+
+    uarray_add(array, copy);
+}
+
+// Adds a new member to the end of this array, resizing it if necessary.
 void sarray_add(sarray array, void* data) {
     array->size++;
     sarray_resize_if_full(array);
@@ -323,12 +337,12 @@ void uarray_remove_at(uarray array, uint16 position) {
 
 // Returns the element at position in this array.
 void* sarray_get(sarray array, uint16 position) {
-    assert(position < array->size);
+    check_kill(position < array->size, "Array index %u is out of bounds in array of size %u", position, array->size);
 
     return array->data[position];
 }
 void* uarray_get(uarray array, uint16 position) {
-    assert(position < array->size);
+    check_kill(position < array->size, "Array index %u is out of bounds in array of size %u", position, array->size);
 
     return array->data[position];
 }

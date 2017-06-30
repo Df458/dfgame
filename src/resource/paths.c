@@ -75,3 +75,53 @@ const char* get_extension(const char* path) {
     else
         return ext + 1;
 }
+
+char* get_folder(const char* path) {
+    const char* file_start = strrchr(path, (int)'/');
+    if(!file_start) {
+        char* c = scalloc(2, sizeof(char));
+        c[0] = '.';
+        return c;
+    }
+
+    char* str = scalloc(file_start - path + 1, sizeof(char));
+    strncpy(str, path, file_start - path);
+
+    return str;
+}
+
+char* combine_paths(char* a, char* b, bool free) {
+    check_return(a, "Can't combine paths, one path is null", b);
+    check_return(b, "Can't combine paths, one path is null", a);
+
+    size_t last_a = strlen(a) - 1;
+    size_t len_b  = strlen(b);
+    char* output;
+    if(a[last_a] == '/') {
+        if(b[0] == '/') {
+            output = scalloc(last_a + len_b + 1, sizeof(char));
+            strncat(output, a, last_a);
+        } else {
+            output = scalloc(last_a + len_b + 2, sizeof(char));
+            strncat(output, a, last_a + 1);
+        }
+        strncat(output, b, len_b);
+    } else if(b[0] == '/') {
+        output = scalloc(last_a + len_b + 2, sizeof(char));
+        strncat(output, a, last_a + 1);
+        strncat(output, b, len_b);
+    } else {
+        output = scalloc(last_a + len_b + 3, sizeof(char));
+        strncat(output, a, last_a + 1);
+        output[last_a + 1] = '/';
+        output[last_a + 2] = '\0';
+        strncat(output, b, len_b);
+    }
+
+    if(free) {
+        sfree(a);
+        sfree(b);
+    }
+
+    return output;
+}

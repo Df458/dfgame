@@ -12,5 +12,9 @@ void shaders_cleanup();
 shader shader_basic_tex_get();
 shader shader_basic_untex_get();
 shader shader_text_get();
+shader shader_test_post_get();
+shader shader_wave_get();
+shader shader_invert_get();
+shader shader_blur_get();
 
 #endif

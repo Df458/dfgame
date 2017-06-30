@@ -1,0 +1,8 @@
+#ifndef DF_GRAPHICS_SPRITESET_D
+#define DF_GRAPHICS_SPRITESET_D
+
+#include "types.h"
+
+declarep(struct, spriteset)
+
+#endif

@@ -100,6 +100,7 @@ rawtex load_png_raw(const char* path) {
     
     tex.width = png_get_image_width(pstruct, info_struct);
     tex.height = png_get_image_height(pstruct, info_struct);
+    tex.elements = 4;
     png_byte color_type = png_get_color_type(pstruct, info_struct);
     /* png_byte bit_depth = png_get_bit_depth(pstruct, info_struct); */
     /* int number_of_passes = png_set_interlace_handling(pstruct); */
@@ -162,6 +163,7 @@ rawtex load_jpeg_raw(const char* path) {
     tex.width = decompresser.output_width;
     tex.height = decompresser.output_height;
     tex.data = scalloc(decompresser.output_width * decompresser.output_height * 4, sizeof(uint8_t));
+    tex.elements = 4;
     for(int j = 0; j < tex.height; ++j) {
         jpeg_read_scanlines(&decompresser, row, 1);
         for(int i = 0; i < tex.width; ++i) {
@@ -216,6 +218,7 @@ rawtex load_tga_raw(const char* path) {
     int px_size = image->hdr.depth;
     tex.width  = image->hdr.width;
     tex.height = image->hdr.height;
+    tex.elements = image->hdr.depth / sizeof(byte);
     if(check_error(px_size == 24 || px_size == 32, "Error trying to load tga file: Expected 24 or 32-bit color depth, got %d", image->hdr.depth)) {
         TGAClose(image);
         return tex;
@@ -253,6 +256,7 @@ rawtex load_tga_raw(const char* path) {
 
 rawtex load_tiff_raw(const char* path) {
     rawtex tex;
+    tex.data = NULL;
     TIFF* infile = TIFFOpen(path, "r");
     check_return(infile, "Could not open file: %s", tex, path)
 
@@ -264,6 +268,7 @@ rawtex load_tiff_raw(const char* path) {
     }
     tex.width = img.width;
     tex.height = img.height;
+    tex.elements = 4;
 
     uint32_t* temp_buffer = 0;
     temp_buffer = _TIFFmalloc(tex.width * tex.height * sizeof(uint32));

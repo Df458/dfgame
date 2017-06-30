@@ -32,8 +32,11 @@ GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
 
     check_kill(glfw_init_called || glewInit() == GLEW_OK, "Failed to initialize GLEW");
     if(!glfw_init_called) {
-        if(!check_error(GLEW_KHR_debug, "Graphics debug logging is not available for your hardware. Graphical errors will not be reported"))
+        if(!check_error(glfwExtensionSupported("GL_ARB_debug_output"), "Graphics debug logging is not available for your hardware. Graphical errors will not be reported")) {
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
             glDebugMessageCallback(graphics_log, NULL);
+        }
 
         GLuint VAO; // Setup default VAO
         glGenVertexArrays(1, &VAO);

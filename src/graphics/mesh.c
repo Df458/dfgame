@@ -52,6 +52,8 @@ void mesh_render(mesh m, GLenum mode) {
 // Frees the mesh. NOTE: Don't call this function. Use the macro without
 // the leading _ instead, as it also NULLs your pointer.
 void _mesh_free(mesh m) {
+    if(!m)
+        return;
     glDeleteBuffers(1, &m->handle);
     sfree(m->data);
     sfree(m);
@@ -112,4 +114,30 @@ GLvoid* mesh_get_element_offset(mesh m, vertex_types type) {
         return count;
 
     return 0;
+}
+
+const vt_pnt mesh_quad_verts[] = {
+    (vt_pnt){.data={-0.5f, -0.5f, 0,  0, 0, 1,  0, 0}},
+    (vt_pnt){.data={ 0.5f, -0.5f, 0,  0, 0, 1,  1, 0}},
+    (vt_pnt){.data={ 0.5f,  0.5f, 0,  0, 0, 1,  1, 1}},
+                                                    
+    (vt_pnt){.data={-0.5f, -0.5f, 0,  0, 0, 1,  0, 0}},
+    (vt_pnt){.data={ 0.5f,  0.5f, 0,  0, 0, 1,  1, 1}},
+    (vt_pnt){.data={-0.5f,  0.5f, 0,  0, 0, 1,  0, 1}},
+};
+
+static struct mesh mesh_quad_data = (struct mesh) {
+    .data = (void*)mesh_quad_verts,
+    .type_flags = VT_POSITION | VT_NORMAL | VT_TEXTURE,
+    .vertex_count = 6,
+    .data_size = sizeof(vt_pnt),
+    .handle = -1
+};
+
+mesh mesh_quad() {
+    if(mesh_quad_data.handle == -1) {
+        glGenBuffers(1, &mesh_quad_data.handle);
+        mesh_update(&mesh_quad_data);
+    }
+    return &mesh_quad_data;
 }

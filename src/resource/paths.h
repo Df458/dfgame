@@ -15,5 +15,7 @@ char* get_resource_path(const char* prefix, const char* suffix, uint16* len);
 #define saves_path(s, l) get_resource_path(SAVES_PREFIX, s, l)
 
 const char* get_extension(const char* path);
+char* get_folder(const char* path);
+char* combine_paths(char* a, char* b, bool free);
 
 #endif
