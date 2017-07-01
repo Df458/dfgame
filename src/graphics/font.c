@@ -36,12 +36,12 @@ void font_add_glyph(font f, glyph gp) {
     array_copyadd(f->glyphs, &gp, sizeof(gp));
 }
 
-glyph font_get_glyph(font f, int16 id) {
+glyph* font_get_glyph(font f, int16 id) {
     int32 glyph_id = array_findp(f->glyphs, (void*)&id, find_glyph_with_id, NULL);
-    check_return(glyph_id >= 0, "Couldn't find glyph 0x%d", (glyph){0}, id);
+    check_return(glyph_id >= 0, "Couldn't find glyph 0x%d", NULL, id);
     glyph* gp = (glyph*)array_get(f->glyphs, glyph_id);
 
-    return *gp;
+    return gp;
 }
 
 aabb_2d font_get_glyph_bounds(font f, int16 id) {

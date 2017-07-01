@@ -26,11 +26,10 @@ audio_source load_audio_source(const char* path, bool preload) {
 }
 
 #define WAV_HEADER_SIZE 44
-// TODO: ERROR CHECKING AND SHIT ON WAV STREAM
 
 void stream_wav_audio(byte** data, uint32 position, uint32 requested_length, uint32* final_length, void* user) {
     FILE* infile = (FILE*)user;
-    fseek(infile, WAV_HEADER_SIZE + position, SEEK_SET);
+    check_return(!fseek(infile, WAV_HEADER_SIZE + position, SEEK_SET), "Failed to seek wav stream: %s", , error_str());
     *data = scalloc(requested_length, sizeof(byte));
     *final_length = fread(*data, sizeof(byte), requested_length, infile);
 }

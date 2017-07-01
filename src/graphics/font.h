@@ -14,7 +14,7 @@ typedef struct glyph {
 
 font font_new(uint16 height);
 void font_add_glyph(font f, glyph gp);
-glyph font_get_glyph(font f, int16 id);
+glyph* font_get_glyph(font f, int16 id);
 aabb_2d font_get_glyph_bounds(font f, int16 id);
 gltex font_get_texture(font f);
 float font_get_height(font f);

@@ -2,19 +2,16 @@
 A library for writing game engines
 
 This library is still in early development, so API changes are a regular
-occurrance. For this reason, using the library at this stage is not
+occurrance. For this reason, using the library at this stage is not yet
 recommended.
 
 ## Features
-- Logging
-- Input
-- Texture loading
-- Audio loading/playback
-- OpenGL matrix and transform wrapper
-- OpenGL camera
-- Animated sprite loading/rendering
-- Asset loading/path generation
-- Arraylist implementation
-- Slightly safer memory allocation and destruction
-- Editor widgets (Asset editor/viewer, log viewer, project creation dialog, asset management pane, and editor viewport)
-- Basic project handling
+- Simple "main loop"
+- Sprite, mesh, and font rendering
+- Camera/Transform handling
+- Audio preloading, streaming, and playback
+- Post-processing system
+- Unified keyboard and mouse input
+- Basic event/delegates implementation
+- Dynamic arrays and hashmaps
+- Marginally safer memory management code

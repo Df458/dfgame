@@ -38,6 +38,7 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
 
 // TODO: This code is OS-specific. We'll want to block it from compiling on
 // certain targets
+#define error_str() strerror(errno)
 #define error_code() error("Error code %d recieved: %s", errno, strerror(errno))
 
 #define nulltest(ptr) if(!ptr) fatal("Unexpected null pointer")

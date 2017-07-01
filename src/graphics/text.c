@@ -78,14 +78,13 @@ void text_set_str(text t, const char* s) {
             continue;
         }
 
-        glyph gp = font_get_glyph(t->fnt, (int16)s[i]);
-        gp.advance = gp.advance;
+        glyph* gp = font_get_glyph(t->fnt, (int16)s[i]);
+        if(!gp)
+            continue;
 
-        // TODO: Check glyph error
-
-        if(gp.advance != 0) {
-            glyph_to_verts(&buf[i * 6], gp, font_get_glyph_bounds(t->fnt, gp.texture_index), offset, font_get_texture(t->fnt).width);
-            offset.x += gp.advance;
+        if(gp->advance != 0) {
+            glyph_to_verts(&buf[i * 6], *gp, font_get_glyph_bounds(t->fnt, gp->texture_index), offset, font_get_texture(t->fnt).width);
+            offset.x += gp->advance;
         } else {
             offset.x += height * 0.5;
         }

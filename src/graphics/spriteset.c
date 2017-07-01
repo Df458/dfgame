@@ -59,7 +59,6 @@ uint16 spriteset_get_animation_count(spriteset set) {
     return hashmap_size(set->animations);
 }
 
-// TODO: Error checking
 animation spriteset_get_animation(spriteset set, const char* handle) {
     if(!handle || !hashmap_has_key(set->animations, make_hash_key("default")))
         return *(animation*)hashmap_get(set->animations, make_hash_key("default"));
