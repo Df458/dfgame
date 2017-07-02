@@ -54,7 +54,6 @@ void renderpass_next(renderpass pass, shader s) {
 void renderpass_present(renderpass pass, shader s) {
     glUseProgram(s.id);
     shader_bind_uniform_name(s, "transform", mat4_scale(mat4_ident, 2));
-    shader_bind_attribute_mesh(s, mesh_quad(), "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
     shader_bind_uniform_texture_name(s, "u_texture", pass->texture, GL_TEXTURE0);
-    mesh_render(mesh_quad(), GL_TRIANGLES);
+    mesh_render(s, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 }

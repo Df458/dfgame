@@ -149,21 +149,19 @@ bool loop(mainloop l, float dt) {
             offset = (vec2){.x=lerp(4, 16, offset_timer), .y=lerp(-4, -16, offset_timer)};
         }
         shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), mat4_translate(mat4_ident, vec_add(ball_position, offset))));
-        shader_bind_attribute_mesh(s, text_get_mesh(test_text), "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
         shader_bind_uniform_texture_name(s, "u_texture", font_get_texture(test_font), GL_TEXTURE0);
         shader_bind_uniform_name(s, "uv_offset", v0);
         shader_bind_uniform_name(s, "uv_scale", v1);
-        mesh_render(text_get_mesh(test_text), GL_TRIANGLES);
+        mesh_render(s, text_get_mesh(test_text), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
     }
 
     aabb_2d box = sprite_get_box(test_sprite);
     shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), mat4_translate(mat4_scale(mat4_ident, box.dimensions), ball_position)));
-    shader_bind_attribute_mesh(s, mesh_quad(), "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
     shader_bind_uniform_texture_name(s, "u_texture", sprite_get_texture(test_sprite), GL_TEXTURE0);
     box.vec = vec4_mul(box.vec, 1.0f / sprite_get_texture(test_sprite).width);
     shader_bind_uniform_name(s, "uv_offset", box.position);
     shader_bind_uniform_name(s, "uv_scale", box.dimensions);
-    mesh_render(mesh_quad(), GL_TRIANGLES);
+    mesh_render(s, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 
     switch(effects) {
         case 1:
@@ -190,11 +188,10 @@ bool loop(mainloop l, float dt) {
         glUseProgram(s.id);
         vec2 corner = (vec2){.x=-620, .y=340};
         shader_bind_uniform_name(s, "transform", mat4_mul(camera_get_vp(player_camera), mat4_translate(mat4_ident, corner)));
-        shader_bind_attribute_mesh(s, text_get_mesh(shader_text), "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
         shader_bind_uniform_texture_name(s, "u_texture", font_get_texture(test_font), GL_TEXTURE0);
         shader_bind_uniform_name(s, "uv_offset", v0);
         shader_bind_uniform_name(s, "uv_scale", v1);
-        mesh_render(text_get_mesh(shader_text), GL_TRIANGLES);
+        mesh_render(s, text_get_mesh(shader_text), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
     }
 
     glfwSwapBuffers(win);

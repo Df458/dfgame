@@ -32,8 +32,7 @@ bool loop(mainloop l, float dt) {
     shader_bind_uniform_name(s_default, "transform", mat4_mul(camera_get_vp(c_main), mat4_scale(mat4_ident, 400)));
     shader_bind_uniform_texture_name(s_default, "u_texture", t_logo, GL_TEXTURE0);
     shader_bind_uniform_name(s_default, "u_color", color);
-    shader_bind_attribute_mesh(s_default, mesh_quad(), "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
-    mesh_render(mesh_quad(), GL_TRIANGLES);
+    mesh_render(s_default, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 
     glfwSwapBuffers(win);
     return !glfwWindowShouldClose(win) && timer < 4.0f;

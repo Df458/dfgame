@@ -1,5 +1,7 @@
 #ifndef DF_GRAPHICS_SHADER
 #define DF_GRAPHICS_SHADER
+#include <stdarg.h>
+
 #include "camera.hd"
 #include "matrix.hd"
 #include "mesh.hd"
@@ -76,5 +78,6 @@ void shader_bind_uniform_texture(GLint handle, gltex t, GLuint bind_index);
 // appends this for you.
 #define shader_bind_attribute_mesh(s, m, ...) _shader_bind_attribute_mesh(s, m, __VA_ARGS__, 0)
 void _shader_bind_attribute_mesh(shader s, mesh m, ...);
+void shader_bind_attribute_mesh_va(shader s, mesh m, va_list args);
 
 #endif

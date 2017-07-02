@@ -45,7 +45,12 @@ mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data) {
     return m;
 }
 
-void mesh_render(mesh m, GLenum mode) {
+void _mesh_render(shader s, mesh m, GLenum mode, ...) {
+
+    va_list args;
+    va_start(args, mode);
+    shader_bind_attribute_mesh_va(s, m, args);
+    va_end(args);
     glDrawArrays(mode, 0, m->vertex_count);
 }
 

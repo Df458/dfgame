@@ -1,6 +1,7 @@
 #ifndef DF_GRAPHICS_MESH
 #define DF_GRAPHICS_MESH
 #include "mesh.hd"
+#include "shader.h"
 #include "vertex.hd"
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -20,7 +21,8 @@ mesh mesh_new_type(uint32 size, uint8 vertex_type, void* data);
     vt_pntc*: mesh_new_type(size, VT_POSITION | VT_NORMAL | VT_TEXTURE | VT_COLOR, data)\
 )
 
-void mesh_render(mesh m, GLenum mode);
+#define mesh_render(s, m, o, ...) _mesh_render(s, m, o, __VA_ARGS__, 0)
+void _mesh_render(shader s, mesh m, GLenum mode, ...);
 
 // Frees the mesh and sets it to NULL to make it harder to double-free.
 #define mesh_free(m) { _mesh_free(m); m = NULL; }

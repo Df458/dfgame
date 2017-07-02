@@ -202,3 +202,37 @@ void _shader_bind_attribute_mesh(shader s, mesh m, ...) {
 
     va_end(args);
 }
+void shader_bind_attribute_mesh_va(shader s, mesh m, va_list args) {
+    glBindBuffer(GL_ARRAY_BUFFER, mesh_get_handle(m));
+    const char* name = va_arg(args, const char*);
+    while(name) {
+        vertex_types type = va_arg(args, vertex_types);
+
+        if(check_warn(mesh_has_vertex_data(m, type), "Mesh does not contain vertex type 0x%x. Attribute %s will not be bound.\n", type, name))
+            continue;
+
+        GLvoid* offset = mesh_get_element_offset(m, type);
+        int pack_distance = mesh_get_data_size(m);
+        int data_size = 0;
+
+        switch(type) {
+            case VT_POSITION:
+                data_size = 3;
+            break;
+            case VT_NORMAL:
+                data_size = 3;
+            break;
+            case VT_TEXTURE:
+                data_size = 2;
+            break;
+            case VT_COLOR:
+                data_size = 4;
+                break;
+        }
+
+        GLuint attrib = glGetAttribLocation(s.id, name);
+        glEnableVertexAttribArray(attrib);
+        glVertexAttribPointer(attrib, data_size, GL_FLOAT, GL_FALSE, pack_distance, offset);
+        name = va_arg(args, const char*);
+    }
+}
