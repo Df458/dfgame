@@ -7,6 +7,7 @@
 #define RESOURCE_PATH_DEFAULT_BUFSIZE 1024
 
 void init_base_resource_path(const char* path);
+void resource_path_free();
 
 const char* get_base_resource_path();
 

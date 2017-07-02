@@ -46,7 +46,7 @@ texture_atlas texture_atlas_new() {
 }
 
 aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
-    check_return(box.width <= atlas->texture_data.width && box.height <= (atlas->texture_data.height - atlas->free_space.y) && (box.width <= (atlas->texture_data.width - atlas->free_space.x) || box.height <= (atlas->texture_data.height - atlas->free_space.z)), "Can't pack texture of "vec2_printstr" in atlas (free "vec3_printstr" [%d %d])", (aabb_2d){0}, vec2_printargs(box.dimensions), vec3_printargs(atlas->free_space), atlas->texture_data.width, atlas->texture_data.height);
+    check_return(box.width <= atlas->texture_data.width && box.height <= (atlas->texture_data.height - atlas->free_space.y) && (box.width <= (atlas->texture_data.width - atlas->free_space.x) || box.height <= (atlas->texture_data.height - atlas->free_space.z)), "Can't pack texture of "vec2_printstr" in atlas (free "vec3_printstr" [%d %d])", (aabb_2d){0}, vec2_decomp(box.dimensions), vec3_decomp(atlas->free_space), atlas->texture_data.width, atlas->texture_data.height);
 
     if(box.width < atlas->texture_data.width - atlas->free_space.x) {
         box.position = atlas->free_space.xy;

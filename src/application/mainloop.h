@@ -22,4 +22,7 @@ void mainloop_request_end(mainloop loop);
 // Gets whether or not the loop is running.
 bool mainloop_is_running(mainloop loop);
 
+// Creates a new mainloop with the given content, runs it, then frees it.
+void mainloop_create_run(loop_func func);
+
 #endif

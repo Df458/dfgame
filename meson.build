@@ -31,9 +31,9 @@ subdir('src/graphics')
 subdir('src/application')
 subdir('src/audio')
 subdir('src/resource')
-#subdir('src/editor')
 
 subdir('demo/basic')
+subdir('demo/logo')
 
 run_command('ctags', '-R', '.')
 

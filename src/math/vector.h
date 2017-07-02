@@ -151,8 +151,8 @@ vec4 vec4_rotate(vec4 v, quat q);
 #define vec2_printstr "[%f, %f]"
 #define vec3_printstr "[%f, %f, %f]"
 #define vec4_printstr "[%f, %f, %f, %f]"
-#define vec2_printargs(v) v.x, v.y
-#define vec3_printargs(v) v.x, v.y, v.z
-#define vec4_printargs(v) v.x, v.y, v.z, v.w
+#define vec2_decomp(v) v.x, v.y
+#define vec3_decomp(v) v.x, v.y, v.z
+#define vec4_decomp(v) v.x, v.y, v.z, v.w
 
 #endif

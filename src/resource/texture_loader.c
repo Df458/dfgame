@@ -39,13 +39,15 @@ gltex load_texture_gl(const char* path) {
     tex.width = raw.width;
     tex.height = raw.height;
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw.width, raw.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, raw.data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw.width, raw.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+    for(int i = 0; i < raw.height; ++i)
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i, raw.width, 1, GL_RGBA, GL_UNSIGNED_BYTE, raw.data + ((raw.height - i - 1) * raw.width * 4));
 
 	sfree(raw.data);
 

@@ -33,6 +33,10 @@ void init_base_resource_path(const char* path) {
         resource_path = strndup(path, RESOURCE_PATH_DEFAULT_BUFSIZE);
 }
 
+void resource_path_free() {
+    sfree(resource_path);
+}
+
 const char* get_base_resource_path() {
     return resource_path;
 }

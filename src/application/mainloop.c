@@ -59,3 +59,10 @@ void mainloop_request_end(mainloop loop) {
 bool mainloop_is_running(mainloop loop) {
     return loop->is_running;
 }
+
+// Creates a new mainloop with the given content, runs it, then frees it.
+void mainloop_create_run(loop_func func) {
+    mainloop loop = mainloop_new(func);
+    mainloop_run(loop);
+    _mainloop_free(loop);
+}
