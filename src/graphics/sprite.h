@@ -16,4 +16,7 @@ int16 sprite_get_anim_id(sprite spr);
 aabb_2d sprite_get_box(sprite spr);
 gltex sprite_get_texture(sprite spr);
 
+#define sprite_free(s, f) { _sprite_free(s, f); s = NULL; }
+void _sprite_free(sprite spr, bool free_src);
+
 #endif

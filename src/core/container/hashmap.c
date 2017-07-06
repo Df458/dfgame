@@ -83,6 +83,23 @@ void _hashmap_free(hashmap map) {
     sfree(map);
 }
 
+// Frees the hashmap and all pointers contained within it. NOTE: Don't call
+// this function. Use the macro without the leading _ instead, as it also NULLs
+// your pointer.
+void _hashmap_free_deep(hashmap map) {
+    if(map) {
+        // Free all buckets
+        for(int i = 0; i < HASHMAP_BUCKET_COUNT; ++i) {
+            sfree(map->buckets[i].keys);
+            for(int j = 0; j < map->buckets[i].size; ++j)
+                sfree(map->buckets[i].data[j])
+            sfree(map->buckets[i].data);
+        }
+    }
+
+    sfree(map);
+}
+
 // Returns the number of items stored in map.
 uint16 hashmap_size(hashmap map) {
     return map->size;

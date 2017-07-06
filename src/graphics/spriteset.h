@@ -34,4 +34,7 @@ uint16 spriteset_get_animation_count(spriteset set);
 animation spriteset_get_animation(spriteset set, const char* handle);
 gltex spriteset_get_texture(spriteset set);
 
+#define spriteset_free(s) { _spriteset_free(s); s = NULL; }
+void _spriteset_free(spriteset set);
+
 #endif

@@ -40,7 +40,15 @@ transform transform_new() {
 }
 
 // Sets or adds the transform's position
-void transform_translate(transform t, vec3 v, bool relative) {
+void transform_translate_2d(transform t, vec2 v, bool relative) {
+    if(relative)
+        t->position = vec3_add(t->position, (vec3){.xy=v});
+    else
+        t->position = (vec3){.xy=v};
+
+    recalculate_matrix(t);
+}
+void transform_translate_3d(transform t, vec3 v, bool relative) {
     if(relative)
         t->position = vec3_add(t->position, v);
     else
@@ -87,7 +95,18 @@ float transform_get_orientation_2d(transform t) {
 }
 
 // Sets or adds the transform's scale
-void transform_scale(transform t, vec3 v, bool relative) {
+void transform_scale_1d(transform t, float v, bool relative) {
+    if(relative)
+        t->scale = vec3_mul(t->scale, v);
+    else
+        t->scale = (vec3){.x=v, .y=v, .z=v};
+
+    recalculate_matrix(t);
+}
+void transform_scale_2d(transform t, vec2 v, bool relative) {
+    transform_scale_3d(t, (vec3){.xy=v}, relative);
+}
+void transform_scale_3d(transform t, vec3 v, bool relative) {
     if(relative)
         t->scale = vec3_add(t->scale, v);
     else

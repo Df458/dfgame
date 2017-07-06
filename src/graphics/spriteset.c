@@ -68,3 +68,10 @@ animation spriteset_get_animation(spriteset set, const char* handle) {
 gltex spriteset_get_texture(spriteset set) {
     return texture_atlas_get_texture(set->atlas);
 }
+
+void _spriteset_free(spriteset set) {
+    check_return(set, "Can't free spriteset: set is NULL", );
+    texture_atlas_free(set->atlas);
+    hashmap_free_deep(set->animations);
+    sfree(set);
+}

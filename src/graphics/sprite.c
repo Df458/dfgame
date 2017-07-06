@@ -3,7 +3,7 @@
 
 #include "sprite.h"
 
-#include "log/log.h"
+#include "check.h"
 #include "memory/alloc.h"
 #include "spriteset.h"
 
@@ -86,4 +86,12 @@ gltex sprite_get_texture(sprite spr) {
 
 int16 sprite_get_anim_id(sprite spr) {
     return spr->current_animation.texture_id;
+}
+
+void _sprite_free(sprite spr, bool free_src) {
+    check_return(spr, "Can't free sprite: Sprite is NULL", );
+
+    if(free_src)
+        spriteset_free(spr->src);
+    sfree(spr);
 }

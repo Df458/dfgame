@@ -21,6 +21,15 @@ hashmap hashmap_new();
 // the leading _ instead, as it also NULLs your pointer.
 void _hashmap_free(hashmap map);
 
+// Frees the hashmap and all pointers contained within it, and sets map to NULL
+// to make it harder to double-free.
+#define hashmap_free_deep(map) { _hashmap_free(map); map = NULL; }
+
+// Frees the hashmap and all pointers contained within it. NOTE: Don't call
+// this function. Use the macro without the leading _ instead, as it also NULLs
+// your pointer.
+void _hashmap_free_deep(hashmap map);
+
 // Returns the number of items stored in map.
 uint16 hashmap_size(hashmap map);
 

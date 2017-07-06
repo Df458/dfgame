@@ -25,9 +25,9 @@ quat euler_to_quat(vec3 v) {
 // Converts q to Euler angles
 vec3 quat_to_euler(quat q) {
     return (vec3) {
-        .x = atan((2 * (q.w * q.x + q.y * q.z)) / (pow(q.w, 2) - pow(q.x, 2) - pow(q.y, 2) + pow(q.z, 2))),
+        .x = atan2((2 * (q.w * q.x + q.y * q.z)), 1 - 2 * (square(q.x) + square(q.y))),
         .y = -asin(2 * (q.x * q.z - q.w * q.y)),
-        .z = atan((2 * (q.w * q.z + q.x * q.y)) / (pow(q.w, 2) + pow(q.x, 2) - pow(q.y, 2) - pow(q.z, 2)))
+        .z = atan2((2 * (q.w * q.z + q.x * q.y)), 1 - 2 * (square(q.y) + square(q.z)))
     };
 }
 
