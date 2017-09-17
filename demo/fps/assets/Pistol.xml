@@ -1,0 +1,3 @@
+<spriteset>
+    <animation autoplay="false" autoloop="false" frame_count="10"  orients="1" fps="20" file="Pistol.png"/>
+</spriteset>

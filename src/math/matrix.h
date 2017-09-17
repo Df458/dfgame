@@ -74,6 +74,18 @@ mat4 mat4_invert(mat4 m);
 // Creates a new projection matrix using the provided settings
 mat4 mat4_projection(projection_settings settings);
 
+// Creates a rotation matrix that faces from eye to target
+mat4 mat4_lookat(vec3 eye, vec3 target, vec3 up);
+
+// Converts a rotation matrix into a quaternion
+quat mat4_to_quat(mat4 m);
+
+vec3 mat4_to_euler(mat4 m);
+
+bool mat4_rotation_valid(mat4 m);
+
+float mat4_norm(mat4 m1, mat4 m2);
+
 // printf helper macros
 #define mat4_printstr "[%f %f %f %f\n %f %f %f %f\n %f %f %f %f\n %f %f %f %f]"
 #define mat4_printargs(m) m.data[0], m.data[1], m.data[2], m.data[3], m.data[4], m.data[5], m.data[6], m.data[7], m.data[8], m.data[9], m.data[10], m.data[11], m.data[12], m.data[13], m.data[14], m.data[15], m.data[16]

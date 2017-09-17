@@ -4,6 +4,7 @@
 
 #include "check.h"
 #include "font.h"
+#include "graphics_log.h"
 #include "log/log.h"
 #include "paths.h"
 #include "texture.h"
@@ -22,9 +23,9 @@ static bool font_library_init;
 
 glyph load_freetype_glyph(FT_Face face, int id, font f) {
     int index = FT_Get_Char_Index(face, id);
-    FT_Load_Glyph(face, index, FT_LOAD_DEFAULT);
+    FT_CALL(FT_Load_Glyph(face, index, FT_LOAD_DEFAULT), (glyph){0});
     if(face->glyph->format != FT_GLYPH_FORMAT_BITMAP)
-        FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+        FT_CALL(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL), (glyph){0});
 
     glyph gp = (glyph) {
         .index = id,
@@ -42,7 +43,7 @@ glyph load_freetype_glyph(FT_Face face, int id, font f) {
         .elements = 1
     };
 
-    gp.texture_index = texture_atlas_add_raw(f->atlas, tex, GL_ALPHA);
+    gp.texture_index = texture_atlas_add_raw(f->atlas, rawtex_mask_to_rgba(tex), GL_RGBA);
 
     return gp;
 }
@@ -59,19 +60,14 @@ font load_font(const char* path, uint16 height) {
 
 font load_freetype_font(const char* path, uint16 height) {
     FT_Face face;
-    int error;
 
     if(!font_library_init) {
-        error = FT_Init_FreeType(&font_library);
-        check_return(!error, "Can't init FreeType: Freetype error 0x%x", NULL, error);
+        FT_CALL(FT_Init_FreeType(&font_library), NULL);
         font_library_init = true;
     }
 
-    error = FT_New_Face(font_library, path, 0, &face);
-    check_return(!error, "Can't load font: Freetype error 0x%x", NULL, error);
-
-    error = FT_Set_Pixel_Sizes(face, 0, height);
-    check_return(!error, "Can't set face size: Freetype error 0x%x", NULL, error);
+    FT_CALL(FT_New_Face(font_library, path, 0, &face), NULL);
+    FT_CALL(FT_Set_Pixel_Sizes(face, 0, height), NULL);
 
     font f = font_new(height);
 

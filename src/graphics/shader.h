@@ -19,11 +19,11 @@ typedef struct shader {
 
 // Compiles a new shader program with the specified vertex and fragment shaders
 #define shader_new_simple(vs, fs) shader_new_vf(vs, fs);
-shader shader_new_vf(const char* const* vs, const char* const* fs);
+shader shader_new_vf(const char** vs, const char** fs);
 
 // Compiles a new shader program with the specified vertex, geometry, and fragment shaders
 #define shader_new(vs, gs, fs) shader_new_vgf(vs, gs, fs);
-shader shader_new_vgf(const char* const* vs, const char* const* gs, const char* const* fs);
+shader shader_new_vgf(const char** vs, const char** gs, const char** fs);
 
 #define shader_free(s) { _shader_free(s); s.id = 0; }
 void _shader_free(shader s);

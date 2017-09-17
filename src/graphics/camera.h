@@ -24,6 +24,11 @@ mat4 camera_get_view(camera c);
 // Calculates and returns the multiplied view/projection matrices of c
 mat4 camera_get_vp(camera c);
 
+#define camera_get_position(c) transform_get_position(camera_get_transform(c))
+#define camera_get_orientation(c) transform_get_orientation(camera_get_transform(c))
+#define camera_get_orientation_euler(c) transform_get_orientation_euler(camera_get_transform(c))
+#define camera_get_orientation_2d(c) transform_get_orientation_2d(camera_get_transform(c))
+
 // Frees the camera
 #define camera_free(c) { _camera_free(c); c = NULL; }
 void _camera_free(camera c);

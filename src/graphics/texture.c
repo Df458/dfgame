@@ -3,6 +3,7 @@
 
 #include "texture.h"
 
+#include "check.h"
 #include "memory/alloc.h"
 
 gltex gltex_new(GLenum type, uint16 w, uint16 h) {
@@ -30,4 +31,24 @@ rawtex rawtex_new(uint16 w, uint16 h, uint8 elements) {
         .elements = elements,
         .data = scalloc(w * h * elements, sizeof(float))
     };
+}
+
+rawtex rawtex_mask_to_rgba(rawtex tex) {
+    check_return(tex.elements == 1, "Trying to convert multi-channel texture as if it had 1", tex);
+    check_return(tex.width > 0 && tex.height > 0 && tex.data, "Trying to convert an invalid texture", tex);
+
+    rawtex tex2 = tex;
+
+    tex2.elements = 4;
+    tex2.data = scalloc(tex.width * tex.height * tex.elements, sizeof(float));
+    for(int i = 0; i < tex.height; ++i) {
+        for(int j = 0; j < tex.width; ++j) {
+            tex2.data[(i * tex.width + j) * 4]     = 255;
+            tex2.data[(i * tex.width + j) * 4 + 1] = 255;
+            tex2.data[(i * tex.width + j) * 4 + 2] = 255;
+            tex2.data[(i * tex.width + j) * 4 + 3] = tex.data[i * tex.width + j];
+        }
+    }
+
+    return tex2;
 }

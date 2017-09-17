@@ -49,6 +49,10 @@ uint16 uarray_size(uarray array);
     sarray: sarray_copyadd,\
     uarray: uarray_copyadd\
 )(array, data, size)
+#define array_copyadd_simple(array, data, type) _Generic(array,\
+    sarray: sarray_copyadd,\
+    uarray: uarray_copyadd\
+)(array, &data, sizeof(type))
 void sarray_copyadd(sarray array, void* data, uint32 size);
 void uarray_copyadd(uarray array, void* data, uint32 size);
 

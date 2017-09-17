@@ -19,5 +19,6 @@ typedef struct rawtex {
 
 gltex gltex_new(GLenum type, uint16 w, uint16 h);
 rawtex rawtex_new(uint16 w, uint16 h, uint8 elements);
+rawtex rawtex_mask_to_rgba(rawtex tex);
 
 #endif

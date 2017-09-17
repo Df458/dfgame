@@ -9,9 +9,6 @@
 #include "vector.h"
 
 // Interpolates linearly between start(0) and end(1)
-int int_lerp(int start, int end, float position) {
-    return start + (end - start) * clamp(position, 0, 1);
-}
 float float_lerp(float start, float end, float position) {
     return start + (end - start) * clamp(position, 0, 1);
 }

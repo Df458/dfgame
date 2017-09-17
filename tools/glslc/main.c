@@ -28,6 +28,10 @@ static const char* warning_comment =
 " * Please refrain from modifying or committing this file to source control.\n"
 "*/\n";
 
+ssize_t read_line(char** ptr, size_t* len, FILE* f) {
+    return getline(ptr, len, f);
+}
+
 void print_info() {
     printf("Usage: glslc [OPTIONS] input\n\n");
     printf("Options:\n");
@@ -120,7 +124,7 @@ void parse_definitions(const char* filename, char** vs, char** fs, char** gs, ch
     while(true) {
         char* line = NULL;
         size_t len = 0;
-        ssize_t read = getline(&line, &len, infile);
+        ssize_t read = read_line(&line, &len, infile);
 
         if(read == -1 || read < 4) {
             free(line);

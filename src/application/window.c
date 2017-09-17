@@ -3,6 +3,7 @@
 
 #include "window.h"
 
+#include "camera.h"
 #include "check.h"
 #include "input.h"
 #include "log/log.h"
@@ -43,6 +44,10 @@ GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
         glBindVertexArray(VAO);
     }
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+
     glfw_init_called = true;
 
     return win;
@@ -59,4 +64,21 @@ void _window_free_final(GLFWwindow* win) {
     window_free(win);
     glfwTerminate();
     glfw_init_called = false;
+}
+
+camera window_create_2d_camera(GLFWwindow* win) {
+    int w, h;
+    glfwGetWindowSize(win, &w, &h);
+
+    projection_settings settings = (projection_settings) {
+        .dims = {
+            .x = w,
+            .y = h,
+            .z = -1,
+            .w = 100
+        },
+        .is_ortho = true
+    };
+
+    return camera_new(settings);
 }

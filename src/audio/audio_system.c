@@ -29,3 +29,10 @@ void audio_update_listener(vec3 position, vec3 forward, vec3 up, vec3 velocity) 
     alListenerfv(AL_ORIENTATION, (float*)orient);
     alListenerfv(AL_VELOCITY, velocity.data);
 }
+
+void audio_cleanup() {
+    if(al_context)
+        alcDestroyContext(al_context);
+    if(al_device)
+        alcCloseDevice(al_device);
+}

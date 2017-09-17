@@ -155,4 +155,10 @@ vec4 vec4_rotate(vec4 v, quat q);
 #define vec3_decomp(v) v.x, v.y, v.z
 #define vec4_decomp(v) v.x, v.y, v.z, v.w
 
+#define vec2_forward (vec2){.x=1, .y=0}
+#define vec2_up (vec2){.x=1, .y=0}
+#define vec3_forward (vec3){.x=0, .y=0, .z=1}
+#define vec3_right (vec3){.x=1, .y=0, .z=0}
+#define vec3_up (vec3){.x=0, .y=1, .z=0}
+
 #endif

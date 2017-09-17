@@ -1,6 +1,20 @@
 // Log category, used to filter logs
 #define LOG_CATEGORY "Graphics"
 
+#include <freetype2/ft2build.h>
+#include FT_FREETYPE_H
+#undef FTERRORS_H_
+#define FT_ERRORDEF( e, v, s )  { e, s },
+#define FT_ERROR_START_LIST     {
+#define FT_ERROR_END_LIST       { 0, NULL } };
+
+const struct
+{
+    int          err_code;
+    const char*  err_msg;
+} ft_errors[] =
+#include FT_ERRORS_H
+
 #include "graphics_log.h"
 
 #include "log/log.h"
@@ -44,4 +58,8 @@ void graphics_log(GLenum src, GLenum type, GLuint id, GLenum level, GLsizei len,
         default:
             warn("OpenGL error (%s) %s", source, message);
     }
+}
+
+void _LogFTError(const char* file, unsigned line, const char* category, int err) {
+    _log(file, line, category, LOG_ERROR, "FreeType error: %s", ft_errors[err].err_msg);
 }

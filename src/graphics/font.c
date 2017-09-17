@@ -55,3 +55,10 @@ gltex font_get_texture(font f) {
 float font_get_height(font f) {
     return f->height;
 }
+
+void _font_free(font f) {
+    FT_Done_Face(f->font_face);
+    uarray_free_deep(f->glyphs);
+    texture_atlas_free(f->atlas);
+    sfree(f);
+}

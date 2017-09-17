@@ -5,9 +5,11 @@
 
 // Allocates memory with malloc, with error logging.
 #define salloc(size) _salloc(__FILE__, __LINE__, size)
+#define msalloc(size) _salloc(__FILE__, __LINE__, sizeof(size))
 
 // Allocates memory with calloc, with error logging.
 #define scalloc(nmemb, size) _scalloc(__FILE__, __LINE__, nmemb, size)
+#define mscalloc(nmemb, size) _scalloc(__FILE__, __LINE__, nmemb, sizeof(size))
 
 // Reallocates memory with realloc, with error logging.
 #define resalloc(ptr, size) _resalloc(__FILE__, __LINE__, ptr, size)

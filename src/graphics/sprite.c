@@ -4,7 +4,9 @@
 #include "sprite.h"
 
 #include "check.h"
+#include "mesh.h"
 #include "memory/alloc.h"
+#include "shader.h"
 #include "spriteset.h"
 
 typedef struct sprite {
@@ -43,6 +45,10 @@ void sprite_set_orientation(sprite spr, uint8 orient) {
 
 void sprite_set_playing(sprite spr, bool playing) {
     spr->is_playing = playing;
+}
+
+bool sprite_get_playing(sprite spr) {
+    return spr->is_playing;
 }
 
 void sprite_set_position(sprite spr, float position) {
@@ -86,6 +92,24 @@ gltex sprite_get_texture(sprite spr) {
 
 int16 sprite_get_anim_id(sprite spr) {
     return spr->current_animation.texture_id;
+}
+
+void sprite_draw(sprite spr, shader s, mat4 model, mat4 view) {
+    aabb_2d box = sprite_get_box(spr);
+    glUseProgram(s.id);
+    shader_bind_uniform_name(s, "u_transform", mat4_mul(view, mat4_mul(model, mat4_scale(mat4_ident, box.dimensions))));
+    shader_bind_uniform_texture_name(s, "u_texture", sprite_get_texture(spr), GL_TEXTURE0);
+    box.vec = vec4_mul(box.vec, 1.0f / sprite_get_texture(spr).width);
+    shader_bind_uniform_name(s, "uv_offset", box.position);
+    shader_bind_uniform_name(s, "uv_scale", box.dimensions);
+    mesh_render(s, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
+
+    aabb_2d clear = (aabb_2d){
+        .position = (vec2){0},
+        .dimensions = (vec2){.x = 1, .y = 1}
+    };
+    shader_bind_uniform_name(s, "uv_offset", clear.position);
+    shader_bind_uniform_name(s, "uv_scale", clear.dimensions);
 }
 
 void _sprite_free(sprite spr, bool free_src) {

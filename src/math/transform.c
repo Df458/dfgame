@@ -68,7 +68,7 @@ void transform_rotate_2d(transform t, float theta, bool relative) {
 }
 void transform_rotate_3d(transform t, vec3 v, bool relative) {
     if(relative)
-        t->orientation = quat_mul(quat_normalize(euler_to_quat(v)), t->orientation);
+        t->orientation = quat_normalize(quat_mul(quat_normalize(euler_to_quat(v)), t->orientation));
     else
         t->orientation = quat_normalize(euler_to_quat(v));
 
@@ -81,6 +81,18 @@ void transform_rotate_3d_quat(transform t, quat q, bool relative) {
         t->orientation = quat_normalize(q);
 
     recalculate_matrix(t);
+}
+
+// Sets the orientation of t to face target
+void transform_lookat(transform t, vec3 target, vec3 up) {
+    /* t->orientation = quat_normalize(mat4_to_quat(mat4_lookat(t->position, target, up))); */
+    transform_rotate_3d(t, mat4_to_euler(mat4_lookat(t->position, target, up)), false);
+    /* info("w\n" mat4_printstr quat_printstr, mat4_printargs(mat4_lookat(t->position, target, up)), quat_printargs(t->orientation)); */
+    /* recalculate_matrix(t); */
+    /* t->matrix = mat4_translate(, vec3_mul(t->position, -1)); */
+    /* mat4 s = mat4_scale(mat4_ident, t->scale); */
+    /* t->matrix = mat4_mul(mat4_translate(mat4_ident, t->position), mat4_mul(mat4_lookat(t->position, target, up), s)); */
+    /* info(mat4_printstr, mat4_printargs(t->matrix)); */
 }
 
 // Gets the orientation of the transform

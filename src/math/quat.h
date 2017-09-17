@@ -26,8 +26,14 @@ quat euler_to_quat(vec3 v);
 // Converts q to Euler angles
 vec3 quat_to_euler(quat q);
 
+#define quat_mul(q, v) _Generic(v,\
+    double: quat_mul_float,\
+    float: quat_mul_float,\
+    quat: quat_mul_quat\
+)(q, v)
 // Multiplies q1 by q2
-quat quat_mul(quat q1, quat q2);
+quat quat_mul_float(quat q1, float f);
+quat quat_mul_quat(quat q1, quat q2);
 
 // Normalizes a quaternion
 quat quat_normalize(quat q);

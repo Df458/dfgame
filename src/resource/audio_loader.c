@@ -28,6 +28,11 @@ audio_source load_audio_source(const char* path, bool preload) {
 #define WAV_HEADER_SIZE 44
 
 void stream_wav_audio(byte** data, uint32 position, uint32 requested_length, uint32* final_length, void* user) {
+    if(!data) { // Null data indicates a close request
+        fclose(user);
+        return;
+    }
+
     FILE* infile = (FILE*)user;
     check_return(!fseek(infile, WAV_HEADER_SIZE + position, SEEK_SET), "Failed to seek wav stream: %s", , error_str());
     *data = scalloc(requested_length, sizeof(byte));
@@ -107,6 +112,11 @@ audio_source load_wav_audio(const char* path, bool preload) {
 }
 
 void stream_ogg_audio(byte** data, uint32 position, uint32 requested_length, uint32* final_length, void* user) {
+    if(!data) { // Null data indicates a close request
+        ov_clear(user);
+        return;
+    }
+
     uint32 size = 0;
     int section;
     int result;

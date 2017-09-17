@@ -9,12 +9,20 @@ m = compiler.find_library('m', required : false)
 freetype = dependency('freetype2')
 glfw = dependency('glfw3')
 glew = dependency('glew')
-jpeg = dependency('libjpeg')
+if get_option('enable_jpeg') == true
+    jpeg = dependency('libjpeg')
+endif
 openal = dependency('openal')
 ogg = dependency('ogg')
-png = dependency('libpng')
-tiff = dependency('libtiff-4')
-tga = compiler.find_library('libtga')
+if get_option('enable_png') == true
+    png = dependency('libpng')
+endif
+if get_option('enable_tiff') == true
+    tiff = dependency('libtiff-4')
+endif
+if get_option('enable_tga') == true
+    tga = compiler.find_library('tga')
+endif
 vorbis = dependency('vorbisfile')
 xml = dependency('libxml-2.0')
 
@@ -34,6 +42,10 @@ subdir('src/resource')
 
 subdir('demo/basic')
 subdir('demo/logo')
+subdir('demo/comets')
+subdir('demo/heightmap')
+subdir('demo/fps')
+subdir('demo/planets')
 
 run_command('ctags', '-R', '.')
 

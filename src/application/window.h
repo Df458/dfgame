@@ -1,6 +1,7 @@
 #ifndef DF_APPLICATION_WINDOW
 #define DF_APPLICATION_WINDOW
 
+#include "camera.hd"
 #include "types.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -20,5 +21,7 @@ GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title);
 // the leading _ instead, as they also NULL your pointer.
 void _window_free(GLFWwindow* win);
 void _window_free_final(GLFWwindow* win);
+
+camera window_create_2d_camera(GLFWwindow* win);
 
 #endif

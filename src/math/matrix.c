@@ -230,3 +230,84 @@ mat4 mat4_projection(projection_settings settings) {
 
     return m;
 }
+
+// Creates a rotation matrix that faces from eye to target
+mat4 mat4_lookat(vec3 eye, vec3 target, vec3 up) {
+    vec3 f = vec3_sub(eye, target);
+    if(eq0(vec3_len_squared(f)))
+        return mat4_ident;
+
+    f = vec3_normalize(f);
+
+    vec3 s = vec3_cross(f, vec3_normalize(up));
+    vec3 u = vec3_cross(vec3_normalize(s), f);
+
+    return (mat4) { .data = {
+         s.x,  s.y,  s.z, 0,
+         u.x,  u.y,  u.z, 0,
+        -f.x, -f.y, -f.z, 0,
+         0,    0,    0,   1
+    }};
+}
+
+// Converts a rotation matrix into a quaternion
+quat mat4_to_quat(mat4 m) {
+    float t = 1;
+    quat q = quat_ident;
+    if(m.data[10] < 0) {
+        if(m.data[0] > m.data[5]) {
+            t = 1 + m.data[0] - m.data[5] - m.data[10];
+            q = (quat){ .x=t, .y=m.data[4]+m.data[1], .z=m.data[2]+m.data[8], .w=m.data[9]-m.data[6]};
+            info("x");
+        } else {
+            t = 1 - m.data[0] + m.data[5] - m.data[10];
+            q = (quat){ .x=m.data[4]+m.data[1], .y=t, .z=m.data[9]+m.data[6], .w=m.data[2]-m.data[8]};
+            info("y");
+        }
+    } else {
+        if(m.data[0] < -m.data[5]) {
+            t = 1 - m.data[0] - m.data[5] + m.data[10];
+            q = (quat){ .x=m.data[2]+m.data[8], .y=m.data[9]+m.data[6], .z=t, .w=m.data[4]-m.data[1]};
+            info("z");
+        } else {
+            t = 1 + m.data[0] + m.data[5] + m.data[10];
+            q = (quat){
+                .x=m.data[9]-m.data[6],
+                .y=m.data[2]-m.data[8],
+                .z=m.data[4]-m.data[1],
+                .w=t};
+            info("w");
+        }
+    }
+    return quat_mul(q, 0.5f / sqrt(t));
+}
+
+vec3 mat4_to_euler(mat4 m) {
+    float sy = sqrt(square(m.data[0]) + square(m.data[1]));
+
+    bool singular = sy < 1e-6;
+
+    float x, y, z;
+    if (!singular)
+    {
+        x = atan2(m.data[6], m.data[7]);
+        y = atan2(-m.data[8], sy);
+        z = atan2(m.data[1], m.data[0]);
+    }
+    else
+    {
+        x = atan2(-m.data[6], m.data[5]);
+        y = atan2(-m.data[8], sy);
+        z = 0;
+    }
+    return (vec3){.data={x,y,z}};
+}
+
+/* bool mat4_rotation_valid(mat4 m) { */
+/*     mat4 mt = mat4_transpose(m); */
+/*     mat4 ident = mat4_mul(mt, m); */
+/*     #<{(| float val = mat4_norm(ident, mat4_ident); |)}># */
+/*     float val = fabs((1-ident.data[0]) + ident.data[1] + ident.data[2] + ident.data[4] + (1-ident.data[5]) + ident.data[6] + ident.data[8] + ident.data[9] + (1-ident.data[10])); */
+/*     info("[[]]%f\n" mat4_printstr, val, mat4_printargs(ident)); */
+/*     return val < 0.000001; */
+/* } */

@@ -1,0 +1,3 @@
+<spriteset>
+    <animation autoplay="false" autoloop="false" frame_count="3"  orients="1" fps="8" file="Barrel.png"/>
+</spriteset>

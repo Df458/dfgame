@@ -14,4 +14,7 @@ byte* audio_source_get_next(audio_source src, uint32 pos, uint32* length);
 bool audio_source_get_next_buffer(audio_source src, ALuint buffer, uint32 pos, uint32* length);
 uint32 audio_source_get_length(audio_source src);
 
+void _audio_source_free(audio_source src);
+#define audio_source_free(p) { _audio_source_free(p); p = NULL; }
+
 #endif

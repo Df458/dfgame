@@ -15,7 +15,7 @@
 
 
 // Compiles a new shader program with the specified vertex and fragment shaders
-shader shader_new_vf(const char* const* vs, const char* const* fs) {
+shader shader_new_vf(const char** vs, const char** fs) {
     shader s;
 
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -50,7 +50,7 @@ shader shader_new_vf(const char* const* vs, const char* const* fs) {
 }
 
 // Compiles a new shader program with the specified vertex, geometry, and fragment shaders
-shader shader_new_vgf(const char* const* vs, const char* const* gs, const char* const* fs) {
+shader shader_new_vgf(const char** vs, const char** gs, const char** fs) {
     shader s;
 
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);

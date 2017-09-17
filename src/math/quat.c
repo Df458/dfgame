@@ -33,7 +33,7 @@ vec3 quat_to_euler(quat q) {
 
 // Multiplies q1 by q2
 // NOTE: Copied from [http://www.gamasutra.com/view/feature/131686/rotating_objects_using_quaternions.php]
-quat quat_mul(quat q1, quat q2) {
+quat quat_mul_quat(quat q1, quat q2) {
     float A, B, C, D, E, F, G, H;
     A = (q1.w + q1.x)*(q2.w + q2.x);
     B = (q1.z - q1.y)*(q2.y - q2.z);
@@ -45,9 +45,17 @@ quat quat_mul(quat q1, quat q2) {
     H = (q1.w - q1.y)*(q2.w + q2.z);
     return (quat) {
         .w = B + (-E - F + G + H)/2,
-            .x = A - (E + F + G + H)/2,
-            .y = C + (E - F + G - H)/2,
-            .z = D + (E - F - G + H)/2
+        .x = A - ( E + F + G + H)/2,
+        .y = C + ( E - F + G - H)/2,
+        .z = D + ( E - F - G + H)/2
+    };
+}
+quat quat_mul_float(quat q1, float f) {
+    return (quat) {
+        .w = q1.w * f,
+        .x = q1.x * f,
+        .y = q1.y * f,
+        .z = q1.z * f
     };
 }
 

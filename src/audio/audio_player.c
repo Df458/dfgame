@@ -126,3 +126,12 @@ void audio_player_update(audio_player player, float dt) {
             AL_CALL(alSourcePlay(player->al_source), );
     }
 }
+
+void _audio_player_free(audio_player player, bool deep) {
+    AL_CALL(alDeleteSources(1, &player->al_source), );
+
+    if(deep)
+        audio_source_free(player->src);
+
+    sfree(player);
+}

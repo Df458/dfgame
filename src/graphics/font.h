@@ -19,4 +19,7 @@ aabb_2d font_get_glyph_bounds(font f, int16 id);
 gltex font_get_texture(font f);
 float font_get_height(font f);
 
+#define font_free(f) { _font_free(f); f = NULL; }
+void _font_free(font f);
+
 #endif

@@ -113,7 +113,12 @@ vec3 vec3_rotate(vec3 v, quat q) {
     vec3 u = (vec3) { .x = q.x, .y = q.y, .z = q.z };
     float s = q.w;
 
-    return vec3_add(vec3_add(vec3_mul(u, 2.0f * vec3_dot(u, v)), vec3_mul(v, square(s) - vec3_dot(u, u))), vec3_mul(vec3_cross(u, v), 2 * s));
+    return vec3_add(
+            vec3_add(
+                vec3_mul(u, 2.0f * vec3_dot(u, v)),
+                vec3_mul(v, square(s) - vec3_dot(u, u))
+            ), vec3_mul(vec3_cross(u, v), 2 * s)
+        );
 }
 vec4 vec4_rotate(vec4 v, quat q) {
     return (vec4) { .xyz=vec3_rotate(v.xyz, q) };

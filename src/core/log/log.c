@@ -67,6 +67,8 @@ void _log(const char* file, uint32 line, const char* category, log_level level, 
     vsnprintf(final_message, length, format, args);
 	va_end(args);
 
+    free(format);
+
     fprintf(current_file, final_message);
 
     call_event(current_handler, file, line, level, final_message);
@@ -115,6 +117,8 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
 	va_copy(tempargs, args);
     vsnprintf(final_message, length, format, args);
 	va_end(tempargs);
+
+    free(format);
 
     fprintf(current_file, final_message);
 
