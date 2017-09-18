@@ -91,7 +91,7 @@ int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
     };
     aabb_2d container = texture_atlas_insert_box(atlas, box);
 
-    if(!container.dimensions.x)
+    if(container.dimensions.x == 0)
         return -1;
 
     glBindTexture(GL_TEXTURE_2D, atlas->texture_data.handle);

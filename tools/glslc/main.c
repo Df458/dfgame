@@ -29,7 +29,22 @@ static const char* warning_comment =
 "*/\n";
 
 ssize_t read_line(char** ptr, size_t* len, FILE* f) {
-    return getline(ptr, len, f);
+    ssize_t read = 0;
+    do {
+        if(*len <= read || *ptr == 0) {
+            *len = (*len == 0 || *ptr == 0) ? 8 : *len * 2;
+            *ptr = realloc(*ptr, *len);
+        }
+
+        char c = fgetc(f);
+        (*ptr)[read] = c;
+        read++;
+
+        if(c == '\0' || c == '\n')
+            break;
+    } while(!feof(f));
+
+    return read;
 }
 
 void print_info() {

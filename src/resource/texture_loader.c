@@ -6,13 +6,22 @@
 #include "check.h"
 #include "memory/alloc.h"
 #include "paths.h"
+#ifdef enable_png
 #include <png.h>
+#endif
+#ifdef enable_jpeg
 #include <jpeglib.h>
+#endif
+#ifdef enable_tiff
 #include <tiffio.h>
+#endif
+#ifdef enable_tga
 #include <tga.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 
+#ifdef enable_jpeg
 typedef struct jpeg_error {
     struct jpeg_error_mgr pub;
     jmp_buf setjmp_buffer;
@@ -25,6 +34,7 @@ void handle_jpeg_error(j_common_ptr ptr) {
 
     longjmp(err->setjmp_buffer, 1);
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -58,20 +68,29 @@ rawtex load_texture_raw(const char* path) {
     rawtex tex = (rawtex){0};
 
     const char* ext = get_extension(path);
+#ifdef enable_png
     if(!strcmp(ext, "png"))
         return load_png_raw(path);
-    else if(!strcmp(ext, "jpg") || !strcmp(ext, "jpeg"))
+#endif
+#ifdef enable_jpeg
+    if(!strcmp(ext, "jpg") || !strcmp(ext, "jpeg"))
         return load_jpeg_raw(path);
-    else if(!strcmp(ext, "tga"))
+#endif
+#ifdef enable_tga
+    if(!strcmp(ext, "tga"))
         return load_tga_raw(path);
-    else if(!strcmp(ext, "tif") || !strcmp(ext, "tiff"))
+#endif
+#ifdef enable_tiff
+    if(!strcmp(ext, "tif") || !strcmp(ext, "tiff"))
         return load_tiff_raw(path);
+#endif
 
     error("Failed to load texture: File extension %s not recognized", ext);
 
     return tex;
 }
 
+#ifdef enable_png
 rawtex load_png_raw(const char* path) {
     rawtex tex = (rawtex){0};
     FILE* infile = fopen(path, "rb");
@@ -133,7 +152,9 @@ rawtex load_png_raw(const char* path) {
 
     return tex;
 }
+#endif
 
+#ifdef enable_jpeg
 rawtex load_jpeg_raw(const char* path) {
     struct jpeg_decompress_struct decompresser;
     rawtex tex = (rawtex){0};
@@ -183,8 +204,9 @@ rawtex load_jpeg_raw(const char* path) {
 
     return tex;
 }
+#endif
 
-// TODO: Add support for all TGA features
+#ifdef enable_tga
 rawtex load_tga_raw(const char* path) {
     // In order to satisfy libtga's irrational desire for a non-const char
     // array, we copy the path to a temporary buffer.
@@ -255,7 +277,9 @@ rawtex load_tga_raw(const char* path) {
 
     return tex;
 }
+#endif
 
+#ifdef enable_tiff
 rawtex load_tiff_raw(const char* path) {
     rawtex tex;
     tex.data = NULL;
@@ -291,3 +315,4 @@ rawtex load_tiff_raw(const char* path) {
     TIFFClose(infile);
     return tex;
 }
+#endif

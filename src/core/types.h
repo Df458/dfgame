@@ -4,6 +4,10 @@
 #include "memory/alloc.h"
 #include <inttypes.h>
 #include <stdbool.h>
+#ifdef WIN32
+#define NOMINMAX
+#include "windows.h"
+#endif
 
 #define INVALID_INDEX -1
 
@@ -18,7 +22,9 @@
 typedef uint8_t uint8;
 typedef uint8_t ubyte;
 typedef int8_t  int8;
+#ifndef WIN32
 typedef int8_t  byte;
+#endif
 
 typedef uint16_t uint16;
 typedef int16_t  int16;

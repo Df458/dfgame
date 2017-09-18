@@ -153,7 +153,7 @@ iter_result update_barrel(void* bar, void* user) {
 void shoot(action_id id, void* user) {
     if(!sprite_get_playing(pistol_sprite)) {
         sprite_set_playing(pistol_sprite, true);
-        audio_player_set_playing(pistol_sfx, true);
+        /* audio_player_set_playing(pistol_sfx, true); */
 
         quat q = camera_get_orientation(c_main);
         q.w *= -1;
@@ -170,8 +170,8 @@ bool loop(mainloop l, float dt) {
 
     quat q = camera_get_orientation(c_main);
     q.w *= -1;
-    vec3 forward = vec3_mul(vec3_rotate(vec3_forward, q), get_axis_value(a_forward));
-    vec3 right = vec3_mul(vec3_rotate(vec3_right, q), get_axis_value(a_side));
+    vec3 forward = vec3_mul(vec3_rotate(vec3_forward, q), get_axis_value(a_forward) * dt * 60);
+    vec3 right = vec3_mul(vec3_rotate(vec3_right, q), get_axis_value(a_side) * dt * 60);
 
     vec3 cpos = camera_get_position(c_main);
     vec3 pos = vec3_add(forward, right);
@@ -378,7 +378,7 @@ int main() {
     s_default = shader_basic_tex_get();
     c_main = camera_new(camera_settings_main);
     transform_translate(camera_get_transform(c_main), (vec3){.y=10}, true);
-    c_ui = window_create_2d_camera(c_ui);
+    c_ui = window_create_2d_camera(win);
 
     srand(time(NULL));
 

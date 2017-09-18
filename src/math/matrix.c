@@ -216,15 +216,13 @@ mat4 mat4_projection(projection_settings settings) {
     {
         float ratio = settings.dims.x / settings.dims.y;
         float tfov  = 1.0f / tan(degtorad(settings.fov * 0.5f));
-        float near  = settings.dims.z;
-        float far   = settings.dims.w;
-        float zdiff = 1.0f/ (near - far);
+        float zdiff = 1.0f/ (settings.dims.z - settings.dims.w);
 
         m.data[0]  = tfov / ratio;
         m.data[5]  = tfov;
-        m.data[10] = (near + far) * zdiff;
+        m.data[10] = (settings.dims.z + settings.dims.w) * zdiff;
         m.data[11] = -1;
-        m.data[14] = 2.0f * far * near * zdiff;
+        m.data[14] = 2.0f * settings.dims.w * settings.dims.z * zdiff;
         m.data[15] = 0;
     }
 

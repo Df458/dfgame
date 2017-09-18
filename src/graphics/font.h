@@ -6,7 +6,7 @@
 #include "texture.h"
 
 typedef struct glyph {
-    int index;
+    int16 index;
     int16 texture_index;
     vec2 bearing;
     float advance;

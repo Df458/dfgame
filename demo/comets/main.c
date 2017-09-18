@@ -12,6 +12,7 @@
 #include "font_loader.h"
 #include "input.h"
 #include "interpolate.h"
+#include "log/log.h"
 #include "mainloop.h"
 #include "mesh.h"
 #include "paths.h"
@@ -169,10 +170,12 @@ void update_player(float dt) {
     if(player_life <= 0)
         return;
 
-    transform_rotate(t_player, degtorad(get_axis_value(a_rotate)), true);
+    float fdt = dt * 60;
+
+    transform_rotate(t_player, degtorad(get_axis_value(a_rotate)) * fdt, true);
 
     float orient = transform_get_orientation_2d(t_player);
-    player_velocity = vec_add(vec_mul(player_velocity, 0.99), vec_mul(vec2_rotate(vec2_forward, -orient), get_axis_value(a_accel)));
+    player_velocity = vec_add(vec_mul(player_velocity, 0.99), vec_mul(vec2_rotate(vec2_forward, -orient), get_axis_value(a_accel) * fdt));
 
     vec2 pos = wrap_position(vec_add(transform_get_position(t_player).xy, vec_mul(player_velocity, dt)));
     transform_translate(t_player, pos, false);
@@ -254,7 +257,7 @@ iter_result update_rock(void* roc, void* user) {
 
     vec2 pos = wrap_position(vec_add(transform_get_position(r->trans).xy, vec_mul(r->velocity, *(float*)user)));
     transform_translate(r->trans, pos, false);
-    transform_rotate(r->trans, r->avel, true);
+    transform_rotate(r->trans, r->avel * (*(float*)user * 60), true);
 
     array_foreach(bullets, bullet_check_collision, r);
 
@@ -281,6 +284,8 @@ void update_rocks(float dt) {
 
 bool loop(mainloop l, float dt) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    info("%f", dt);
 
     update_player(dt);
     update_bullets(dt);

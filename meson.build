@@ -40,12 +40,10 @@ subdir('src/application')
 subdir('src/audio')
 subdir('src/resource')
 
-subdir('demo/basic')
 subdir('demo/logo')
 subdir('demo/comets')
 subdir('demo/heightmap')
 subdir('demo/fps')
-subdir('demo/planets')
 
 run_command('ctags', '-R', '.')
 

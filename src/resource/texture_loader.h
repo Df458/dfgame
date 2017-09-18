@@ -4,9 +4,21 @@
 
 gltex  load_texture_gl(const char* path);
 rawtex load_texture_raw(const char* path);
+
+#ifdef enable_png
 rawtex load_png_raw(const char* path);
+#endif
+
+#ifdef enable_jpeg
 rawtex load_jpeg_raw(const char* path);
+#endif
+
+#ifdef enable_tga
 rawtex load_tga_raw(const char* path);
+#endif
+
+#ifdef enable_tiff
 rawtex load_tiff_raw(const char* path);
+#endif
 
 #endif

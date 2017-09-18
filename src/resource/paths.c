@@ -6,13 +6,28 @@
 #include "memory/alloc.h"
 #include <stdlib.h>
 #include <string.h>
+#ifdef WIN32
+#include "windows.h"
+#elif __GNUC__
 #include <unistd.h>
+#endif
 
 static char* resource_path = NULL;
+
+#ifdef WIN32
+#define DELIM '\\'
+#else
+#define DELIM '/'
+#endif
 
 // TODO: This code is OS-specific. Adding new build targets will require this
 // to be updated
 void get_exe_path(char* buf, size_t bufsize) {
+#ifdef WIN32
+    GetModuleFileName(NULL, buf, bufsize);
+    char* c = strrchr(buf, '\\');
+    c[1] = 0;
+#elif __GNUC__
     ssize_t len = readlink("/proc/self/exe", buf, bufsize - 1);
     if (len != -1) {
         char* c = strrchr(buf, '/');
@@ -20,17 +35,21 @@ void get_exe_path(char* buf, size_t bufsize) {
     } else {
         error_code();
     }
+#else
+#error Unsupported platform
+#endif
 }
 
 void init_base_resource_path(const char* path) {
     if(check_warn(!resource_path, "Redefinition of resource_path from %s to %s", resource_path, path))
         sfree(resource_path);
 
+    resource_path = scalloc(RESOURCE_PATH_DEFAULT_BUFSIZE, sizeof(char));
     if(!path) {
-        resource_path = scalloc(RESOURCE_PATH_DEFAULT_BUFSIZE, sizeof(char));
         get_exe_path(resource_path, RESOURCE_PATH_DEFAULT_BUFSIZE);
-    } else
-        resource_path = strndup(path, RESOURCE_PATH_DEFAULT_BUFSIZE);
+    } else {
+        resource_path = strncpy(resource_path, path, RESOURCE_PATH_DEFAULT_BUFSIZE);
+    }
 }
 
 void resource_path_free() {
@@ -56,12 +75,12 @@ char* get_resource_path(const char* prefix, const char* suffix, uint16* len) {
     uint16 pen = 0;
     if(resource_path) {
         strncpy(data, resource_path, resource_len);
-        data[resource_len] = '/';
+        data[resource_len] = DELIM;
         pen += resource_len + 1;
     }
     if(prefix) {
         strncpy(data + pen, prefix, prefix_len);
-        data[pen + prefix_len] = '/';
+        data[pen + prefix_len] = DELIM;
         pen += prefix_len + 1;
     }
     strncpy(data + pen, suffix, suffix_len);
@@ -81,7 +100,7 @@ const char* get_extension(const char* path) {
 }
 
 char* get_folder(const char* path) {
-    const char* file_start = strrchr(path, (int)'/');
+    const char* file_start = strrchr(path, (int)DELIM);
     if(!file_start) {
         char* c = scalloc(2, sizeof(char));
         c[0] = '.';
@@ -101,8 +120,8 @@ char* combine_paths(char* a, char* b, bool free) {
     size_t last_a = strlen(a) - 1;
     size_t len_b  = strlen(b);
     char* output;
-    if(a[last_a] == '/') {
-        if(b[0] == '/') {
+    if(a[last_a] == DELIM) {
+        if(b[0] == DELIM) {
             output = scalloc(last_a + len_b + 1, sizeof(char));
             strncat(output, a, last_a);
         } else {
@@ -110,14 +129,14 @@ char* combine_paths(char* a, char* b, bool free) {
             strncat(output, a, last_a + 1);
         }
         strncat(output, b, len_b);
-    } else if(b[0] == '/') {
+    } else if(b[0] == DELIM) {
         output = scalloc(last_a + len_b + 2, sizeof(char));
         strncat(output, a, last_a + 1);
         strncat(output, b, len_b);
     } else {
         output = scalloc(last_a + len_b + 3, sizeof(char));
         strncat(output, a, last_a + 1);
-        output[last_a + 1] = '/';
+        output[last_a + 1] = DELIM;
         output[last_a + 2] = '\0';
         strncat(output, b, len_b);
     }
