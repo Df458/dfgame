@@ -25,9 +25,12 @@ static bool font_library_init;
 
 glyph load_freetype_glyph(FT_Face face, int id, font f) {
     int index = FT_Get_Char_Index(face, id);
-    FT_CALL(FT_Load_Glyph(face, index, FT_LOAD_DEFAULT), (glyph){0});
+    FT_CALL(FT_Load_Glyph(face, index, FT_LOAD_DEFAULT), (glyph){.texture_index=-1});
     if(face->glyph->format != FT_GLYPH_FORMAT_BITMAP)
-        FT_CALL(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL), (glyph){0});
+        FT_CALL(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL), (glyph){.texture_index=-1});
+
+    if(!face->glyph->bitmap.buffer)
+        return (glyph){.texture_index=-1};
 
     glyph gp = (glyph) {
         .index = id,

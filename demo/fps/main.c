@@ -427,8 +427,8 @@ int main() {
 
     camera_free(c_main);
     audio_cleanup();
-    shaders_cleanup();
     window_free_final(win);
+    shaders_cleanup();
 
     return 0;
 }

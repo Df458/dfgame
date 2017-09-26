@@ -9,4 +9,4 @@ dlogoexe  = executable('demo_logo', dlogosrc,
                        install : false)
 
 run_command('ctags', '-R', '.')
-run_command('cp', '-rf', 'assets', '../../build/demo/logo/assets')
+run_command('cp', '-rf', 'assets', '../../build/demo/logo')

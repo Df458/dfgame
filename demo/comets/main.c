@@ -372,8 +372,8 @@ int main() {
     text_free(info_text, true);
 
     camera_free(c_main);
-    shaders_cleanup();
     window_free_final(win);
+    shaders_cleanup();
 
     return 0;
 }

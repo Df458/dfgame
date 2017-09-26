@@ -9,4 +9,4 @@ dcometsexe  = executable('demo_comets', dcometssrc,
                        install : false)
 
 run_command('ctags', '-R', '.')
-run_command('cp', '-rf', 'assets', '../../build/demo/comets/assets')
+run_command('cp', '-rf', 'assets', '../../build/demo/comets')

@@ -140,7 +140,6 @@ void cleanup_resources() {
     glDeleteTextures(1, &t_heightmap.handle);
     text_free(info_text, true);
 
-    shaders_cleanup();
     resource_path_free();
 }
 
@@ -172,6 +171,7 @@ int main() {
     camera_free(c_main);
     camera_free(c_ui);
     window_free_final(win);
+    shaders_cleanup();
 
     return 0;
 }

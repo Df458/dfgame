@@ -48,9 +48,9 @@ int main() {
 
     glDeleteTextures(1, &t_logo.handle);
     camera_free(c_main);
-    shaders_cleanup();
     resource_path_free();
     window_free_final(win);
+    shaders_cleanup();
 
     return 0;
 }

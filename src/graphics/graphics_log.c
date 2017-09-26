@@ -24,39 +24,39 @@ void graphics_log(GLenum src, GLenum type, GLuint id, GLenum level, GLsizei len,
     const char* source = NULL;
     switch(src) {
         case GL_DEBUG_SOURCE_API:
-            source = "API";
+            source = "GL API";
             break;
         case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-            source = "Window";
+            source = "GL Window";
             break;
         case GL_DEBUG_SOURCE_SHADER_COMPILER:
-            source = "Shader";
+            source = "GL Shader";
             break;
         case GL_DEBUG_SOURCE_THIRD_PARTY:
-            source = "3rd Party";
+            source = "GL (3rd Party)";
             break;
         case GL_DEBUG_SOURCE_APPLICATION:
-            source = "Application";
+            source = "GL Application";
             break;
         default:
-            source = "Other";
+            source = "OpenGL";
             break;
     }
     switch(level) {
         case GL_DEBUG_SEVERITY_NOTIFICATION:
-            info("OpenGL error (%s) %s", source, message);
+            info("%s: %s", source, message);
             break;
         case GL_DEBUG_SEVERITY_LOW:
-            warn("OpenGL error (%s) %s", source, message);
+            warn("%s: %s", source, message);
             break;
         case GL_DEBUG_SEVERITY_MEDIUM:
-            error("OpenGL error (%s) %s", source, message);
+            error("%s: %s", source, message);
             break;
         case GL_DEBUG_SEVERITY_HIGH:
-            fatal("OpenGL error (%s) %s", source, message);
+            fatal("%s: %s", source, message);
             break;
         default:
-            warn("OpenGL error (%s) %s", source, message);
+            warn("%s: %s", source, message);
     }
 }
 
