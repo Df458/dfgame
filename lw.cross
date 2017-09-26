@@ -8,6 +8,6 @@ exe_wrapper = 'wine'
 
 [host_machine]
 system = 'windows'
-cpu_family = 'x86_64'
+cpu_family = 'x86'
 cpu = 'i686'
 endian = 'little'

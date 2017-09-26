@@ -175,7 +175,8 @@ void update_player(float dt) {
     transform_rotate(t_player, degtorad(get_axis_value(a_rotate)) * fdt, true);
 
     float orient = transform_get_orientation_2d(t_player);
-    player_velocity = vec_add(vec_mul(player_velocity, 0.99), vec_mul(vec2_rotate(vec2_forward, -orient), get_axis_value(a_accel) * fdt));
+    vec2 friction = vec2_len_squared(player_velocity) == 0 ? (vec2){0} : vec_mul(vec_normalize(player_velocity), 0.04);
+    player_velocity = vec_add(vec_sub(player_velocity, friction), vec_mul(vec2_rotate(vec2_forward, -orient), get_axis_value(a_accel) * fdt));
 
     vec2 pos = wrap_position(vec_add(transform_get_position(t_player).xy, vec_mul(player_velocity, dt)));
     transform_translate(t_player, pos, false);
@@ -284,8 +285,6 @@ void update_rocks(float dt) {
 
 bool loop(mainloop l, float dt) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    info("%f", dt);
 
     update_player(dt);
     update_bullets(dt);

@@ -153,7 +153,7 @@ iter_result update_barrel(void* bar, void* user) {
 void shoot(action_id id, void* user) {
     if(!sprite_get_playing(pistol_sprite)) {
         sprite_set_playing(pistol_sprite, true);
-        /* audio_player_set_playing(pistol_sfx, true); */
+        audio_player_set_playing(pistol_sfx, true);
 
         quat q = camera_get_orientation(c_main);
         q.w *= -1;
@@ -421,7 +421,6 @@ int main() {
     text_free(info_text, true);
 
     sprite_free(pistol_sprite, true);
-    /* sprite_free(a_barrel.spr, true); */
     audio_player_free(pistol_sfx, true);
 
     mesh_free(m_floor);

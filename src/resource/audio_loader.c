@@ -10,6 +10,7 @@
 #include "paths.h"
 #include "power.h"
 #include <AL/al.h>
+#include <stdio.h>
 #include <string.h>
 #include <vorbis/vorbisfile.h>
 
@@ -50,19 +51,19 @@ audio_source load_wav_audio(const char* path, bool preload) {
     uint16 tag, channel_count, block_alignment, bits_per_sample;
     ALenum channels = AL_FORMAT_MONO8;
     
-    fread(&id, sizeof(uint8), 4, infile);
+    fread(&id, sizeof(char), 4, infile);
     if(check_error(!strcmp(id, "RIFF"), "Cannot prepare WAV stream: Not a RIFF file. (Got %s)", id)) {
         fclose(infile);
         return false;
     }
     fread(&file_size, sizeof(uint32), 1, infile);
-    fread(&id, sizeof(uint8), 4, infile);
+    fread(&id, sizeof(char), 4, infile);
     if(check_error(!strcmp(id, "WAVE"), "Cannot prepare WAV stream: Not a WAVE file. (Got %s)", id)) {
         fclose(infile);
         return false;
     }
     
-    fread(&id, sizeof(uint8), 4, infile);
+    fread(&id, sizeof(char), 4, infile);
     if(check_error(!strcmp(id, "fmt "), "Cannot prepare WAV stream: Unrecognized format. (fmt not found, got %s)", id)) {
         fclose(infile);
         return false;

@@ -7,3 +7,11 @@ mathlib  = static_library('dfgame_math', mathsrc,
                          link_with : corelib,
                          link_args : args,
                          install : true)
+
+pkgconfig.generate(libraries : mathlib,
+                    version : '1.0.0',
+                    name : 'dfgame-math',
+                    filebase : 'dfgame-math',
+                    extra_cflags : '-lm',
+                    requires : ['dfgame-core'],
+                    description : 'dfgame math module, provides various math utilities')

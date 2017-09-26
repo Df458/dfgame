@@ -9,3 +9,10 @@ graphicslib  = static_library('dfgame_graphics', shaders, graphicssrc,
                          link_with: [ corelib, mathlib ],
                          link_args : args,
                          install : true)
+
+pkgconfig.generate(libraries : graphicslib,
+                    version : '1.0.0',
+                    name : 'dfgame-graphics',
+                    filebase : 'dfgame-graphics',
+                    requires : ['glew', 'freetype', 'dfgame-core', 'dfgame-math'],
+                    description : 'dfgame graphics module, provides rendering functions')

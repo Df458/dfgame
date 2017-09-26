@@ -5,6 +5,8 @@ project('dfgame', 'c', 'vala',
 
 compiler = meson.get_compiler('c')
 
+pkgconfig = import('pkgconfig')
+
 m = compiler.find_library('m', required : false)
 freetype = dependency('freetype2')
 glfw = dependency('glfw3')
@@ -46,10 +48,3 @@ subdir('demo/heightmap')
 subdir('demo/fps')
 
 run_command('ctags', '-R', '.')
-
-#pkgconfig = import('pkgconfig')
-#pkgconfig.generate(libraries : ,
-#                    version : '0.0.1',
-#                    name : '',
-#                    filebase : '',
-#                    description : '')

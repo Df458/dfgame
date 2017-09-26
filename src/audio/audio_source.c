@@ -81,6 +81,7 @@ byte* audio_source_get_next(audio_source src, uint32 pos, uint32* length) {
 }
 
 bool audio_source_get_next_buffer(audio_source src, ALuint buffer, uint32 pos, uint32* length) {
+    check_return(src, "Failed to get audio buffer: src is NULL", NULL);
     uint32 size = 0;
     byte* data = audio_source_get_next(src, pos, &size);
 

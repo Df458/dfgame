@@ -9,3 +9,10 @@ audiolib   = static_library('dfgame_audio', audiosrc,
                          install : true)
 
 run_command('ctags', '-R', '.')
+
+pkgconfig.generate(libraries : audiolib,
+                    version : '1.0.0',
+                    name : 'dfgame-audio',
+                    filebase : 'dfgame-audio',
+                    requires : ['openal', 'dfgame-core', 'dfgame-math'],
+                    description : 'dfgame audio module, provides audio functionality')

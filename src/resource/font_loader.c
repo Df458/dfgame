@@ -3,6 +3,7 @@
 #include "font_loader.h"
 
 #include "check.h"
+#include "container/array.h"
 #include "font.h"
 #include "graphics_log.h"
 #include "log/log.h"
@@ -15,6 +16,7 @@
 typedef struct font {
     FT_Face font_face;
     texture_atlas atlas;
+    uarray glyphs;
     float height;
 }* font;
 

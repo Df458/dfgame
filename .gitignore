@@ -8,3 +8,4 @@ src/editor-front.h
 vapi/editor-frontend.vapi
 vapi/editor-frontend.deps
 build
+crossbuild

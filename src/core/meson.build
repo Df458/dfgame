@@ -6,3 +6,9 @@ corelib  = static_library('dfgame_core', coresrc,
                          dependencies : coredeps,
                          link_args : args,
                          install : true)
+
+pkgconfig.generate(libraries : corelib,
+                    version : '1.0.0',
+                    name : 'dfgame-core',
+                    filebase : 'dfgame-core',
+                    description : 'dfgame core module, provides core functionality')

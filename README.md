@@ -1,17 +1,45 @@
-# dfgame
-A library for writing game engines
-
-This library is still in early development, so API changes are a regular
-occurrance. For this reason, using the library at this stage is not yet
-recommended.
+# DFGame
+DFGame is a collection of libraries designed to remove much of the boilerplate
+involved in "from scratch" game development.
 
 ## Features
-- Simple "main loop"
-- Sprite, mesh, and font rendering
-- Camera/Transform handling
-- Audio preloading, streaming, and playback
-- Post-processing system
-- Unified keyboard and mouse input
-- Basic event/delegates implementation
+DFGame's various modules provide a variety of helpful features:
+- Basic delegate implementation
 - Dynamic arrays and hashmaps
-- Marginally safer memory management code
+- Simple "main loop" implementation
+- Action-based input
+- Message logging
+- Sprite, mesh, and text rendering
+- Matrix and vector math
+- Transform handling
+- Audio preloading, streaming, and playback
+- Post-processing
+...and probably more that I've forgotten to list.
+
+## Building DFGame
+To build DFGame, you'll need the following tools:
+- meson
+- ninja
+- pkg-config (optional)
+and the following libraries:
+- libFreeType
+- GLFW
+- GLEW
+- libJPEG (optional)
+- libPNG (optional)
+- libTIFF (optional)
+- libTGA (optional)
+- OpenAL
+- libOgg
+- libVorbisfile
+- libXml
+You can build and install DFGame using the following steps.
+```bash
+# Create build directory and generate project files
+mkdir build && cd build
+meson ..
+
+# Compile and install
+ninja
+ninja install
+```

@@ -7,3 +7,10 @@ gameplaylib  = static_library('dfgame_gameplay', gameplaysrc,
                          link_with : [ corelib, mathlib ],
                          link_args : args,
                          install : true)
+
+pkgconfig.generate(libraries : gameplaylib,
+                    version : '1.0.0',
+                    name : 'dfgame-gameplay',
+                    filebase : 'dfgame-gameplay',
+                    requires : ['dfgame-core', 'dfgame-math'],
+                    description : 'dfgame gameplay module, acts as a proxy between platform-specific modules')
