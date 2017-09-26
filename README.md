@@ -14,6 +14,7 @@ DFGame's various modules provide a variety of helpful features:
 - Transform handling
 - Audio preloading, streaming, and playback
 - Post-processing
+
 ...and probably more that I've forgotten to list.
 
 ## Building DFGame
@@ -33,6 +34,7 @@ and the following libraries:
 - libOgg
 - libVorbisfile
 - libXml
+
 You can build and install DFGame using the following steps.
 ```bash
 # Create build directory and generate project files
