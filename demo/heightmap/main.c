@@ -100,8 +100,8 @@ void init_resources() {
     sfree(path);
 
     a_drag = input_add_mouse_button_action(0, NULL);
-    a_horizontal = input_add_mouse_position_axis(false, 20.0, 0.05f, false);
-    a_vertical = input_add_mouse_position_axis(true, 20.0, 0.05f, false);
+    a_horizontal = input_add_mouse_position_axis(false, 20.0, 0.05f, true);
+    a_vertical = input_add_mouse_position_axis(true, 20.0, 0.05f, true);
     a_zoom = input_add_mouse_scroll_axis(true, 20.0, -0.5f, false);
 
     path = assets_path("heightmap.vert", NULL);
