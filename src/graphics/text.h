@@ -25,7 +25,7 @@ typedef enum text_alignment {
 } text_alignment;
 
 text text_new(font f, const char* s);
-void text_set_str(text t, const char* s);
+void text_set_str(text t, const char* s, ...);
 mesh text_get_mesh(text t);
 
 void text_set_align(text t, text_alignment align);

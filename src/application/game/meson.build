@@ -10,5 +10,10 @@ pkgconfig.generate(libraries : applicationgamelib,
                     version : '1.0.0',
                     name : 'dfgame-application-game',
                     filebase : 'dfgame-application-game',
+                    extra_cflags : [ '-I${prefix}/include/dfgame/application', '-I${prefix}/include/dfgame/application/game' ],
                     requires : ['glfw3', 'glew', 'dfgame-core', 'dfgame-gameplay', 'dfgame-graphics', 'dfgame-math'],
                     description : 'dfgame application module (game), provides helper functions to be used in a final game executable')
+
+install_headers(
+    [ 'mainloop.h', 'window.h', 'mainloop.hd' ],
+    subdir : 'dfgame/application/game')

@@ -14,5 +14,10 @@ pkgconfig.generate(libraries : audiolib,
                     version : '1.0.0',
                     name : 'dfgame-audio',
                     filebase : 'dfgame-audio',
+                    extra_cflags : [ '-I${prefix}/include/dfgame/audio' ],
                     requires : ['openal', 'dfgame-core', 'dfgame-math'],
                     description : 'dfgame audio module, provides audio functionality')
+
+install_headers(
+    [ 'audio_log.h', 'audio_player.h', 'audio_source.h', 'audio_system.h', 'audio_source.hd', 'audio_player.hd' ],
+    subdir : 'dfgame/audio')

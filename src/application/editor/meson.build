@@ -20,7 +20,12 @@ pkgconfig.generate(libraries : applicationeditorlib,
                     version : '1.0.0',
                     name : 'dfgame-application-editor',
                     filebase : 'dfgame-application-editor',
+                    extra_cflags : [ '-I${prefix}/include/dfgame/application', '-I${prefix}/include/dfgame/application/editor' ],
                     requires : [ 'dfgame-gameplay', 'dfgame-graphics' ],
                     description : 'dfgame application module (editor), provides classes and UI widgets for use in tools')
 
 install_data(sources : '../../../data/catalog/dfgame-editor.xml', install_dir : '/usr/share/glade/catalogs')
+
+install_headers(
+    [ 'window.h' ],
+    subdir : 'dfgame/application/editor')

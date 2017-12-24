@@ -1,5 +1,5 @@
 project('dfgame', 'c', 'vala',
-        version : '0.0.1',
+        version : '1.1.0',
         license : 'MIT',
         default_options : ['c_std=gnu11'])
 

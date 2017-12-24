@@ -4,3 +4,7 @@ applicationinc  = [ include_directories('../core'), include_directories('../game
 
 subdir('editor')
 subdir('game')
+
+install_headers(
+    [ 'input.h', 'input_id.h' ],
+    subdir : 'dfgame/application')

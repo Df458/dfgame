@@ -14,5 +14,10 @@ pkgconfig.generate(libraries : graphicslib,
                     version : '1.0.0',
                     name : 'dfgame-graphics',
                     filebase : 'dfgame-graphics',
-                    requires : ['glew', 'freetype', 'dfgame-core', 'dfgame-math'],
+                    extra_cflags : [ '-I${prefix}/include/dfgame/graphics' ],
+                    requires : ['glew', 'freetype2', 'dfgame-core', 'dfgame-math'],
                     description : 'dfgame graphics module, provides rendering functions')
+
+install_headers(
+    [ 'camera.h', 'color.h', 'font.h', 'framebuffer.h', 'graphics_log.h', 'mesh.h', 'renderpass.h', 'shader.h', 'shader_init.h', 'sprite.h', 'spriteset.h', 'text.h', 'texture.h', 'texture_atlas.h', 'camera.hd', 'font.hd', 'mesh.hd', 'renderpass.hd', 'shader.hd', 'sprite.hd', 'spriteset.hd', 'text.hd', 'texture_atlas.hd', 'vertex.hd' ],
+    subdir : 'dfgame/graphics')

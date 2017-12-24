@@ -13,4 +13,9 @@ pkgconfig.generate(libraries : gameplaylib,
                     name : 'dfgame-gameplay',
                     filebase : 'dfgame-gameplay',
                     requires : ['dfgame-core', 'dfgame-math'],
+                    extra_cflags : [ '-I${prefix}/include/dfgame/gameplay' ],
                     description : 'dfgame gameplay module, acts as a proxy between platform-specific modules')
+
+install_headers(
+    [ 'control.h' ],
+    subdir : 'dfgame/gameplay')

@@ -12,6 +12,11 @@ pkgconfig.generate(libraries : mathlib,
                     version : '1.0.0',
                     name : 'dfgame-math',
                     filebase : 'dfgame-math',
-                    extra_cflags : '-lm',
+                    extra_cflags : [ '-I${prefix}/include/dfgame/math' ],
+                    libraries : ['-lm', '-ldfgame_math' ],
                     requires : ['dfgame-core'],
                     description : 'dfgame math module, provides various math utilities')
+
+install_headers(
+    [ 'aabb.h', 'interpolate.h', 'mathutil.h', 'matrix.h', 'quat.h', 'transform.h', 'vector.h', 'matrix.hd', 'quat.hd', 'transform.hd', 'vector.hd' ],
+    subdir : 'dfgame/math')

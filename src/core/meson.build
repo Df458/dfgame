@@ -11,4 +11,18 @@ pkgconfig.generate(libraries : corelib,
                     version : '1.0.0',
                     name : 'dfgame-core',
                     filebase : 'dfgame-core',
+                    extra_cflags : [ '-I${prefix}/include/dfgame/core' ],
                     description : 'dfgame core module, provides core functionality')
+
+install_headers(
+    [ 'check.h', 'crc.h', 'power.h', 'types.h' ],
+    subdir : 'dfgame/core')
+install_headers(
+    [ 'container/array.h', 'container/delegate.h', 'container/hashmap.h', 'container/array.hd', 'container/hashmap.hd' ],
+    subdir : 'dfgame/core/container')
+install_headers(
+    [ 'log/log.h' ],
+    subdir : 'dfgame/core/log')
+install_headers(
+    [ 'memory/alloc.h' ],
+    subdir : 'dfgame/core/memory')
