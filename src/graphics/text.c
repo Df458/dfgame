@@ -54,6 +54,7 @@ typedef struct text_line_data {
     uint16 end;
 } text_line_data;
 
+
 iter_result iter_arrange_lines(void* data, void* user) {
     text t = user;
     text_line_data* line = data;
@@ -102,16 +103,6 @@ iter_result iter_arrange_lines(void* data, void* user) {
     mesh_update(t->msh);
 
     return iter_continue;
-}
-
-text text_new(font f, const char* s) {
-    text t = salloc(sizeof(struct text));
-    t->fnt = f;
-    t->msh = NULL;
-    t->str = NULL;
-    t->align = TEXT_ALIGN_DEFAULT;
-    text_set_str(t, s);
-    return t;
 }
 
 void text_update_mesh(text t) {
@@ -178,12 +169,49 @@ void text_update_mesh(text t) {
     array_free_deep(line_data);
 }
 
-void text_set_str(text t, const char* s) {
+void text_set_str_va(text t, const char* s, va_list args) {
     if(t->str)
         sfree(t->str);
-    t->str = strdup(s);
+
+    if(!s)
+        return;
+
+    va_list tempargs;
+    size_t length;
+	va_copy(tempargs, args);
+
+    length = vsnprintf(0, 0, s, tempargs);
+    va_end(tempargs);
+
+	++length;
+    t->str = mscalloc(length, char);
+
+    vsnprintf(t->str, length, s, args);
 
     text_update_mesh(t);
+}
+
+
+text text_new(font f, const char* s, ...) {
+    text t = salloc(sizeof(struct text));
+    t->fnt = f;
+    t->msh = NULL;
+    t->str = NULL;
+    t->align = TEXT_ALIGN_DEFAULT;
+
+    va_list args;
+    va_start(args, s);
+    text_set_str_va(t, s, args);
+	va_end(args);
+
+    return t;
+}
+
+void text_set_str(text t, const char* s, ...) {
+    va_list args;
+    va_start(args, s);
+    text_set_str_va(t, s, args);
+	va_end(args);
 }
 
 mesh text_get_mesh(text t) {

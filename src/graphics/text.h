@@ -24,7 +24,7 @@ typedef enum text_alignment {
     TEXT_ALIGN_DEFAULT = TEXT_ALIGN_TOP_LEFT
 } text_alignment;
 
-text text_new(font f, const char* s);
+text text_new(font f, const char* s, ...);
 void text_set_str(text t, const char* s, ...);
 mesh text_get_mesh(text t);
 
