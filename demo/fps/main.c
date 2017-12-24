@@ -25,7 +25,7 @@
 #include "transform.h"
 #include "window.h"
 
-GLFWwindow* win;
+void* win;
 camera      c_main;
 camera      c_ui;
 shader      s_default;
@@ -202,8 +202,8 @@ bool loop(mainloop l, float dt) {
     audio_player_update(pistol_sfx, dt);
     sprite_draw(pistol_sprite, s_default, mat4_translate(mat4_scale(mat4_ident, 15), (vec3){.y = 120}), camera_get_vp(c_ui));
 
-    glfwSwapBuffers(win);
-    return !glfwWindowShouldClose(win);
+    window_redraw(win);
+    return !window_should_close(win);
 }
 
 void prepare_mesh(const char* path) {
@@ -371,7 +371,7 @@ void prepare_mesh(const char* path) {
 
 int main() {
     win = window_new_default(1280, 720, "FPS Demo");
-    glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    window_cursor_mode(win, CM_DISABLED);
     shaders_init();
     audio_init();
 
@@ -408,13 +408,13 @@ int main() {
     resource_path_free();
 
     // Input binding
-    a_side = input_add_key_axis(GLFW_KEY_A, 1, 1, false);
-    input_bind_key_axis(GLFW_KEY_D, a_side, -1);
-    a_forward = input_add_key_axis(GLFW_KEY_W, 1, -1, true);
-    input_bind_key_axis(GLFW_KEY_S, a_forward, 1);
+    a_side = input_add_key_axis(K_A, 1, 1, false);
+    input_bind_key_axis(K_D, a_side, -1);
+    a_forward = input_add_key_axis(K_W, 1, -1, true);
+    input_bind_key_axis(K_S, a_forward, 1);
     a_turn = input_add_mouse_position_axis(false, 15.0, 0.025f, false);
 
-    input_add_mouse_button_action(GLFW_MOUSE_BUTTON_LEFT, as_event(action_event, shoot, NULL));
+    input_add_mouse_button_action(MB_LEFT, as_event(action_event, shoot, NULL));
 
     mainloop_create_run(loop);
 

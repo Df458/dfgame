@@ -9,7 +9,7 @@
 #include "vector.h"
 #include "window.h"
 
-GLFWwindow* win;
+void* win;
 camera c_main;
 shader s_default;
 float  timer;
@@ -28,8 +28,8 @@ bool loop(mainloop l, float dt) {
     shader_bind_uniform_texture_name(s_default, "u_texture", t_logo, GL_TEXTURE0);
     mesh_render(s_default, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 
-    glfwSwapBuffers(win);
-    return !glfwWindowShouldClose(win) && timer < 4.0f;
+    window_redraw(win);
+    return !window_should_close(win) && timer < 4.0f;
 }
 
 int main() {

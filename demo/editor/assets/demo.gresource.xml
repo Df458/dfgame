@@ -1,0 +1,5 @@
+<gresources>
+    <gresource prefix="/org/df458/EditorDemo">
+        <file preprocess="xml-stripblanks">MainWindow.ui</file>
+    </gresource>
+</gresources>

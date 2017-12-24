@@ -5,6 +5,7 @@ project('dfgame', 'c', 'vala',
 
 compiler = meson.get_compiler('c')
 
+gnome = import('gnome')
 pkgconfig = import('pkgconfig')
 
 m = compiler.find_library('m', required : false)
@@ -27,6 +28,7 @@ if get_option('enable_tga') == true
 endif
 vorbis = dependency('vorbisfile')
 xml = dependency('libxml-2.0')
+gtk = dependency('gtk+-3.0')
 
 add_project_arguments('-I/usr/include/freetype2', language: 'c')
 
@@ -46,5 +48,6 @@ subdir('demo/logo')
 subdir('demo/comets')
 subdir('demo/heightmap')
 subdir('demo/fps')
+subdir('demo/editor')
 
 run_command('ctags', '-R', '.')

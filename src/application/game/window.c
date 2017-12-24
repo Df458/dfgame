@@ -5,7 +5,7 @@
 
 #include "camera.h"
 #include "check.h"
-#include "input.h"
+#include "glfw_input.h"
 #include "log/log.h"
 #include "graphics_log.h"
 
@@ -13,7 +13,7 @@ static bool glfw_init_called = false;
 
 // Creates a new GLFWwindow with an OpenGL context and input callbacks.
 // This also calls glfwInit and glewInit the first time that it's called.
-GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
+void* window_new_default(uint16 width, uint16 height, const char* title) {
     check_kill(glfw_init_called || glfwInit(), "Failed to intialize GLFW.");
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -53,22 +53,44 @@ GLFWwindow* window_new_default(uint16 width, uint16 height, const char* title) {
     return win;
 }
 
+void window_redraw(void* win) {
+    glfwSwapBuffers((GLFWwindow*)win);
+}
+
+bool window_should_close(void* win) {
+    return glfwWindowShouldClose((GLFWwindow*)win);
+}
+
+void window_cursor_mode(void* win, cursor_mode mode) {
+    switch(mode) {
+        case CM_ENABLED:
+            glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            break;
+        case CM_HIDDEN:
+            glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            break;
+        case CM_DISABLED:
+            glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            break;
+    }
+}
+
 // Frees the window.
 // window_free_final also calls glfwTerminate.
 // NOTE: Don't call these functions. Use the macros without
 // the leading _ instead, as they also NULL your pointer.
-void _window_free(GLFWwindow* win) {
-    glfwDestroyWindow(win);
+void _window_free(void* win) {
+    glfwDestroyWindow((GLFWwindow*)win);
 }
-void _window_free_final(GLFWwindow* win) {
+void _window_free_final(void* win) {
     window_free(win);
     glfwTerminate();
     glfw_init_called = false;
 }
 
-camera window_create_2d_camera(GLFWwindow* win) {
+camera window_create_2d_camera(void* win) {
     int w, h;
-    glfwGetWindowSize(win, &w, &h);
+    glfwGetWindowSize((GLFWwindow*)win, &w, &h);
 
     projection_settings settings = (projection_settings) {
         .dims = {

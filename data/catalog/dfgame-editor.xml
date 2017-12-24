@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<glade-catalog name="dfgame" library="dfgame_editor" depends="gtk+">
+    <glade-widget-classes>
+        <glade-widget-class name="DFGameViewport" generic-name="dfgameviewport" title="DFGame Viewport" get-type-function="df_game_viewport_get_type" parent="GtkGLArea">
+            <properties>
+                <property id="update_interval" default="0" name="Update Interval"/>
+            </properties>
+            <signals>
+                <signal id="update_step"/>
+            </signals>
+        </glade-widget-class>
+    </glade-widget-classes>
+
+    <glade-widget-group name="DFGame" title="DFGame Editor Widgets">
+        <glade-widget-class-ref name="DFGameViewport"/>
+    </glade-widget-group>
+</glade-catalog>

@@ -24,7 +24,7 @@
 #include "transform.h"
 #include "window.h"
 
-GLFWwindow* win;
+void* win;
 camera      c_main;
 shader      s_default;
 
@@ -296,8 +296,8 @@ bool loop(mainloop l, float dt) {
     shader_bind_uniform_name(s_default, "u_color", color_white);
     text_draw(info_text, s_default, mat4_mul(camera_get_vp(c_main), mat4_translate(mat4_ident, offset)));
 
-    glfwSwapBuffers(win);
-    return !glfwWindowShouldClose(win);
+    window_redraw(win);
+    return !window_should_close(win);
 }
 
 int main() {
@@ -332,11 +332,11 @@ int main() {
     sfree(path);
 
     // Input binding
-    a_rotate = input_add_key_axis(GLFW_KEY_LEFT, 4, 4, false);
-    input_bind_key_axis(GLFW_KEY_RIGHT, a_rotate, -4);
-    a_accel = input_add_key_axis(GLFW_KEY_UP, 5, 5, true);
-    input_bind_key_axis(GLFW_KEY_DOWN, a_accel, -5);
-    a_shoot = input_add_key_action(GLFW_KEY_Z, NULL);
+    a_rotate = input_add_key_axis(K_LEFT, 4, 4, false);
+    input_bind_key_axis(K_RIGHT, a_rotate, -4);
+    a_accel = input_add_key_axis(K_UP, 5, 5, true);
+    input_bind_key_axis(K_DOWN, a_accel, -5);
+    a_shoot = input_add_key_action(K_Z, NULL);
 
     rocks = uarray_new(30);
 

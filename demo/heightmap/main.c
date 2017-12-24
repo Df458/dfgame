@@ -18,7 +18,7 @@
 
 #define MESH_DIM 100
 
-GLFWwindow* win;
+void* win;
 
 camera      c_main;
 camera      c_ui;
@@ -89,8 +89,8 @@ bool loop(mainloop l, float dt) {
     shader_bind_uniform_name(s_text, "u_color", color_white);
     text_draw(info_text, s_text, mat4_mul(camera_get_vp(c_ui), mat4_translate(mat4_ident, offset)));
 
-    glfwSwapBuffers(win);
-    return !glfwWindowShouldClose(win);
+    window_redraw(win);
+    return !window_should_close(win);
 }
 
 void init_resources() {
@@ -99,10 +99,11 @@ void init_resources() {
     t_heightmap = load_texture_gl(path);
     sfree(path);
 
-    a_drag = input_add_mouse_button_action(0, NULL);
+    a_drag = input_add_mouse_button_action(MB_LEFT, NULL);
     a_horizontal = input_add_mouse_position_axis(false, 20.0, 0.05f, true);
     a_vertical = input_add_mouse_position_axis(true, 20.0, 0.05f, true);
-    a_zoom = input_add_mouse_scroll_axis(true, 20.0, -0.5f, false);
+    a_zoom = input_add_mouse_button_axis(MB_SCROLL_UP, 20.0, -1, true);
+    input_bind_mouse_button_axis(MB_SCROLL_DOWN, a_zoom, 1);
 
     path = assets_path("heightmap.vert", NULL);
     char* vert = (char*)load_data_buffer(path, NULL);
@@ -113,6 +114,7 @@ void init_resources() {
     sfree(path);
     s_default = shader_new_vf((const char**)&vert, (const char**)&frag);
     shaders_init();
+
     s_water = shader_basic_untex_get();
     s_text = shader_basic_tex_get();
 
