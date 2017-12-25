@@ -12,6 +12,7 @@ void update_controls();
 action_id create_action(action_event* event);
 void activate_action(action_id id);
 bool action_is_active(action_id id);
+bool action_is_triggered(action_id id);
 
 axis_id create_axis(float limit, bool digital);
 void set_axis_value(axis_id id, float value, bool digital);

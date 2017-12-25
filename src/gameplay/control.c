@@ -14,6 +14,7 @@ typedef struct action {
 
     bool active;
     bool set;
+    bool triggered;
 } action;
 
 typedef struct axis {
@@ -35,6 +36,7 @@ void update_controls() {
         if(!action_list[i].set)
             action_list[i].active = false;
         action_list[i].set = false;
+        action_list[i].triggered = false;
     }
     for(int i = 0; i < axis_count; ++i) {
         if(!axis_list[i].set) {
@@ -65,8 +67,10 @@ action_id create_action(action_event* event) {
 void activate_action(action_id id) {
     check_return(id < action_count, "Can't access action: Index is out of range", );
 
-    if(!action_list[id].active)
+    if(!action_list[id].active) {
         call_event(action_list[id].event, id);
+        action_list[id].triggered = true;
+    }
 
     action_list[id].active = true;
     action_list[id].set    = true;
@@ -76,6 +80,12 @@ bool action_is_active(action_id id) {
     check_return(id < action_count, "Can't access action: Index is out of range", false);
 
     return action_list[id].active;
+}
+
+bool action_is_triggered(action_id id) {
+    check_return(id < action_count, "Can't access action: Index is out of range", false);
+
+    return action_list[id].triggered;
 }
 
 axis_id create_axis(float limit, bool digital) {
