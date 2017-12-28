@@ -1,4 +1,4 @@
 option('enable_png',  type: 'boolean', value: true)
 option('enable_jpeg', type: 'boolean', value: true)
-option('enable_tga',  type: 'boolean', value: true)
+option('enable_tga',  type: 'boolean', value: false)
 option('enable_tiff', type: 'boolean', value: true)

@@ -3,6 +3,7 @@
 
 #include "camera.hd"
 #include "types.h"
+#include "vector.h"
 
 #include "input_id.h"
 
@@ -29,5 +30,9 @@ void _window_free(void* win);
 void _window_free_final(void* win);
 
 camera window_create_2d_camera(void* win);
+
+vec2 get_mouse_position_raw(void* win);
+vec2 get_mouse_position(void* win);
+vec2 get_window_dims(void* win);
 
 #endif

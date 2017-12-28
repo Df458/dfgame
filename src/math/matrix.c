@@ -30,7 +30,7 @@ mat4 mat4_translate_vec4(mat4 m, vec4 v) {
     m2.data[12] += v.x;
     m2.data[13] += v.y;
     m2.data[14] += v.z;
-    m2.data[15] += v.w;
+    m2.data[15] = v.w;
 
     return m2;
 }
@@ -128,7 +128,7 @@ mat4 mat4_scale_vec4(mat4 m, vec4 v) {
 }
 
 // Multiplies m1 by m2
-mat4 mat4_mul(mat4 m1, mat4 m2) {
+mat4 mat4_mul_mat4(mat4 m1, mat4 m2) {
     mat4 res;
     for(uint8 i = 0; i < 4; ++i) {
         uint8 j = i * 4;
@@ -137,6 +137,20 @@ mat4 mat4_mul(mat4 m1, mat4 m2) {
         res.data[j + 2] = m1.data[2]*m2.data[j] + m1.data[6]*m2.data[j+1] + m1.data[10]*m2.data[j+2] + m1.data[14]*m2.data[j+3];
         res.data[j + 3] = m1.data[3]*m2.data[j] + m1.data[7]*m2.data[j+1] + m1.data[11]*m2.data[j+2] + m1.data[15]*m2.data[j+3];
     }
+    return res;
+}
+vec4 mat4_mul_vec2(mat4 m1, vec2 v) {
+    return mat4_mul_vec4(m1, (vec4){ .x=v.x, .y=v.y, .z=0, .w=1 });
+}
+vec4 mat4_mul_vec3(mat4 m1, vec3 v) {
+    return mat4_mul_vec4(m1, (vec4){ .x=v.x, .y=v.y, .z=v.z, .w=1 });
+}
+vec4 mat4_mul_vec4(mat4 m1, vec4 v) {
+    vec4 res;
+    res.x = m1.data[0] * v.x + m1.data[1] * v.y + m1.data[2] * v.z + m1.data[3] * v.w;
+    res.y = m1.data[4] * v.x + m1.data[5] * v.y + m1.data[6] * v.z + m1.data[7] * v.w;
+    res.z = m1.data[8] * v.x + m1.data[9] * v.y + m1.data[10] * v.z + m1.data[11] * v.w;
+    res.w = m1.data[12] * v.x + m1.data[13] * v.y + m1.data[14] * v.z + m1.data[15] * v.w;
     return res;
 }
 

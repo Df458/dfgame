@@ -1,31 +1,38 @@
 applicationeditorcsrc  = [ 'input.c', 'window.c' ]
-applicationeditorclib  = static_library('dfgame_application_editor_c', applicationeditorcsrc,
+applicationeditorclib  = static_library('dfgame_application_editor_backend', applicationeditorcsrc,
                          include_directories : applicationinc,
                          dependencies : applicationdeps + [ gtk ],
                          link_with : applicationlink,
                          link_args : args,
-                         install : false)
+                         install : true)
 
 applicationeditordeps = [ gtk ]
 applicationeditorsrc  = [ 'Viewport.vala']
 applicationeditorinc  = [ include_directories('.') ] + applicationinc
 applicationeditorlib  = shared_library('dfgame_application_editor', applicationeditorsrc,
                         include_directories : applicationeditorinc,
+                        vala_header : 'dfgame-application-editor.h',
+                        vala_vapi : 'dfgame-application-editor.vapi',
                         dependencies : applicationeditordeps,
                         link_with : [ gameplaylib, graphicslib, applicationeditorclib ],
                         vala_args : ['--target-glib=2.38', '--vapidir=../src/application/editor', '--pkg=editorc'],
-                        install : true)
+                        install : true,
+                       install_dir : [ true, true, true ])
+
+pkgconfig.generate(libraries : applicationeditorclib,
+                    version : '1.0.0',
+                    name : 'dfgame-application-editor-backend',
+                    filebase : 'dfgame-application-editor-backend',
+                    extra_cflags : [ '-I${prefix}/include/dfgame/application', '-I${prefix}/include/dfgame/application/editor' ],
+                    requires : [ 'dfgame-gameplay', 'dfgame-graphics' ],
+                    description : 'dfgame application module (editor backend code), provides classes and UI widgets for use in tools')
 
 pkgconfig.generate(libraries : applicationeditorlib,
                     version : '1.0.0',
                     name : 'dfgame-application-editor',
                     filebase : 'dfgame-application-editor',
                     extra_cflags : [ '-I${prefix}/include/dfgame/application', '-I${prefix}/include/dfgame/application/editor' ],
-                    requires : [ 'dfgame-gameplay', 'dfgame-graphics' ],
+                    requires : [ 'dfgame-application-editor-backend' ],
                     description : 'dfgame application module (editor), provides classes and UI widgets for use in tools')
 
 install_data(sources : '../../../data/catalog/dfgame-editor.xml', install_dir : '/usr/share/glade/catalogs')
-
-install_headers(
-    [ 'window.h' ],
-    subdir : 'dfgame/application/editor')

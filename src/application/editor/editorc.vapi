@@ -11,9 +11,9 @@ namespace DFGame
             public static bool on_key_press(Gdk.EventKey event);
         [CCode (cname = "on_key_release")]
             public static bool on_key_release(Gdk.EventKey event);
-        [CCode (cname = "on_key_release")]
+        [CCode (cname = "on_mouse_motion")]
             public static bool on_mouse_motion(Gdk.EventMotion event);
-        [CCode (cname = "on_key_release")]
+        [CCode (cname = "on_scroll")]
             public static bool on_scroll(Gdk.EventScroll event);
         [CCode (cname = "update_input")]
             public static void update_input();

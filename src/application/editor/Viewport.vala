@@ -16,16 +16,20 @@ namespace DFGame
             key_release_event.connect(on_key_release);
             motion_notify_event.connect(on_mouse_motion);
             scroll_event.connect(on_scroll);
+            enter_notify_event.connect((ev) => { is_focus = true; });
 
-            events |= Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.KEY_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.SCROLL_MASK;
+            events = Gdk.EventMask.ALL_EVENTS_MASK;
             update_id = Signal.lookup("update_step", typeof(Viewport));
+            render.connect(run_update);
         }
 
         public bool update()
         {
             update_input();
 
-            return !Signal.has_handler_pending(this, update_id, {}, false) || update_step(_update_interval > 0 ? 1.0f / update_interval : 0);
+            queue_render();
+
+            return should_continue;
         }
 
         private void set_update_timer(uint fps)
@@ -42,9 +46,17 @@ namespace DFGame
             }
         }
 
+        private bool run_update()
+        {
+            should_continue = !Signal.has_handler_pending(this, update_id, {}, false) || update_step(_update_interval > 0 ? 1.0f / update_interval : 0);
+
+            return true;
+        }
+
         public signal bool update_step(float delta);
 
         private TimeoutSource update_timer;
         private uint update_id;
+        private bool should_continue;
     }
 }

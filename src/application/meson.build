@@ -6,5 +6,5 @@ subdir('editor')
 subdir('game')
 
 install_headers(
-    [ 'input.h', 'input_id.h' ],
+    [ 'input.h', 'input_id.h', 'window.h' ],
     subdir : 'dfgame/application')

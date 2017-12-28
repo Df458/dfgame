@@ -15,5 +15,5 @@ pkgconfig.generate(libraries : applicationgamelib,
                     description : 'dfgame application module (game), provides helper functions to be used in a final game executable')
 
 install_headers(
-    [ 'mainloop.h', 'window.h', 'mainloop.hd' ],
+    [ 'mainloop.h', 'mainloop.hd' ],
     subdir : 'dfgame/application/game')

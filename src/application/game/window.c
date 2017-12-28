@@ -28,6 +28,8 @@ void* window_new_default(uint16 width, uint16 height, const char* title) {
     glfwSetScrollCallback(win, input_mouse_scroll_callback);
     glfwSetCursorPosCallback(win, input_mouse_position_callback);
 
+    glfwSetWindowSizeLimits(win, width, height, width, height);
+
     check_kill(win, "Failed to create a new window");
     glfwMakeContextCurrent(win);
 
@@ -103,4 +105,20 @@ camera window_create_2d_camera(void* win) {
     };
 
     return camera_new(settings);
+}
+
+vec2 get_mouse_position_raw(void* win) {
+    double x, y;
+    glfwGetCursorPos(win, &x, &y);
+    return (vec2){ .x=x, .y=y };
+}
+vec2 get_mouse_position(void* win) {
+    vec2 v = get_mouse_position_raw(win);
+    vec2 v2 = get_window_dims(win);
+    return (vec2){ .x = v.x / v2.x * 2 - 1, .y = v.y / v2.y * -2 + 1 };
+}
+vec2 get_window_dims(void* win) {
+    int x, y;
+    glfwGetWindowSize(win, &x, &y);
+    return (vec2){ .x=x, .y=y };
 }

@@ -60,7 +60,16 @@ mat4 mat4_scale_vec3(mat4 m, vec3 v);
 mat4 mat4_scale_vec4(mat4 m, vec4 v);
 
 // Multiplies m1 by m2
-mat4 mat4_mul(mat4 m1, mat4 m2);
+#define mat4_mul(m, v) _Generic(v,\
+    mat4: mat4_mul_mat4,\
+    vec2: mat4_mul_vec2,\
+    vec3: mat4_mul_vec3,\
+    vec4: mat4_mul_vec4\
+)(m, v)
+mat4 mat4_mul_mat4(mat4 m1, mat4 m2);
+vec4 mat4_mul_vec2(mat4 m1, vec2 v);
+vec4 mat4_mul_vec3(mat4 m1, vec3 v);
+vec4 mat4_mul_vec4(mat4 m1, vec4 v);
 
 // Gets the determinant of m
 float mat4_determinant(mat4 m);

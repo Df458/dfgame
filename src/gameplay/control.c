@@ -57,7 +57,7 @@ action_id create_action(action_event* event) {
     check_return(action_count < 256, "Can't create action: Maximum number of actions created", -1);
 
     action_id id = action_count;
-    bind_event(action_event, action_list[id].event, event);
+    set_action_event(id, event);
 
     action_count++;
 
@@ -86,6 +86,10 @@ bool action_is_triggered(action_id id) {
     check_return(id < action_count, "Can't access action: Index is out of range", false);
 
     return action_list[id].triggered;
+}
+
+void set_action_event(action_id id, action_event* event) {
+    bind_event(action_event, action_list[id].event, event);
 }
 
 axis_id create_axis(float limit, bool digital) {
