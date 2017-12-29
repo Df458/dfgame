@@ -147,10 +147,10 @@ vec4 mat4_mul_vec3(mat4 m1, vec3 v) {
 }
 vec4 mat4_mul_vec4(mat4 m1, vec4 v) {
     vec4 res;
-    res.x = m1.data[0] * v.x + m1.data[1] * v.y + m1.data[2] * v.z + m1.data[3] * v.w;
-    res.y = m1.data[4] * v.x + m1.data[5] * v.y + m1.data[6] * v.z + m1.data[7] * v.w;
-    res.z = m1.data[8] * v.x + m1.data[9] * v.y + m1.data[10] * v.z + m1.data[11] * v.w;
-    res.w = m1.data[12] * v.x + m1.data[13] * v.y + m1.data[14] * v.z + m1.data[15] * v.w;
+    res.x = m1.data[0] * v.x + m1.data[4] * v.y + m1.data[8] * v.z + m1.data[12] * v.w;
+    res.y = m1.data[1] * v.x + m1.data[5] * v.y + m1.data[9] * v.z + m1.data[13] * v.w;
+    res.z = m1.data[2] * v.x + m1.data[6] * v.y + m1.data[10] * v.z + m1.data[14] * v.w;
+    res.w = m1.data[3] * v.x + m1.data[7] * v.y + m1.data[11] * v.z + m1.data[15] * v.w;
     return res;
 }
 
