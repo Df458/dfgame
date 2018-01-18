@@ -1,3 +1,0 @@
-name: blur
-vert: basic_tex.vert
-frag: blur.frag

@@ -1,7 +1,12 @@
-shaders = [ glsl_gen.process('../../data/shaders/shader_basic_tex.gl'), glsl_gen.process('../../data/shaders/shader_text.gl'), glsl_gen.process('../../data/shaders/shader_basic_untex.gl'), glsl_gen.process('../../data/shaders/shader_test_post.gl'), glsl_gen.process('../../data/shaders/invert.gl'), glsl_gen.process('../../data/shaders/wave.gl'), glsl_gen.process('../../data/shaders/blur.gl') ]
+shaders = [
+    glsl_gen.process('../../data/shaders/shader_debug.gl'),
+    glsl_gen.process('../../data/shaders/shader_basic_tex.gl'),
+    glsl_gen.process('../../data/shaders/shader_text.gl'),
+    glsl_gen.process('../../data/shaders/shader_basic_untex.gl'),
+]
 
 graphicsdeps = [ glew, freetype ]
-graphicssrc  = [ 'camera.c', 'font.c', 'framebuffer.c', 'graphics_log.c', 'mesh.c', 'renderpass.c', 'shader.c', 'shader_init.c', 'sprite.c', 'spriteset.c', 'text.c', 'texture.c', 'texture_atlas.c' ]
+graphicssrc  = [ 'camera.c', 'debug_draw.c', 'font.c', 'framebuffer.c', 'graphics_log.c', 'mesh.c', 'renderpass.c', 'shader.c', 'shader_init.c', 'sprite.c', 'spriteset.c', 'text.c', 'texture.c', 'texture_atlas.c' ]
 graphicsinc  = [ include_directories('../core'), include_directories('../math') ]
 graphicslib  = static_library('dfgame_graphics', shaders, graphicssrc,
                          include_directories : graphicsinc,
@@ -19,5 +24,5 @@ pkgconfig.generate(libraries : graphicslib,
                     description : 'dfgame graphics module, provides rendering functions')
 
 install_headers(
-    [ 'camera.h', 'color.h', 'font.h', 'framebuffer.h', 'graphics_log.h', 'mesh.h', 'renderpass.h', 'shader.h', 'shader_init.h', 'sprite.h', 'spriteset.h', 'text.h', 'texture.h', 'texture_atlas.h', 'camera.hd', 'font.hd', 'mesh.hd', 'renderpass.hd', 'shader.hd', 'sprite.hd', 'spriteset.hd', 'text.hd', 'texture_atlas.hd', 'vertex.hd' ],
+    [ 'camera.h', 'color.h', 'debug_draw.h', 'font.h', 'framebuffer.h', 'graphics_log.h', 'mesh.h', 'renderpass.h', 'shader.h', 'shader_init.h', 'sprite.h', 'spriteset.h', 'text.h', 'texture.h', 'texture_atlas.h', 'camera.hd', 'font.hd', 'mesh.hd', 'renderpass.hd', 'shader.hd', 'sprite.hd', 'spriteset.hd', 'text.hd', 'texture_atlas.hd', 'vertex.hd' ],
     subdir : 'dfgame/graphics')

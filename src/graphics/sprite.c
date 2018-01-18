@@ -68,7 +68,10 @@ void sprite_update(sprite spr, float dt) {
         } else {
             spr->position = (spr->current_animation.frame_count - 1) * spr->current_animation.start_delay;
             sprite_set_playing(spr, false);
-            sprite_set_animation(spr, NULL, false);
+            if(spr->current_animation.default_on_finish)
+                sprite_set_animation(spr, NULL, false);
+            else
+                spr->position = (spr->current_animation.frame_count - 1 + spr->current_animation.start_delay) / (float)spr->current_animation.fps;
         }
     }
 }
@@ -104,7 +107,7 @@ void sprite_draw(sprite spr, shader s, mat4 model, mat4 view) {
     shader_bind_uniform_name(s, "uv_scale", box.dimensions);
     mesh_render(s, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 
-    aabb_2d clear = (aabb_2d){
+    aabb_2d clear = (aabb_2d) {
         .position = (vec2){0},
         .dimensions = (vec2){.x = 1, .y = 1}
     };

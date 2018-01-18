@@ -13,13 +13,13 @@
 #include <string.h>
 
 void read_animation(spriteset set, xmlNodePtr node, const char* path) {
-    animation anim = (animation) {
+    animation anim =  {
         .orient_count = 0,
         .origin = {
             .x = 0,
             .y = 0
         },
-        .texture_box = (aabb_2d){0},
+        .texture_box = (aabb_2d){ 0 },
 
         .start_delay = 0,
         .frame_count = 1,
@@ -29,6 +29,7 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
 
         .autoplay = true,
         .autoloop = false,
+        .default_on_finish = true,
     };
 
     xmlChar* a = 0;
@@ -58,6 +59,10 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
     }
     if((a = xmlGetProp(node, (const xmlChar*)"autoplay"))) {
         anim.autoplay = strcmp((char*)a, "false");
+        sfree(a);
+    }
+    if((a = xmlGetProp(node, (const xmlChar*)"default_on_finish"))) {
+        anim.default_on_finish = strcmp((char*)a, "false");
         sfree(a);
     }
     if((a = xmlGetProp(node, (const xmlChar*)"autoloop"))) {

@@ -21,6 +21,7 @@ typedef struct animation {
 
     bool autoplay;
     bool autoloop;
+    bool default_on_finish;
 } animation;
 
 spriteset spriteset_new();

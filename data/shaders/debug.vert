@@ -2,11 +2,11 @@
 uniform mat4 transform;
 
 in vec3 i_pos;
-in vec2 i_uv;
+in vec4 i_color;
 
-out vec2 v_uv;
+out vec4 v_color;
 
 void main() {
     gl_Position = transform * vec4(i_pos, 1.0);
-    v_uv = i_uv;
+    v_color = i_color;
 }
