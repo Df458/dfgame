@@ -18,6 +18,8 @@ namespace DFGame
             scroll_event.connect(on_scroll);
             enter_notify_event.connect((ev) => { is_focus = true; });
 
+            Framebuffer.set_callback({ framebuffer_callback, this });
+
             events = Gdk.EventMask.ALL_EVENTS_MASK;
             update_id = Signal.lookup("update_step", typeof(Viewport));
             render.connect(run_update);
@@ -51,6 +53,11 @@ namespace DFGame
             should_continue = !Signal.has_handler_pending(this, update_id, {}, false) || update_step(_update_interval > 0 ? 1.0f / update_interval : 0);
 
             return true;
+        }
+
+        private static void framebuffer_callback(void* pass, void* user)
+        {
+            (user as GLArea).attach_buffers();
         }
 
         public signal bool update_step(float delta);

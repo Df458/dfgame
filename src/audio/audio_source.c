@@ -47,7 +47,7 @@ audio_source audio_source_new_stream(audio_stream_event* ev, uint32 length, ALen
     audio_source src = salloc(sizeof(struct audio_source));
 
     src->type = SRC_TYPE_STREAM;
-    bind_event(audio_stream_event, src->ev, ev);
+    bind_event(src->ev, ev);
     src->length = length;
     src->channels = channels;
     if(src->channels == AL_FORMAT_MONO8 || src->channels == AL_FORMAT_MONO16)

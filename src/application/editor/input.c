@@ -40,14 +40,14 @@ void input_bind_key_action(key_id key, action_id id) {
     if(!key_bindings[key].actions)
         key_bindings[key].actions = uarray_new(1);
 
-    array_copyadd_simple(key_bindings[key].actions, id, action_id);
+    array_copyadd_simple(key_bindings[key].actions, id);
 }
 void input_bind_mouse_button_action(mouse_button_id button, action_id id) {
     check_return(button <= MB_LAST, "Can't bind mouse button: Index is out of range", )
 
     if(!mouse_button_bindings[button].actions)
         mouse_button_bindings[button].actions = uarray_new(1);
-    array_copyadd_simple(mouse_button_bindings[button].actions, id, action_id);
+    array_copyadd_simple(mouse_button_bindings[button].actions, id);
 }
 action_id input_add_key_action(key_id key, action_event* event) {
     action_id id = create_action(event);

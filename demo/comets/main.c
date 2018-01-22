@@ -115,7 +115,7 @@ void create_bullet(vec2 position, float orient, float angle_multiplier) {
     };
     transform_rotate(b.trans, orient, false);
     transform_translate(b.trans, vec_add(position, vec_mul(vec_rotate(facing, PI * angle_multiplier), 5)), false);
-    array_copyadd_simple(bullets, b, bullet);
+    array_copyadd_simple(bullets, b);
 
     play_audio(au_shot);
 }
@@ -229,7 +229,7 @@ void create_rock(vec2 position, uint8 size) {
         transform_translate(r.trans, position, false);
         transform_rotate(r.trans, rot, false);
         transform_scale(r.trans, (float)r.size / 3.0f, false);
-        array_copyadd_simple(rocks, r, rock);
+        array_copyadd_simple(rocks, r);
 }
 
 iter_result free_rock(void* roc, void* user) {

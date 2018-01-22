@@ -5,10 +5,13 @@
 
 #include "shader.hd"
 
+event(renderpass_null_response, renderpass prev);
+
 renderpass renderpass_new(uint16 w, uint16 h);
 
 void renderpass_start(renderpass pass);
 void renderpass_next(renderpass pass, shader s);
 void renderpass_present(renderpass pass, shader s);
+void set_default_renderpass_response(renderpass_null_response* res);
 
 #endif

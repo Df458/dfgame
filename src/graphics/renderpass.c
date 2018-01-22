@@ -11,7 +11,7 @@
 #include "texture.h"
 
 static renderpass prev_pass = NULL;
-
+static renderpass_null_response* default_response;
 typedef struct renderpass {
     framebuffer fbo;
     gltex texture;
@@ -32,20 +32,23 @@ renderpass renderpass_new(uint16 w, uint16 h) {
 }
 
 void renderpass_start(renderpass pass) {
-    glBindFramebuffer(GL_FRAMEBUFFER, pass->fbo.handle);
-    glViewport(0, 0, pass->texture.width, pass->texture.height);
+    if(pass == NULL) {
+        call_event(default_response, prev_pass)
+        else // call_event expands to an if-statement, so we can use an else here to react to cases where it's ubound
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        prev_pass = NULL;
+    } else {
+        glBindFramebuffer(GL_FRAMEBUFFER, pass->fbo.handle);
+        glViewport(0, 0, pass->texture.width, pass->texture.height);
+    }
 
     prev_pass = pass;
 }
 
 void renderpass_next(renderpass pass, shader s) {
     renderpass prev = prev_pass;
-    if(pass)
-        renderpass_start(pass);
-    else {
-        prev_pass = NULL;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
+    renderpass_start(pass);
 
     if(prev)
         renderpass_present(prev, s);
@@ -56,4 +59,8 @@ void renderpass_present(renderpass pass, shader s) {
     shader_bind_uniform_name(s, "transform", mat4_scale(mat4_ident, 2));
     shader_bind_uniform_texture_name(s, "u_texture", pass->texture, GL_TEXTURE0);
     mesh_render(s, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
+}
+
+void set_default_renderpass_response(renderpass_null_response* res) {
+    bind_event(default_response, res);
 }

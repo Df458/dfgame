@@ -32,6 +32,10 @@ texture_atlas texture_atlas_new() {
 
     glBindTexture(GL_TEXTURE_2D, atlas->texture_data.handle);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+    uint8 clearcolor[4] = { 0, 0, 0, 0 };
+    glClearTexImage(atlas->texture_data.handle, 0, GL_RGBA, GL_UNSIGNED_BYTE, &clearcolor);
+
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);

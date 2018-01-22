@@ -87,7 +87,7 @@ void create_bullet(vec3 position, quat orient) {
         .velocity = vec3_mul(vec3_rotate(vec3_forward, orient), 10),
         .destroyed = false
     };
-    array_copyadd_simple(bullets, b, bullet);
+    array_copyadd_simple(bullets, b);
 }
 void create_barrel(vec3 position) {
     barrel b = (barrel) {
@@ -98,7 +98,7 @@ void create_barrel(vec3 position) {
     transform_scale(b.trans, -10, false);
     transform_translate(b.trans, position, false);
 
-    array_copyadd_simple(barrels, b, barrel);
+    array_copyadd_simple(barrels, b);
 }
 
 iter_result barrel_collision(void* bar, void* user) {

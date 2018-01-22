@@ -131,7 +131,7 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
 
 void register_log_handler(log_handler* handler)
 {
-    bind_event(log_handler, current_handler, handler);
+    bind_event(current_handler, handler);
 }
 
 void register_log_file(FILE* file)

@@ -89,7 +89,7 @@ bool action_is_triggered(action_id id) {
 }
 
 void set_action_event(action_id id, action_event* event) {
-    bind_event(action_event, action_list[id].event, event);
+    bind_event(action_list[id].event, event);
 }
 
 axis_id create_axis(float limit, bool digital) {

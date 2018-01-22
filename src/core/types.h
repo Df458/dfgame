@@ -4,6 +4,7 @@
 #include "memory/alloc.h"
 #include <inttypes.h>
 #include <stdbool.h>
+#include <string.h>
 #ifdef WIN32
 #define NOMINMAX
 #include "windows.h"
@@ -16,7 +17,7 @@
 #define delegate(type, name, ...) typedef type (*name)(__VA_ARGS__);
 #define event(name, ...) typedef void (*name##_func)(__VA_ARGS__, void* user); typedef struct name { name##_func func; void* user; } name;
 #define call_event(ev, ...) if(ev && ev->func) { ev->func(__VA_ARGS__, ev->user); }
-#define bind_event(type, bind, ev) { if(bind) sfree(bind); if(ev) { bind = salloc(sizeof(type)); bind = memcpy(bind, ev, sizeof(type)); } }
+#define bind_event(bind, ev) { if(bind) sfree(bind); if(ev) { bind = salloc(sizeof(*bind)); bind = memcpy(bind, ev, sizeof(*bind)); } }
 #define as_event(type, f, u) &((type){ .func=f, .user=u })
 
 typedef uint8_t uint8;

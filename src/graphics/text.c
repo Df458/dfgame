@@ -128,7 +128,7 @@ void text_update_mesh(text t) {
             offset.y += height;
 
             current_data.end = i;
-            array_copyadd_simple(line_data, current_data, text_line_data);
+            array_copyadd_simple(line_data, current_data);
             if(current_data.box.dimensions.x > t->bounding_size.x)
                 t->bounding_size.x = current_data.box.dimensions.x;
             current_data = (text_line_data){0};
@@ -159,7 +159,7 @@ void text_update_mesh(text t) {
     }
     current_data.end = i;
     if(current_data.start < current_data.end)
-        array_copyadd_simple(line_data, current_data, text_line_data);
+        array_copyadd_simple(line_data, current_data);
 
     mesh_free(t->msh);
     t->msh = mesh_new(len * 6, buf);
