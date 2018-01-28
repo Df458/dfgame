@@ -219,9 +219,8 @@ void update_input() {
             array_foreach(key_axis_bindings[i].axes, axis_value_foreach, NULL);
     }
     for(int i = 0; i < MB_LAST; ++i) {
-        if(mouse_button_bindings[i].actions != NULL && mouse_button_bindings[i].active) {
+        if(mouse_button_bindings[i].actions != NULL && mouse_button_bindings[i].active)
             array_foreach(mouse_button_bindings[i].actions, action_active_foreach, NULL);
-        }
         if(mouse_button_axis_bindings[i].axes != NULL && mouse_button_axis_bindings[i].set)
             array_foreach(mouse_button_axis_bindings[i].axes, axis_value_foreach, NULL);
     }

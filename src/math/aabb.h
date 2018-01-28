@@ -35,9 +35,11 @@ float aabb_volume_3d(aabb_3d box);
 // Gets whether or not the two aabbs intersect
 #define aabb_intersects(box, v) _Generic(box,\
     aabb_2d: aabb_intersects_2d,\
-    aabb_3d: aabb_intersects_3d,\
-    vec2: aabb_intersects_point_2d,\
-    vec3: aabb_intersects_point_3d\
+    aabb_3d: aabb_intersects_3d\
+)(box, v)
+#define aabb_intersects_point(box, v) _Generic(box,\
+    aabb_2d: aabb_intersects_point_2d,\
+    aabb_3d: aabb_intersects_point_3d\
 )(box, v)
 bool aabb_intersects_2d(aabb_2d box1, aabb_2d box2);
 bool aabb_intersects_3d(aabb_3d box1, aabb_3d box2);

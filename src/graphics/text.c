@@ -9,6 +9,7 @@
 #include "memory/alloc.h"
 #include "matrix.h"
 #include "mesh.h"
+#include "stringutil.h"
 #include "texture_atlas.h"
 #include "vertex.hd"
 #include <string.h>
@@ -173,20 +174,12 @@ void text_set_str_va(text t, const char* s, va_list args) {
     if(t->str)
         sfree(t->str);
 
-    if(!s)
+    char* new_str = vsaprintf(s, args);
+
+    if(!new_str)
         return;
 
-    va_list tempargs;
-    size_t length;
-	va_copy(tempargs, args);
-
-    length = vsnprintf(0, 0, s, tempargs);
-    va_end(tempargs);
-
-	++length;
-    t->str = mscalloc(length, char);
-
-    vsnprintf(t->str, length, s, args);
+    t->str = new_str;
 
     text_update_mesh(t);
 }

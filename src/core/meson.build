@@ -1,5 +1,5 @@
 coredeps = []
-coresrc  = [ 'check.c', 'log/log.c', 'memory/alloc.c', 'container/array.c', 'container/hashmap.c', 'power.c', 'crc.c' ]
+coresrc  = [ 'check.c', 'log/log.c', 'memory/alloc.c', 'container/array.c', 'container/hashmap.c', 'power.c', 'crc.c', 'stringutil.c' ]
 coreinc  = [ include_directories('log'), include_directories('memory'), include_directories('container') ]
 corelib  = static_library('dfgame_core', coresrc,
                          include_directories : coreinc,
@@ -15,7 +15,7 @@ pkgconfig.generate(libraries : corelib,
                     description : 'dfgame core module, provides core functionality')
 
 install_headers(
-    [ 'check.h', 'crc.h', 'power.h', 'types.h' ],
+    [ 'check.h', 'crc.h', 'power.h', 'stringutil.h', 'types.h' ],
     subdir : 'dfgame/core')
 install_headers(
     [ 'container/array.h', 'container/delegate.h', 'container/hashmap.h', 'container/array.hd', 'container/hashmap.hd' ],
