@@ -24,6 +24,17 @@ gltex gltex_new(GLenum type, uint16 w, uint16 h) {
 
     return tex;
 }
+gltex gltex_new_depth(GLenum type, uint16 w, uint16 h) {
+    gltex tex;
+    tex.width = w;
+    tex.height = h;
+    tex.type = type;
+    glGenTextures(1, &tex.handle);
+    glBindTexture(type, tex.handle);
+    glTexImage2D(type, 0, GL_DEPTH24_STENCIL8, w, h, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+
+    return tex;
+}
 rawtex rawtex_new(uint16 w, uint16 h, uint8 elements) {
     return (rawtex) {
         .width = w,

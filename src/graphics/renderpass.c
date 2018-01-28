@@ -15,14 +15,17 @@ static renderpass_null_response* default_response;
 typedef struct renderpass {
     framebuffer fbo;
     gltex texture;
+    gltex depth;
 }* renderpass;
 
 renderpass renderpass_new(uint16 w, uint16 h) {
     renderpass pass = salloc(sizeof(struct renderpass));
     pass->fbo = framebuffer_new();
     pass->texture = gltex_new(GL_TEXTURE_2D, w, h);
+    pass->depth = gltex_new_depth(GL_TEXTURE_2D, w, h);
     glBindFramebuffer(GL_FRAMEBUFFER, pass->fbo.handle);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pass->texture.handle, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, pass->depth.handle, 0);
     GLenum targets[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, targets);
 
