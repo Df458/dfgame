@@ -86,7 +86,7 @@ bool audio_source_get_next_buffer(audio_source src, ALuint buffer, uint32 pos, u
     byte* data = audio_source_get_next(src, pos, &size);
 
     if(size) {
-        AL_CALL(alBufferData(buffer, src->channels, data, AUDIO_BUFFER_SIZE * src->length_mod, src->sample_rate), false);
+        AL_CALL(alBufferData(buffer, src->channels, data, size, src->sample_rate), false);
 
         if(length)
             *length = size;
