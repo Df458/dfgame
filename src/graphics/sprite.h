@@ -18,6 +18,7 @@ void sprite_update(sprite spr, float dt);
 int16 sprite_get_anim_id(sprite spr);
 aabb_2d sprite_get_box(sprite spr);
 gltex sprite_get_texture(sprite spr);
+spriteset sprite_get_data(sprite spr);
 
 void sprite_draw(sprite spr, shader s, mat4 model, mat4 view);
 

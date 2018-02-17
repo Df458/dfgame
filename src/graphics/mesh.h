@@ -46,6 +46,20 @@ uint8 mesh_get_data_type(mesh m);
 // Returns the contents of the mesh.
 void* mesh_get_data(mesh m);
 
+// Sets the mesh's data
+void mesh_set_data_type(mesh m, uint32 size, uint8 vertex_type, void* data);
+
+#define mesh_set_data(m, size, data) _Generic(data,\
+    vt_p*: mesh_set_data_type(m, size, VT_POSITION, data),\
+    vt_pn*: mesh_set_data_type(m, size, VT_POSITION | VT_NORMAL, data),\
+    vt_pt*: mesh_set_data_type(m, size, VT_POSITION | VT_TEXTURE, data),\
+    vt_pnt*: mesh_set_data_type(m, size, VT_POSITION | VT_NORMAL | VT_TEXTURE, data),\
+    vt_pc*: mesh_set_data_type(m, size, VT_POSITION | VT_COLOR, data),\
+    vt_pnc*: mesh_set_data_type(m, size, VT_POSITION | VT_NORMAL | VT_COLOR, data),\
+    vt_ptc*: mesh_set_data_type(m, size, VT_POSITION | VT_TEXTURE | VT_COLOR, data),\
+    vt_pntc*: mesh_set_data_type(m, size, VT_POSITION | VT_NORMAL | VT_TEXTURE | VT_COLOR, data)\
+)
+
 // Updates the mesh for rendering
 void mesh_update(mesh m);
 

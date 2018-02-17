@@ -93,6 +93,10 @@ gltex sprite_get_texture(sprite spr) {
     return spriteset_get_texture(spr->src);
 }
 
+spriteset sprite_get_data(sprite spr) {
+    return spr->src;
+}
+
 int16 sprite_get_anim_id(sprite spr) {
     return spr->current_animation.texture_id;
 }

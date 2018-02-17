@@ -23,24 +23,11 @@ typedef struct mesh {
 mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data) {
     check_return(vertex_type & VT_POSITION, "Unsupported vertex type %u: Type must contain position.", NULL, vertex_type);
 
-    uint32 vt_size = sizeof(float) * 3;
-    if(vertex_type & VT_NORMAL)
-        vt_size += sizeof(float) * 3;
-    if(vertex_type & VT_TEXTURE)
-        vt_size += sizeof(float) * 2;
-    if(vertex_type & VT_COLOR)
-        vt_size += sizeof(float) * 4;
-
     mesh m = salloc(sizeof(struct mesh));
-    m->data = scalloc(size, vt_size);
-    if(data)
-        memcpy(m->data, data, size * vt_size);
-    m->type_flags = vertex_type;
-    m->vertex_count = size;
-    m->data_size = vt_size;
-
+    m->data = NULL;
     glGenBuffers(1, &m->handle);
-    mesh_update(m);
+
+    mesh_set_data_type(m, size, vertex_type, data);
 
     return m;
 }
@@ -87,6 +74,32 @@ uint8 mesh_get_data_type(mesh m) {
 // Returns the contents of the mesh.
 void* mesh_get_data(mesh m) {
     return m->data;
+}
+
+void mesh_set_data_type(mesh m, uint32 size, uint8 vertex_type, void* data) {
+    check_return(vertex_type & VT_POSITION, "Unsupported vertex type %u: Type must contain position.", , vertex_type);
+
+    if(m->data)
+        sfree(m->data);
+
+    uint32 vt_size = sizeof(float) * 3;
+    if(vertex_type & VT_NORMAL)
+        vt_size += sizeof(float) * 3;
+    if(vertex_type & VT_TEXTURE)
+        vt_size += sizeof(float) * 2;
+    if(vertex_type & VT_COLOR)
+        vt_size += sizeof(float) * 4;
+
+    m->data = scalloc(size, vt_size);
+
+    if(data)
+        memcpy(m->data, data, size * vt_size);
+
+    m->type_flags = vertex_type;
+    m->vertex_count = size;
+    m->data_size = vt_size;
+
+    mesh_update(m);
 }
 
 // Updates the mesh for rendering
