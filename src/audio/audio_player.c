@@ -90,6 +90,10 @@ void audio_player_set_distances(audio_player player, float reference_distance, f
     AL_CALL(alSourcef(player->al_source, AL_MAX_DISTANCE, max_distance), );
 }
 
+void audio_player_set_gain(audio_player player, float gain) {
+    alSourcef(player->al_source, AL_GAIN, gain);
+}
+
 void audio_player_update(audio_player player, float dt) {
     if(!player->play)
         return;

@@ -30,6 +30,10 @@ void audio_update_listener(vec3 position, vec3 forward, vec3 up, vec3 velocity) 
     alListenerfv(AL_VELOCITY, velocity.data);
 }
 
+void audio_set_listener_gain(float gain) {
+    alListenerf(AL_GAIN, gain);
+}
+
 void audio_cleanup() {
     if(al_context)
         alcDestroyContext(al_context);
