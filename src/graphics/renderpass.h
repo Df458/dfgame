@@ -8,6 +8,8 @@
 event(renderpass_null_response, renderpass prev);
 
 renderpass renderpass_new(uint16 w, uint16 h);
+#define renderpass_free(p) { _renderpass_free(p); p = NULL; }
+void _renderpass_free(renderpass pass);
 
 void renderpass_start(renderpass pass);
 void renderpass_next(renderpass pass, shader s);

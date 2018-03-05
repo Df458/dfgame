@@ -161,6 +161,15 @@ void* hashmap_get(hashmap map, hash_key) {
     return map->buckets[crc % HASHMAP_BUCKET_COUNT].data[index];
 }
 
+void* hashmap_get_value(hashmap map, void* data, equality_predicate p, void* user) {
+    for(uint16 i = 0; i < HASHMAP_BUCKET_COUNT; ++i)
+        for(uint16 j = 0; j < map->buckets[i].size; ++j)
+            if(p(map->buckets[i].data[j], data, user))
+                return map->buckets[i].data[j];
+
+    return NULL;
+}
+
 // Removes the entry at has_key in the map.
 void hashmap_remove(hashmap map, hash_key) {
     uint32 crc = make_crc();

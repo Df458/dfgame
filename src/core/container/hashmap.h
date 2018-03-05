@@ -42,14 +42,18 @@ void hashmap_copyset(hashmap map, hash_key, void* value, uint32 size);
 // Returns whether or not hash_key is present in the map
 bool hashmap_has_key(hashmap map, hash_key);
 
-// Returns the value mapped to hash_key. Returns NULL is hash_key is not
+// Returns the value mapped to hash_key. Returns NULL if hash_key is not
 // mapped.
 void* hashmap_get(hashmap map, hash_key);
+
+// Returns the first value matching predicate p. Returns NULL if no values
+// match.
+void* hashmap_get_value(hashmap map, void* data, equality_predicate p, void* user);
 
 // Removes the entry at has_key in the map.
 void hashmap_remove(hashmap map, hash_key);
 
-// Calls d on each object in the array. Values an be replaced
+// Calls d on each object in the map. Values an be replaced
 // by returning a decision of *_REPLACE, and they can be deleted by returning
 // a decision of *_DELETE.
 // Values can be safely deleted without worrying about skipping entries, but

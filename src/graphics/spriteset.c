@@ -59,10 +59,21 @@ uint16 spriteset_get_animation_count(spriteset set) {
     return hashmap_size(set->animations);
 }
 
-animation spriteset_get_animation(spriteset set, const char* handle) {
+animation spriteset_get_animation_by_name(spriteset set, const char* handle) {
     if(!handle || !hashmap_has_key(set->animations, make_hash_key("default")))
         return *(animation*)hashmap_get(set->animations, make_hash_key("default"));
     return *(animation*)hashmap_get(set->animations, make_hash_key(handle));
+}
+
+bool match_animation_id(void* anim, void* id, void* user) {
+    return ((animation*)anim)->texture_id == *(int*)id;
+}
+
+animation spriteset_get_animation_by_id(spriteset set, int16 handle) {
+    animation* a = hashmap_get_value(set->animations, &handle, match_animation_id, NULL);
+    if(handle == -1 || !a)
+        return *(animation*)hashmap_get(set->animations, make_hash_key("default"));
+    return *a;
 }
 
 gltex spriteset_get_texture(spriteset set) {

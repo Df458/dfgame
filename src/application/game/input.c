@@ -190,3 +190,24 @@ void update_input() {
     mouse_position_axis_bindings[1].set = false;
     mouse_position_axis_bindings[1].offset = 0;
 }
+
+void clear_input_bindings()
+{
+    for(int i = 0; i < K_LAST; ++i) {
+        if(key_bindings[i].actions != NULL)
+            array_free_deep(key_bindings[i].actions);
+        if(key_axis_bindings[i].axes != NULL)
+            array_free_deep(key_axis_bindings[i].axes);
+    }
+    for(int i = 0; i < MB_LAST; ++i) {
+        if(mouse_button_bindings[i].actions != NULL)
+            array_free_deep(mouse_button_bindings[i].actions);
+        if(mouse_button_axis_bindings[i].axes != NULL)
+            array_free_deep(mouse_button_axis_bindings[i].axes);
+    }
+
+    if(mouse_position_axis_bindings[0].axes != NULL)
+        array_free_deep(mouse_position_axis_bindings[0].axes);
+    if(mouse_position_axis_bindings[1].axes != NULL)
+        array_free_deep(mouse_position_axis_bindings[1].axes);
+}

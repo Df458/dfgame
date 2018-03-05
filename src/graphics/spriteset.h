@@ -32,7 +32,14 @@ spriteset spriteset_new();
 void spriteset_add_animation_raw(spriteset set, animation anim, rawtex texture, const char* handle);
 void spriteset_add_animation_gl(spriteset set, animation anim, gltex texture, const char* handle);
 uint16 spriteset_get_animation_count(spriteset set);
-animation spriteset_get_animation(spriteset set, const char* handle);
+#define spriteset_get_animation(s, h) _Generic(h,\
+    void*: spriteset_get_animation_by_name,\
+    char*: spriteset_get_animation_by_name,\
+    const char*: spriteset_get_animation_by_name,\
+    int16: spriteset_get_animation_by_id\
+)(s, h)
+animation spriteset_get_animation_by_name(spriteset set, const char* handle);
+animation spriteset_get_animation_by_id(spriteset set, int16 handle);
 gltex spriteset_get_texture(spriteset set);
 
 #define spriteset_free(s) { _spriteset_free(s); s = NULL; }

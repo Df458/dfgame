@@ -30,7 +30,16 @@ sprite sprite_new(spriteset set) {
     return spr;
 }
 
-void sprite_set_animation(sprite spr, const char* handle, bool force_reset) {
+void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset) {
+    animation anim = spriteset_get_animation(spr->src, handle);
+    if(anim.texture_id == spr->current_animation.texture_id && !force_reset)
+        return;
+    spr->current_animation = anim;
+    spr->position = 0;
+    sprite_set_playing(spr, spr->current_animation.autoplay);
+}
+
+void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset) {
     animation anim = spriteset_get_animation(spr->src, handle);
     if(anim.texture_id == spr->current_animation.texture_id && !force_reset)
         return;
@@ -41,6 +50,10 @@ void sprite_set_animation(sprite spr, const char* handle, bool force_reset) {
 
 void sprite_set_orientation(sprite spr, uint8 orient) {
     spr->orient = orient;
+}
+
+uint8 sprite_get_orientation(sprite spr) {
+    return spr->orient;
 }
 
 void sprite_set_playing(sprite spr, bool playing) {

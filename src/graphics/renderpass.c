@@ -3,6 +3,7 @@
 
 #include "renderpass.h"
 
+#include "check.h"
 #include "framebuffer.h"
 #include "matrix.h"
 #include "memory/alloc.h"
@@ -32,6 +33,14 @@ renderpass renderpass_new(uint16 w, uint16 h) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return pass;
+}
+void _renderpass_free(renderpass pass) {
+    check_return(pass, "Can't free renderpass: pass is NULL", );
+    glDeleteTextures(1, &pass->texture.handle);
+    glDeleteTextures(1, &pass->depth.handle);
+    glDeleteFramebuffers(1, &pass->depth.handle);
+
+    sfree(pass);
 }
 
 void renderpass_start(renderpass pass) {

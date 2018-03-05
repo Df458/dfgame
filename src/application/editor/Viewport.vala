@@ -16,7 +16,11 @@ namespace DFGame
             key_release_event.connect(on_key_release);
             motion_notify_event.connect(on_mouse_motion);
             scroll_event.connect(on_scroll);
-            enter_notify_event.connect((ev) => { is_focus = true; });
+            enter_notify_event.connect((ev) => {
+                is_focus = true;
+                on_enter(ev.x, ev.y);
+                return false;
+            });
 
             Framebuffer.set_callback({ framebuffer_callback, this });
 

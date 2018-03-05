@@ -105,19 +105,21 @@ void audio_player_update(audio_player player, float dt) {
 
     if(player->pos >= audio_source_get_length(player->src) && !remaining) {
         player->pos = 0;
+
+        while(processed != 0 && processed--)
+            AL_CALL(alSourceUnqueueBuffers(player->al_source, 1, NULL), );
+
         if(!player->loop) {
             player->play = false;
             AL_CALL(alSourceStop(player->al_source), );
-
-            ALuint buffer;
-            while(processed--) {
-                AL_CALL(alSourceUnqueueBuffers(player->al_source, 1, &buffer), );
-            }
-            return;
+        } else if(prepare_buffer(player, &player->buffers[0])) {
+            prepare_buffer(player, &player->buffers[1]);
         }
+
+        return;
     }
 
-    while(processed--) {
+    while(processed != 0 && processed--) {
         ALuint buffer;
         AL_CALL(alSourceUnqueueBuffers(player->al_source, 1, &buffer), );
 

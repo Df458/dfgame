@@ -18,4 +18,6 @@ axis_id input_add_mouse_position_axis(bool vertical, float limit, float mod, boo
 
 void update_input();
 
+void clear_input_bindings();
+
 #endif

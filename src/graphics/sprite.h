@@ -9,8 +9,16 @@
 #include "texture.h"
 
 sprite sprite_new(spriteset set);
-void sprite_set_animation(sprite spr, const char* handle, bool force_reset);
+#define sprite_set_animation(s, h, f) _Generic(h,\
+    void*: sprite_set_animation_name,\
+    char*: sprite_set_animation_name,\
+    const char*: sprite_set_animation_name,\
+    int16: sprite_set_animation_id\
+)(s, h, f)
+void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset);
+void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset);
 void sprite_set_orientation(sprite spr, uint8 orient);
+uint8 sprite_get_orientation(sprite spr);
 void sprite_set_playing(sprite spr, bool playing);
 bool sprite_get_playing(sprite spr);
 void sprite_set_position(sprite spr, float position);

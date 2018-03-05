@@ -15,6 +15,8 @@ namespace DFGame
             public static bool on_mouse_motion(Gdk.EventMotion event);
         [CCode (cname = "on_scroll")]
             public static bool on_scroll(Gdk.EventScroll event);
+        [CCode (cname = "on_enter")]
+            public static bool on_enter(double x, double y);
         [CCode (cname = "update_input")]
             public static void update_input();
     }

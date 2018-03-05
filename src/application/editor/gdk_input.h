@@ -10,5 +10,6 @@ bool on_key_press(GdkEventKey* event);
 bool on_key_release(GdkEventKey* event);
 bool on_mouse_motion(GdkEventMotion* event);
 bool on_scroll(GdkEventScroll* event);
+void on_enter(double x, double y);
 
 #endif
