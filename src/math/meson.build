@@ -20,3 +20,5 @@ pkgconfig.generate(libraries : mathlib,
 install_headers(
     [ 'aabb.h', 'interpolate.h', 'mathutil.h', 'matrix.h', 'quat.h', 'transform.h', 'vector.h', 'matrix.hd', 'quat.hd', 'transform.hd', 'vector.hd' ],
     subdir : 'dfgame/math')
+
+math = declare_dependency(include_directories : include_directories('.'), link_with : mathlib)

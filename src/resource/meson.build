@@ -47,3 +47,5 @@ pkgconfig.generate(libraries : resourcelib,
 install_headers(
     [ 'audio_loader.h', 'data_loader.h', 'font_loader.h', 'mesh_loader.h', 'paths.h', 'sprite_loader.h', 'texture_loader.h' ],
     subdir : 'dfgame/resource')
+
+resource = declare_dependency(include_directories : include_directories('.'), link_with : resourcelib)

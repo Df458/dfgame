@@ -36,3 +36,6 @@ pkgconfig.generate(libraries : applicationeditorlib,
                     description : 'dfgame application module (editor), provides classes and UI widgets for use in tools')
 
 install_data(sources : '../../../data/catalog/dfgame-editor.xml', install_dir : '/usr/share/glade/catalogs')
+
+application_editor_c = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorclib)
+application_editor_vala = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorlib)

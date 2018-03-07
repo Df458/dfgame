@@ -19,3 +19,5 @@ pkgconfig.generate(libraries : gameplaylib,
 install_headers(
     [ 'control.h' ],
     subdir : 'dfgame/gameplay')
+
+gameplay = declare_dependency(include_directories : include_directories('.'), link_with : gameplaylib)

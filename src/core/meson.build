@@ -26,3 +26,5 @@ install_headers(
 install_headers(
     [ 'memory/alloc.h' ],
     subdir : 'dfgame/core/memory')
+
+core = declare_dependency(include_directories : coreinc, link_with : corelib)

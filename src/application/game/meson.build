@@ -17,3 +17,5 @@ pkgconfig.generate(libraries : applicationgamelib,
 install_headers(
     [ 'mainloop.h', 'mainloop.hd' ],
     subdir : 'dfgame/application/game')
+
+application_game = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationgamelib)

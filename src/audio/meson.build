@@ -21,3 +21,5 @@ pkgconfig.generate(libraries : audiolib,
 install_headers(
     [ 'audio_log.h', 'audio_player.h', 'audio_source.h', 'audio_system.h', 'audio_source.hd', 'audio_player.hd' ],
     subdir : 'dfgame/audio')
+
+audio = declare_dependency(include_directories : include_directories('.'), link_with : audiolib)

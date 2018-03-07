@@ -26,3 +26,5 @@ pkgconfig.generate(libraries : graphicslib,
 install_headers(
     [ 'camera.h', 'color.h', 'debug_draw.h', 'font.h', 'framebuffer.h', 'graphics_log.h', 'mesh.h', 'renderpass.h', 'shader.h', 'shader_init.h', 'sprite.h', 'spriteset.h', 'text.h', 'texture.h', 'texture_atlas.h', 'camera.hd', 'font.hd', 'mesh.hd', 'renderpass.hd', 'shader.hd', 'sprite.hd', 'spriteset.hd', 'text.hd', 'texture_atlas.hd', 'vertex.hd' ],
     subdir : 'dfgame/graphics')
+
+graphics = declare_dependency(include_directories : include_directories('.'), link_with : graphicslib)
