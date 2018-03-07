@@ -6,6 +6,7 @@ applicationeditorclib  = static_library('dfgame_application_editor_backend', app
                          link_args : args,
                          install : true)
 
+
 applicationeditordeps = [ gtk ]
 applicationeditorsrc  = [ 'Viewport.vala']
 applicationeditorinc  = [ include_directories('.') ] + applicationinc
@@ -15,7 +16,7 @@ applicationeditorlib  = shared_library('dfgame_application_editor', applicatione
                         vala_vapi : 'dfgame-application-editor.vapi',
                         dependencies : applicationeditordeps,
                         link_with : [ gameplaylib, graphicslib, applicationeditorclib ],
-                        vala_args : ['--target-glib=2.38', '--vapidir=../src/application/editor', '--pkg=editorc'],
+                        vala_args : ['--target-glib=2.38', '--pkg=editorc', ['--vapidir', join_paths(meson.current_source_dir())]],
                         install : true,
                        install_dir : [ true, true, true ])
 
