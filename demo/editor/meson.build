@@ -7,7 +7,7 @@ deditor_ctarget = static_library('demo_editor', 'triangle.c',
 
 deditorsrc = [ 'main.vala', 'DemoApp.vala', 'MainWindow.vala', 'Demo.vapi' ]
 deditordeps = [ gtk ]
-deditorinc = [ application_editor_vala.include_directories ] + deditor_cinc
+deditorinc = deditor_cinc
 deditorresources = gnome.compile_resources('resources', 'assets/demo.gresource.xml', source_dir : 'assets')
 deditortarget = executable('demo_editor', deditorsrc + deditorresources,
                         dependencies : deditordeps,
