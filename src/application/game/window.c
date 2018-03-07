@@ -23,6 +23,10 @@ void* window_new_default(uint16 width, uint16 height, const char* title) {
     glfwSwapInterval(0);
     
     GLFWwindow* win = glfwCreateWindow(width, height, title, NULL, NULL);
+    if(!win) {
+        glfwTerminate();
+        fatal("Failed to create window");
+    }
     glfwSetKeyCallback(win, input_key_callback);
     glfwSetMouseButtonCallback(win, input_mouse_button_callback);
     glfwSetScrollCallback(win, input_mouse_scroll_callback);
