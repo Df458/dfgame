@@ -55,6 +55,7 @@ triangle* triangle_init() {
     t->size  = 0.5f;
     t->angle = 0.0f;
     t->color = color_white;
+    t->filled = true;
     t->tri_data = mesh_new(3, triangle_verts);
 
     return t;

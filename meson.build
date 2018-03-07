@@ -10,8 +10,9 @@ pkgconfig = import('pkgconfig')
 
 m = compiler.find_library('m', required : false)
 freetype = dependency('freetype2')
-glfw = dependency('glfw3')
-glew = dependency('glew')
+gl = dependency('gl')
+glfw = subproject('glfw').get_variable('glfw_dep')
+glew = subproject('glew').get_variable('glew_dep')
 if get_option('enable_jpeg') == true
     jpeg = dependency('libjpeg')
 endif

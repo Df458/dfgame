@@ -24,8 +24,6 @@ To build DFGame, you'll need the following tools:
 - pkg-config (optional)
 and the following libraries:
 - libFreeType
-- GLFW
-- GLEW
 - libJPEG (optional)
 - libPNG (optional)
 - libTIFF (optional)
@@ -34,6 +32,10 @@ and the following libraries:
 - libOgg
 - libVorbisfile
 - libXml
+
+DFGame will pull in the following libraries on its own:
+- glew
+- glfw
 
 You can build and install DFGame using the following steps.
 ```bash

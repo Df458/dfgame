@@ -21,6 +21,7 @@ public class MainWindow : ApplicationWindow
     {
         color_selector.notify["rgba"].connect(color_changed);
         viewport.update_interval = 60;
+        viewport.update_step.connect(on_loop);
     }
 
     public void prepare()
@@ -29,6 +30,12 @@ public class MainWindow : ApplicationWindow
 
         Demo.init();
         triangle = new Demo.Triangle();
+    }
+
+    private bool on_loop(float dt)
+    {
+        triangle.draw();
+        return true;
     }
 
     [GtkCallback]

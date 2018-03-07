@@ -5,7 +5,7 @@ shaders = [
     glsl_gen.process('../../data/shaders/shader_basic_untex.gl'),
 ]
 
-graphicsdeps = [ glew, freetype ]
+graphicsdeps = [ gl, glew, freetype ]
 graphicssrc  = [ 'camera.c', 'debug_draw.c', 'font.c', 'framebuffer.c', 'graphics_log.c', 'mesh.c', 'renderpass.c', 'shader.c', 'shader_init.c', 'sprite.c', 'spriteset.c', 'text.c', 'texture.c', 'texture_atlas.c' ]
 graphicsinc  = [ include_directories('../core'), include_directories('../math') ]
 graphicslib  = static_library('dfgame_graphics', shaders, graphicssrc,

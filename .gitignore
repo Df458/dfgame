@@ -9,3 +9,7 @@ vapi/editor-frontend.vapi
 vapi/editor-frontend.deps
 build
 crossbuild
+
+subprojects/glew-2.1.0
+subprojects/glfw
+subprojects/packagecache
