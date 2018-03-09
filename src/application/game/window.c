@@ -16,7 +16,7 @@ static bool glfw_init_called = false;
 void* window_new_default(uint16 width, uint16 height, const char* title) {
     check_kill(glfw_init_called || glfwInit(), "Failed to intialize GLFW.");
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 

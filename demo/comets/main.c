@@ -10,6 +10,7 @@
 #include "control.h"
 #include "container/array.h"
 #include "font_loader.h"
+#include "font.h"
 #include "input.h"
 #include "interpolate.h"
 #include "log/log.h"

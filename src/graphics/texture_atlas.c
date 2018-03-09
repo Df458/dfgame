@@ -6,65 +6,121 @@
 #include "check.h"
 #include "container/array.h"
 #include "memory/alloc.h"
+#include "power.h"
+
+typedef struct atlas_box {
+    aabb_2d box;
+    vec3 free_marker;
+} atlas_box;
 
 bool find_fitting_atlas_box(void* o1, void* o2, void* user) {
-    aabb_2d box = *(aabb_2d*)o2;
-    aabb_2d container = *(aabb_2d*)o1;
+    atlas_box a = *(atlas_box*)o1; // Container
+    atlas_box* a_p = (atlas_box*)o1;
+    aabb_2d b = *(aabb_2d*)o2; // New box
 
-    return box.dimensions.x <= container.dimensions.x && box.dimensions.y <= container.dimensions.y;
+    if(a.box.dimensions.x < b.dimensions.x || a.box.dimensions.y - a.free_marker.y < b.dimensions.y)
+        return false;
+
+    if(a.box.dimensions.x - a.free_marker.x < b.dimensions.x) {
+        if(a.box.dimensions.y - a.free_marker.z < b.dimensions.y)
+            return false;
+
+        a_p->free_marker.x = 0;
+        a_p->free_marker.y = a.free_marker.z;
+        a_p->free_marker.z += b.dimensions.y;
+    } else if(a.free_marker.z - a.free_marker.y < b.dimensions.y) {
+        a_p->free_marker.z = a.free_marker.y + b.dimensions.y;
+    }
+
+    return true;
 }
 
 typedef struct texture_atlas {
     gltex texture_data;
     uarray textures;
-    vec3 free_space;
+    uarray free_space;
 }* texture_atlas;
 
-// TODO: Resize if the atlas fills
 texture_atlas texture_atlas_new() {
     texture_atlas atlas = salloc(sizeof(struct texture_atlas));
-    atlas->texture_data = (gltex) {
-        .width = 4096,
-        .height = 4096,
-        .type = GL_TEXTURE_2D,
-    };
-    glGenTextures(1, &atlas->texture_data.handle);
-
-    glBindTexture(GL_TEXTURE_2D, atlas->texture_data.handle);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
+    atlas->texture_data = gltex_new(GL_TEXTURE_2D, 256, 256);
     uint8 clearcolor[4] = { 0, 0, 0, 0 };
     glClearTexImage(atlas->texture_data.handle, 0, GL_RGBA, GL_UNSIGNED_BYTE, &clearcolor);
 
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
-
     atlas->textures = uarray_new(8);
-    atlas->free_space = (vec3){0};
+    atlas->free_space = uarray_new(8);
+
+    atlas_box initial = (atlas_box) {
+        .box = (aabb_2d) {
+            .position = (vec2){0},
+            .dimensions = (vec2){ .x = 256, .y = 256 }
+        },
+        .free_marker = (vec3){0}
+    };
+    array_copyadd_simple(atlas->free_space, initial);
 
     return atlas;
 }
 
 aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
-    check_return(box.width <= atlas->texture_data.width && box.height <= (atlas->texture_data.height - atlas->free_space.y) && (box.width <= (atlas->texture_data.width - atlas->free_space.x) || box.height <= (atlas->texture_data.height - atlas->free_space.z)), "Can't pack texture of "vec2_printstr" in atlas (free "vec3_printstr" [%d %d])", (aabb_2d){0}, vec2_decomp(box.dimensions), vec3_decomp(atlas->free_space), atlas->texture_data.width, atlas->texture_data.height);
+    uint16 new_size = atlas->texture_data.width;
+    atlas_box* found_box = NULL;
 
-    if(box.width < atlas->texture_data.width - atlas->free_space.x) {
-        box.position = atlas->free_space.xy;
-        atlas->free_space.x += box.width;
-        atlas->free_space.z = max(atlas->free_space.z, atlas->free_space.y + box.height);
-    } else {
-        box.x = 0;
-        box.y = atlas->free_space.z;
-        atlas->free_space.x = box.width;
-        atlas->free_space.y = atlas->free_space.z;
-        atlas->free_space.z = max(atlas->free_space.z, atlas->free_space.y + box.height);
+    do {
+        int32 res = array_findp(atlas->free_space, &box, find_fitting_atlas_box, NULL);
+
+        if(res == -1) {
+            uint16 prev_size = new_size;
+            new_size = next_power_of_two(new_size);
+            uint16 len = array_size(atlas->free_space);
+
+            for(uint16 i = 0; i < len; ++i) {
+                atlas_box* box = array_get(atlas->free_space, i);
+
+                if(box->box.position.x + box->box.dimensions.x >= prev_size) {
+                    if(box->free_marker.y == 0) {
+                        box->box.dimensions.x += new_size - prev_size;
+                    } else {
+                        atlas_box new_box = (atlas_box) {
+                            .box = (aabb_2d) {
+                                .position = (vec2){ .x = prev_size, .y = box->box.position.y },
+                                .dimensions = (vec2){ .x = new_size - prev_size, .y = box->box.dimensions.y }
+                            },
+                                .free_marker = (vec3){0}
+                        };
+                        array_copyadd_simple(atlas->free_space, new_box);
+                    }
+                }
+            }
+            atlas_box new_box = (atlas_box) {
+                .box = (aabb_2d) {
+                    .position = (vec2){ .x = 0, .y = prev_size },
+                        .dimensions = (vec2){ .x = new_size, .y = new_size - prev_size }
+                },
+                    .free_marker = (vec3){0}
+            };
+            array_copyadd_simple(atlas->free_space, new_box);
+        } else {
+            found_box = array_get(atlas->free_space, res);
+        }
+    } while(!found_box && new_size <= 4096);
+
+    check_return(found_box, "Can't pack a texture of "vec2_printstr" in atlas (Current size [%d, %d]).", (aabb_2d){0}, vec2_decomp(box.dimensions), atlas->texture_data.width, atlas->texture_data.height);
+
+    if(new_size != atlas->texture_data.width)
+    {
+        gltex new_tex = gltex_new(GL_TEXTURE_2D, new_size, new_size);
+        uint8 clearcolor[4] = { 0, 0, 0, 0 };
+        glClearTexImage(atlas->texture_data.handle, 0, GL_RGBA, GL_UNSIGNED_BYTE, &clearcolor);
+
+        glCopyImageSubData(atlas->texture_data.handle, atlas->texture_data.type, 0, 0, 0, 0, new_tex.handle, new_tex.type, 0, 0, 0, 0, atlas->texture_data.width, atlas->texture_data.height, 0);
+        glDeleteTextures(1, &atlas->texture_data.handle);
+        atlas->texture_data = new_tex;
     }
 
-    array_copyadd(atlas->textures, &box, sizeof(aabb_2d));
+    box.position = vec2_add(found_box->box.position, found_box->free_marker.xy);
+    found_box->free_marker.x += box.dimensions.x;
+    array_copyadd_simple(atlas->textures, box);
 
     return box;
 }
@@ -115,6 +171,7 @@ void texture_atlas_free(texture_atlas atlas) {
     check_return(atlas, "Can't destroy atlas: Atlas is null", );
 
     array_free_deep(atlas->textures);
+    array_free_deep(atlas->free_space);
     glDeleteTextures(1, &atlas->texture_data.handle);
     sfree(atlas);
 }

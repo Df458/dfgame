@@ -132,8 +132,8 @@ bool uarray_removep(uarray array, void* data, equality_predicate p, void* user);
     sarray: sarray_remove_at,\
     uarray: uarray_remove_at\
 )(array, position)
-void sarray_remove_at(sarray array, uint16 position);
-void uarray_remove_at(uarray array, uint16 position);
+void* sarray_remove_at(sarray array, uint16 position);
+void* uarray_remove_at(uarray array, uint16 position);
 
 // Returns the element at position in this array.
 #define array_get(array, position) _Generic(array,\

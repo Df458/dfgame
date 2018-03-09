@@ -324,15 +324,21 @@ bool uarray_removep(uarray array, void* data, equality_predicate p, void* user) 
 }
 
 // Removes the element at position in this array.
-void sarray_remove_at(sarray array, uint16 position) {
+void* sarray_remove_at(sarray array, uint16 position) {
     assert(position < array->size);
     --array->size;
+
+    void* data = array->data[position];
     shift(array->data, array->size, position);
+    return data;
 }
-void uarray_remove_at(uarray array, uint16 position) {
+void* uarray_remove_at(uarray array, uint16 position) {
     assert(position < array->size);
     --array->size;
+
+    void* data = array->data[position];
     array->data[position] = array->data[array->size];
+    return data;
 }
 
 // Returns the element at position in this array.
