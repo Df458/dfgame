@@ -111,9 +111,9 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
     {
         gltex new_tex = gltex_new(GL_TEXTURE_2D, new_size, new_size);
         uint8 clearcolor[4] = { 0, 0, 0, 0 };
-        glClearTexImage(atlas->texture_data.handle, 0, GL_RGBA, GL_UNSIGNED_BYTE, &clearcolor);
+        glClearTexImage(new_tex.handle, 0, GL_RGBA, GL_UNSIGNED_BYTE, &clearcolor);
 
-        glCopyImageSubData(atlas->texture_data.handle, atlas->texture_data.type, 0, 0, 0, 0, new_tex.handle, new_tex.type, 0, 0, 0, 0, atlas->texture_data.width, atlas->texture_data.height, 0);
+        glCopyImageSubData(atlas->texture_data.handle, atlas->texture_data.type, 0, 0, 0, 0, new_tex.handle, new_tex.type, 0, 0, 0, 0, atlas->texture_data.width, atlas->texture_data.height, 1);
         glDeleteTextures(1, &atlas->texture_data.handle);
         atlas->texture_data = new_tex;
     }
@@ -137,7 +137,7 @@ int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
     if(!container.dimensions.x)
         return -1;
 
-    glCopyImageSubData(tex.handle, tex.type, 0, 0, 0, 0, atlas->texture_data.handle, atlas->texture_data.type, 0, container.position.x, container.position.y, 0, container.dimensions.x, container.dimensions.y, 0);
+    glCopyImageSubData(tex.handle, tex.type, 0, 0, 0, 0, atlas->texture_data.handle, atlas->texture_data.type, 0, container.position.x, container.position.y, 0, container.dimensions.x, container.dimensions.y, 1);
 
     return array_size(atlas->textures) - 1;
 }
