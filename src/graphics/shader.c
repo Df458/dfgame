@@ -18,28 +18,33 @@
 shader shader_new_vf(const char** vs, const char** fs) {
     shader s;
 
+    GLsizei len;
+    char log[1024];
+
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, vs, NULL);
     glCompileShader(vertex_shader);
 
+    glGetShaderInfoLog(vertex_shader, 1024, &len, log);
+    if(len)
+        info("Vertex shader log:\n%s", log);
+
     GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, fs, NULL);
     glCompileShader(fragment_shader);
+
+    glGetShaderInfoLog(fragment_shader, 1024, &len, log);
+    if(len)
+        info("Fragment shader log:\n%s", log);
 
     s.id = glCreateProgram();
     glAttachShader(s.id, vertex_shader);
     glAttachShader(s.id, fragment_shader);
     glLinkProgram(s.id);
 
-    GLsizei len;
-    char log[1024];
-    glGetShaderInfoLog(vertex_shader, 1024, &len, log);
+    glGetProgramInfoLog(s.id, 1024, &len, log);
     if(len)
-        info("Vertex shader log:\n%s", log);
-
-    glGetShaderInfoLog(fragment_shader, 1024, &len, log);
-    if(len)
-        info("Fragment shader log:\n%s", log);
+        info("Program link log:\n%s", log);
 
     glDetachShader(s.id, vertex_shader);
     glDetachShader(s.id, fragment_shader);
@@ -53,17 +58,32 @@ shader shader_new_vf(const char** vs, const char** fs) {
 shader shader_new_vgf(const char** vs, const char** gs, const char** fs) {
     shader s;
 
+    GLsizei len;
+    char log[1024];
+
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, vs, NULL);
     glCompileShader(vertex_shader);
+
+    glGetShaderInfoLog(vertex_shader, 1024, &len, log);
+    if(len)
+        info("Vertex shader log:\n%s", log);
 
     GLuint geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
     glShaderSource(geometry_shader, 1, fs, NULL);
     glCompileShader(geometry_shader);
 
+    glGetShaderInfoLog(geometry_shader, 1024, &len, log);
+    if(len)
+        info("Geometry shader log:\n%s\n%s", log, *gs);
+
     GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, fs, NULL);
     glCompileShader(fragment_shader);
+
+    glGetShaderInfoLog(fragment_shader, 1024, &len, log);
+    if(len)
+        info("Fragment shader log:\n%s", log);
 
     s.id = glCreateProgram();
     glAttachShader(s.id, vertex_shader);
@@ -71,17 +91,9 @@ shader shader_new_vgf(const char** vs, const char** gs, const char** fs) {
     glAttachShader(s.id, geometry_shader);
     glLinkProgram(s.id);
 
-    GLsizei len;
-    char log[1024];
-    glGetShaderInfoLog(vertex_shader, 1024, &len, log);
+    glGetProgramInfoLog(s.id, 1024, &len, log);
     if(len)
-        info("Vertex shader log:\n%s", log);
-    glGetShaderInfoLog(fragment_shader, 1024, &len, log);
-    if(len)
-        info("Fragment shader log:\n%s", log);
-    glGetShaderInfoLog(geometry_shader, 1024, &len, log);
-    if(len)
-        info("Geometry shader log:\n%s\n%s", log, *gs);
+        info("Program link log:\n%s", log);
 
     glDetachShader(s.id, vertex_shader);
     glDetachShader(s.id, fragment_shader);

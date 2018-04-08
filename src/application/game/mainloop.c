@@ -17,7 +17,7 @@ typedef struct mainloop {
 
 // Creates a new mainloop with the given content
 mainloop mainloop_new(loop_func func) {
-    mainloop loop = salloc(sizeof(mainloop));
+    mainloop loop = msalloc(struct mainloop);
     loop->is_running = false;
     loop->end_requested = false;
     loop->func = func;
