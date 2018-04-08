@@ -70,7 +70,7 @@ shader shader_new_vgf(const char** vs, const char** gs, const char** fs) {
         info("Vertex shader log:\n%s", log);
 
     GLuint geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
-    glShaderSource(geometry_shader, 1, fs, NULL);
+    glShaderSource(geometry_shader, 1, gs, NULL);
     glCompileShader(geometry_shader);
 
     glGetShaderInfoLog(geometry_shader, 1024, &len, log);
