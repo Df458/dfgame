@@ -105,7 +105,7 @@ mesh load_obj_mesh(const char* path) {
         type |= VT_NORMAL;
     if(array_size(uv_list) > 0)
         type |= VT_TEXTURE;
-    mesh m = mesh_new_type(array_size(index_list) * 3, type, NULL);
+    mesh m = mesh_new_type(array_size(index_list) * 3, type, NULL, path);
     if(type & VT_NORMAL && type & VT_TEXTURE) {
         vt_pnt* data = (vt_pnt*)mesh_get_data(m);
         for(int i = 0; array_size(index_list) > 0; i += 3) {

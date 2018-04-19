@@ -14,7 +14,10 @@ texture_atlas texture_atlas_new();
 int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode);
 int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode);
 aabb_2d texture_atlas_get(texture_atlas atlas, int16 index);
-void texture_atlas_free(texture_atlas atlas);
+
+// Frees the given atlas, and all resources contained within it
+#define texture_atlas_free(atlas) { _texture_atlas_free(atlas); atlas = NULL; }
+void _texture_atlas_free(texture_atlas atlas);
 gltex texture_atlas_get_texture(texture_atlas atlas);
 
 #endif

@@ -18,10 +18,12 @@ typedef struct font {
     texture_atlas atlas;
     uarray glyphs;
     float height;
+
+    char* asset_path;
 }* font;
 
 static FT_Library font_library;
-static bool font_library_init;
+static bool font_library_init = false;
 
 glyph load_freetype_glyph(FT_Face face, int id, font f) {
     int index = FT_Get_Char_Index(face, id);
@@ -48,7 +50,9 @@ glyph load_freetype_glyph(FT_Face face, int id, font f) {
         .elements = 1
     };
 
-    gp.texture_index = texture_atlas_add_raw(f->atlas, rawtex_mask_to_rgba(tex), GL_RGBA);
+    rawtex rgba = rawtex_mask_to_rgba(tex, false);
+    gp.texture_index = texture_atlas_add_raw(f->atlas, rgba, GL_RGBA);
+    rawtex_cleanup(&rgba);
 
     return gp;
 }
@@ -74,7 +78,8 @@ font load_freetype_font(const char* path, uint16 height) {
     FT_CALL(FT_New_Face(font_library, path, 0, &face), NULL);
     FT_CALL(FT_Set_Pixel_Sizes(face, 0, height), NULL);
 
-    font f = font_new(height);
+    font f = font_new(height, path);
+    f->font_face = face;
 
     for(int i = 0; i < 256; ++i) {
        glyph gp = load_freetype_glyph(face, i, f);

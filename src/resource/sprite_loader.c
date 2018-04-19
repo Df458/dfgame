@@ -13,7 +13,7 @@
 #include <string.h>
 
 void read_animation(spriteset set, xmlNodePtr node, const char* path) {
-    animation anim =  {
+    animation anim =  (animation) {
         .orient_count = 0,
         .origin = {
             .x = 0,
@@ -73,7 +73,9 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
     bool should_keep = false;
     rawtex tex = (rawtex){0};
     if((a = xmlGetProp(node, (const xmlChar*)"file"))) {
-        tex = load_texture_raw(combine_paths(get_folder(path), (char*)a, true));
+        char* combined = combine_paths(get_folder(path), (char*)a, true);
+        tex = load_texture_raw(combined);
+        sfree(combined);
         anim.texture_box.dimensions.x = tex.width;
         anim.texture_box.dimensions.y = tex.height;
         if(tex.data)
@@ -90,7 +92,7 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
         spriteset_add_animation(set, anim, tex, "default");
     }
     
-    sfree(tex.data);
+    rawtex_cleanup(&tex);
 }
 
 spriteset load_spriteset(const char* path) {
@@ -104,7 +106,7 @@ spriteset load_spriteset(const char* path) {
 
     check_return(root, "Spriteset file %s is invalid", NULL, path);
 
-    spriteset spr = spriteset_new();
+    spriteset spr = spriteset_new(NULL);
 
     for(xmlNodePtr node = root->children; node; node = node->next)
         if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"animation"))

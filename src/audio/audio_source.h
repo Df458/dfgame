@@ -8,8 +8,11 @@
 
 event(audio_stream_event, byte** data, uint32 position, uint32 desired_length, uint32* final_length)
 
-audio_source audio_source_new_buffer(byte* data, uint32 length, ALenum channels, uint32 sample_rate);
-audio_source audio_source_new_stream(audio_stream_event* ev, uint32 length, ALenum channels, uint32 sample_rate);
+// Creates a new audio_source that streams from a buffer in memory
+audio_source audio_source_new_buffer(byte* data, uint32 length, ALenum channels, uint32 sample_rate, const char* path);
+// Creates a new audio_source that streams via a callback event, most likely
+// a wrapper for an existing streaming API
+audio_source audio_source_new_stream(audio_stream_event* ev, uint32 length, ALenum channels, uint32 sample_rate, const char* path);
 byte* audio_source_get_next(audio_source src, uint32 pos, uint32* length);
 bool audio_source_get_next_buffer(audio_source src, ALuint buffer, uint32 pos, uint32* length);
 uint32 audio_source_get_length(audio_source src);

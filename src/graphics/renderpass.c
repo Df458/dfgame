@@ -36,9 +36,9 @@ renderpass renderpass_new(uint16 w, uint16 h) {
 }
 void _renderpass_free(renderpass pass) {
     check_return(pass, "Can't free renderpass: pass is NULL", );
-    glDeleteTextures(1, &pass->texture.handle);
-    glDeleteTextures(1, &pass->depth.handle);
-    glDeleteFramebuffers(1, &pass->depth.handle);
+    gltex_cleanup(&pass->texture);
+    gltex_cleanup(&pass->depth);
+    glDeleteFramebuffers(1, &pass->fbo.handle);
 
     sfree(pass);
 }

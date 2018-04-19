@@ -2,6 +2,7 @@
 
 #include "hashmap.h"
 
+#include "log/log.h"
 #include "alloc.h"
 #include "crc.h"
 #include "power.h"
@@ -92,7 +93,7 @@ void _hashmap_free_deep(hashmap map) {
         for(int i = 0; i < HASHMAP_BUCKET_COUNT; ++i) {
             sfree(map->buckets[i].keys);
             for(int j = 0; j < map->buckets[i].size; ++j)
-                sfree(map->buckets[i].data[j])
+                sfree(map->buckets[i].data[j]);
             sfree(map->buckets[i].data);
         }
     }
@@ -137,9 +138,8 @@ void hashmap_set(hashmap map, hash_key, void* value) {
 
 void hashmap_copyset(hashmap map, hash_key, void* value, uint32 size) {
     void* data = salloc(size);
-    memcpy(data, value, size);
 
-    hashmap_set(map, hash_key_data, data);
+    hashmap_set(map, hash_key_data, memcpy(data, value, size));
 }
 
 // Returns whether or not hash_key is present in the map

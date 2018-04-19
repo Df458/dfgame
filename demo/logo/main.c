@@ -9,7 +9,7 @@
 #include "vector.h"
 #include "window.h"
 
-void* win;
+void*  win;
 camera c_main;
 shader s_default;
 float  timer;
@@ -46,7 +46,7 @@ int main() {
 
     mainloop_create_run(loop);
 
-    glDeleteTextures(1, &t_logo.handle);
+    gltex_cleanup(&t_logo);
     camera_free(c_main);
     resource_path_free();
     window_free_final(win);

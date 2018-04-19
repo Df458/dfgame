@@ -6,6 +6,7 @@
 #include "check.h"
 #include "mathutil.h"
 #include "memory/alloc.h"
+#include "stringutil.h"
 #include "types.h"
 
 typedef enum audio_source_type {
@@ -26,13 +27,14 @@ typedef struct audio_source {
         byte* buffer;
         audio_stream_event* ev;
     };
+
+    char* asset_path;
 }* audio_source;
 
-audio_source audio_source_new_buffer(byte* data, uint32 length, ALenum channels, uint32 sample_rate) {
+// Common initialization for audio_source structs
+audio_source _audio_source_new_common(uint32 length, ALenum channels, uint32 sample_rate, const char* path) {
     audio_source src = salloc(sizeof(struct audio_source));
 
-    src->type = SRC_TYPE_BUFFER;
-    src->buffer = data;
     src->length = length;
     src->channels = channels;
     if(src->channels == AL_FORMAT_MONO8 || src->channels == AL_FORMAT_MONO16)
@@ -40,21 +42,28 @@ audio_source audio_source_new_buffer(byte* data, uint32 length, ALenum channels,
     else
         src->length_mod = 1.0f;
     src->sample_rate = sample_rate;
+    src->asset_path = nstrdup(path);
 
     return src;
 }
-audio_source audio_source_new_stream(audio_stream_event* ev, uint32 length, ALenum channels, uint32 sample_rate) {
-    audio_source src = salloc(sizeof(struct audio_source));
+
+// Creates a new audio_source that streams from a buffer in memory
+audio_source audio_source_new_buffer(byte* data, uint32 length, ALenum channels, uint32 sample_rate, const char* path) {
+    audio_source src = _audio_source_new_common(length, channels, sample_rate, path);
+
+    src->type = SRC_TYPE_BUFFER;
+    src->buffer = data;
+
+    return src;
+}
+
+// Creates a new audio_source that streams via a callback event, most likely
+// a wrapper for an existing streaming API
+audio_source audio_source_new_stream(audio_stream_event* ev, uint32 length, ALenum channels, uint32 sample_rate, const char* path) {
+    audio_source src = _audio_source_new_common(length, channels, sample_rate, path);
 
     src->type = SRC_TYPE_STREAM;
     bind_event(src->ev, ev);
-    src->length = length;
-    src->channels = channels;
-    if(src->channels == AL_FORMAT_MONO8 || src->channels == AL_FORMAT_MONO16)
-        src->length_mod = 0.5f;
-    else
-        src->length_mod = 1.0f;
-    src->sample_rate = sample_rate;
 
     return src;
 }
@@ -107,6 +116,9 @@ void _audio_source_free(audio_source src) {
     } else {
         call_event(src->ev, NULL, 0, 0, NULL);
     }
+
+    if(src->asset_path)
+        sfree(src->asset_path);
 
     sfree(src);
 }

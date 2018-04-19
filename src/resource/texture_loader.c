@@ -6,6 +6,7 @@
 #include "check.h"
 #include "memory/alloc.h"
 #include "paths.h"
+#include "stringutil.h"
 #ifdef enable_png
 #include <png.h>
 #endif
@@ -39,34 +40,17 @@ void handle_jpeg_error(j_common_ptr ptr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 gltex load_texture_gl(const char* path) {
-    gltex tex;
-	glGenTextures(1, &tex.handle);
-    tex.type = GL_TEXTURE_2D;
-	glBindTexture(GL_TEXTURE_2D, tex.handle);
-	
     rawtex raw = load_texture_raw(path);
-    check_return(raw.data, "Failed to load texture %s", tex, path);
-    tex.width = raw.width;
-    tex.height = raw.height;
-	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw.width, raw.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
-    for(int i = 0; i < raw.height; ++i)
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i, raw.width, 1, GL_RGBA, GL_UNSIGNED_BYTE, raw.data + ((raw.height - i - 1) * raw.width * 4));
+    check_return(raw.data, "Failed to load texture %s", (gltex){0}, path);
 
-	sfree(raw.data);
+    gltex tex = gltex_new_from_raw(GL_TEXTURE_2D, raw, true);
+
+    rawtex_cleanup(&raw);
 
     return tex;
 }
 
 rawtex load_texture_raw(const char* path) {
-    rawtex tex = (rawtex){0};
-
     const char* ext = get_extension(path);
 #ifdef enable_png
     if(!strcmp(ext, "png"))
@@ -87,7 +71,7 @@ rawtex load_texture_raw(const char* path) {
 
     error("Failed to load texture: File extension %s not recognized", ext);
 
-    return tex;
+    return (rawtex){0};
 }
 
 #ifdef enable_png
@@ -101,8 +85,11 @@ rawtex load_png_raw(const char* path) {
     png_infop info_struct;
     png_bytep* row_ptrs;
     
-    fread(header, sizeof(uint8), 8, infile);
-    check_return(!png_sig_cmp(header, 0, 8), "File has an invalid header.", tex);
+    size_t read = fread(header, sizeof(uint8), 8, infile);
+    if(check_error(read == 8 && !png_sig_cmp(header, 0, 8), "File has an invalid header.")) {
+        fclose(infile);
+        return tex;
+    }
 
     pstruct = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     check_return(pstruct, "Could not read structure of file.", tex)
@@ -118,10 +105,7 @@ rawtex load_png_raw(const char* path) {
     png_init_io(pstruct, infile);
     png_set_sig_bytes(pstruct, 8);
     png_read_info(pstruct, info_struct);
-    
-    tex.width = png_get_image_width(pstruct, info_struct);
-    tex.height = png_get_image_height(pstruct, info_struct);
-    tex.elements = 4;
+
     png_byte color_type = png_get_color_type(pstruct, info_struct);
     /* png_byte bit_depth = png_get_bit_depth(pstruct, info_struct); */
     /* int number_of_passes = png_set_interlace_handling(pstruct); */
@@ -136,7 +120,9 @@ rawtex load_png_raw(const char* path) {
     
     int rowbytes = png_get_rowbytes(pstruct, info_struct);
     
-    tex.data = salloc(rowbytes * tex.height * sizeof(png_byte) + 15);
+    tex = rawtex_new(png_get_image_width(pstruct, info_struct), png_get_image_height(pstruct, info_struct), 4);
+    tex.asset_path = nstrdup(path);
+
     row_ptrs = (png_bytep*)salloc(sizeof(png_bytep) * tex.height);
     for(int i = 0; i < tex.height; i++)
         row_ptrs[tex.height - 1 - i] = tex.data + i * rowbytes;
@@ -183,10 +169,8 @@ rawtex load_jpeg_raw(const char* path) {
     row_width = decompresser.output_width * decompresser.output_components;
 
     row = (*decompresser.mem->alloc_sarray) ((j_common_ptr) &decompresser, JPOOL_IMAGE, row_width, 1);
-    tex.width = decompresser.output_width;
-    tex.height = decompresser.output_height;
-    tex.data = scalloc(decompresser.output_width * decompresser.output_height * 4, sizeof(uint8_t));
-    tex.elements = 4;
+    tex = rawtex_new(decompresser.output_width, decompresser.output_height, 4);
+    tex.asset_path = nstrdup(path);
     for(int j = 0; j < tex.height; ++j) {
         jpeg_read_scanlines(&decompresser, row, 1);
         for(int i = 0; i < tex.width; ++i) {
@@ -210,7 +194,7 @@ rawtex load_jpeg_raw(const char* path) {
 rawtex load_tga_raw(const char* path) {
     // In order to satisfy libtga's irrational desire for a non-const char
     // array, we copy the path to a temporary buffer.
-    char* temp_path = strdup(path);
+    char* temp_path = nstrdup(path);
     TGA* image = TGAOpen(temp_path, "r");
     TGAData data;
     sfree(temp_path);
@@ -275,6 +259,8 @@ rawtex load_tga_raw(const char* path) {
         }
     }
 
+    tex.asset_path = nstrdup(path);
+
     return tex;
 }
 #endif
@@ -311,8 +297,10 @@ rawtex load_tiff_raw(const char* path) {
     _TIFFfree(temp_buffer);
 
     TIFFRGBAImageEnd(&img);
-
     TIFFClose(infile);
+
+    tex.asset_path = nstrdup(path);
+
     return tex;
 }
 #endif

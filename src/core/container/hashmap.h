@@ -23,7 +23,7 @@ void _hashmap_free(hashmap map);
 
 // Frees the hashmap and all pointers contained within it, and sets map to NULL
 // to make it harder to double-free.
-#define hashmap_free_deep(map) { _hashmap_free(map); map = NULL; }
+#define hashmap_free_deep(map) { _hashmap_free_deep(map); map = NULL; }
 
 // Frees the hashmap and all pointers contained within it. NOTE: Don't call
 // this function. Use the macro without the leading _ instead, as it also NULLs

@@ -7,11 +7,14 @@
 #include "check.h"
 #include "container/hashmap.h"
 #include "memory/alloc.h"
+#include "stringutil.h"
 #include "texture_atlas.h"
 
 typedef struct spriteset {
     texture_atlas atlas;
     hashmap animations;
+
+    char* asset_path;
 }* spriteset;
 typedef struct sprite {
     spriteset src;
@@ -21,10 +24,11 @@ typedef struct sprite {
     bool playing;
 } sprite;
 
-spriteset spriteset_new() {
+spriteset spriteset_new(const char* path) {
     spriteset set = salloc(sizeof(struct spriteset));
     set->atlas = texture_atlas_new();
     set->animations = hashmap_new();
+    set->asset_path = nstrdup(path);
 
     return set;
 }
@@ -38,7 +42,7 @@ void spriteset_add_animation_raw(spriteset set, animation anim, rawtex texture, 
         anim.texture_box = texture_atlas_get(set->atlas, index);
         hashmap_copyset(set->animations, make_hash_key(handle), &anim, sizeof(animation));
 
-        if(hashmap_size(set->animations) == 1)
+        if(hashmap_size(set->animations) == 1 && strcmp(handle, "default"))
             hashmap_copyset(set->animations, make_hash_key("default"), &anim, sizeof(animation));
     }
 }
@@ -80,9 +84,15 @@ gltex spriteset_get_texture(spriteset set) {
     return texture_atlas_get_texture(set->atlas);
 }
 
+// Frees the given spriteset, and all resources contained within it
+// NOTE: Don't call this function. Use the macro without
+// the leading _ instead, as it also NULLs your pointer.
 void _spriteset_free(spriteset set) {
     check_return(set, "Can't free spriteset: set is NULL", );
+
     texture_atlas_free(set->atlas);
     hashmap_free_deep(set->animations);
+    if(set->asset_path)
+        sfree(set->asset_path);
     sfree(set);
 }

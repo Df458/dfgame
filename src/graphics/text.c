@@ -163,7 +163,8 @@ void text_update_mesh(text t) {
         array_copyadd_simple(line_data, current_data);
 
     mesh_free(t->msh);
-    t->msh = mesh_new(len * 6, buf);
+    t->msh = mesh_new(len * 6, buf, NULL);
+    sfree(buf);
 
     array_foreach(line_data, iter_arrange_lines, t);
 

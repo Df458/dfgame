@@ -197,7 +197,9 @@ void write_file(FILE* output, const char* infilename, const char* filename, cons
     long len = ftell(infile);
     rewind(infile);
     char* ptr = calloc(len, sizeof(char));
-    fread(ptr, sizeof(char), len, infile);
+    size_t read = fread(ptr, sizeof(char), len, infile);
+    if(read != len)
+        fprintf(stderr, "Failed to read complete file: %ld/%ld bytes read.\n", read, len);
     fclose(infile);
 
     char* varname = gen_var_name(filename);

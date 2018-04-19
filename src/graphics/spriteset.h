@@ -24,7 +24,7 @@ typedef struct animation {
     bool default_on_finish;
 } animation;
 
-spriteset spriteset_new();
+spriteset spriteset_new(const char* path);
 #define spriteset_add_animation(s, a, t, h) _Generic(t,\
     gltex: spriteset_add_animation_gl,\
     rawtex: spriteset_add_animation_raw\
@@ -42,6 +42,7 @@ animation spriteset_get_animation_by_name(spriteset set, const char* handle);
 animation spriteset_get_animation_by_id(spriteset set, int16 handle);
 gltex spriteset_get_texture(spriteset set);
 
+// Frees the given spriteset, and all resources contained within it
 #define spriteset_free(s) { _spriteset_free(s); s = NULL; }
 void _spriteset_free(spriteset set);
 

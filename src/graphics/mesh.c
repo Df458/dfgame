@@ -5,6 +5,7 @@
 
 #include "check.h"
 #include "memory/alloc.h"
+#include "stringutil.h"
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -16,15 +17,18 @@ typedef struct mesh {
     uint32 vertex_count;
     uint32 data_size;
     GLuint handle;
+
+    char* asset_path;
 }* mesh;
 
 // Creates a new mesh struct.
 // setting data to NULL creates an empty mesh struct
-mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data) {
+mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data, const char* path) {
     check_return(vertex_type & VT_POSITION, "Unsupported vertex type %u: Type must contain position.", NULL, vertex_type);
 
     mesh m = salloc(sizeof(struct mesh));
     m->data = NULL;
+    m->asset_path = nstrdup(path);
     glGenBuffers(1, &m->handle);
 
     mesh_set_data_type(m, size, vertex_type, data);
@@ -48,6 +52,8 @@ void _mesh_free(mesh m) {
         return;
     glDeleteBuffers(1, &m->handle);
     sfree(m->data);
+    if(m->asset_path)
+        sfree(m->asset_path);
     sfree(m);
 }
 

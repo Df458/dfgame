@@ -149,6 +149,15 @@ iter_result update_barrel(void* bar, void* user) {
 
     return iter_continue;
 }
+iter_result cleanup_barrel(void* bar, void* user) {
+    barrel* b = (barrel*)bar;
+
+    sprite_free(b->spr, false);
+    transform_free(b->trans);
+    sfree(b);
+
+    return iter_delete;
+}
 
 void shoot(action_id id, void* user) {
     if(!sprite_get_playing(pistol_sprite)) {
@@ -364,8 +373,9 @@ void prepare_mesh(const char* path) {
         }
     }
 
-    m_floor = mesh_new(size, data);
+    m_floor = mesh_new(size, data, NULL);
 
+    sfree(data);
     sfree(loaded);
 }
 
@@ -418,7 +428,13 @@ int main() {
 
     mainloop_create_run(loop);
 
+    array_free_deep(bullets);
+    array_foreach(barrels, cleanup_barrel, NULL);
+    array_free_deep(barrels);
+
     text_free(info_text, true);
+
+    sfree(m_level);
 
     sprite_free(pistol_sprite, true);
     audio_player_free(pistol_sfx, true);

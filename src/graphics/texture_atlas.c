@@ -167,12 +167,15 @@ aabb_2d texture_atlas_get(texture_atlas atlas, int16 index) {
     return *(aabb_2d*)array_get(atlas->textures, index);
 }
 
-void texture_atlas_free(texture_atlas atlas) {
+// Frees the given atlas, and all resources contained within it
+// NOTE: Don't call this function. Use the macro without
+// the leading _ instead, as it also NULLs your pointer.
+void _texture_atlas_free(texture_atlas atlas) {
     check_return(atlas, "Can't destroy atlas: Atlas is null", );
 
     array_free_deep(atlas->textures);
     array_free_deep(atlas->free_space);
-    glDeleteTextures(1, &atlas->texture_data.handle);
+    gltex_cleanup(&atlas->texture_data);
     sfree(atlas);
 }
 

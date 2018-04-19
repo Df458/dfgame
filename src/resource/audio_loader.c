@@ -51,42 +51,51 @@ audio_source load_wav_audio(const char* path, bool preload) {
     uint16 tag, channel_count, block_alignment, bits_per_sample;
     ALenum channels = AL_FORMAT_MONO8;
     
-    fread(&id, sizeof(char), 4, infile);
-    if(check_error(!strcmp(id, "RIFF"), "Cannot prepare WAV stream: Not a RIFF file. (Got %s)", id)) {
+    size_t read = fread(&id, sizeof(char), 4, infile);
+    if(check_error(read == 4 && !strcmp(id, "RIFF"), "Cannot prepare WAV stream: Not a RIFF file. (Got %s)", id)) {
         fclose(infile);
         return false;
     }
-    fread(&file_size, sizeof(uint32), 1, infile);
-    fread(&id, sizeof(char), 4, infile);
-    if(check_error(!strcmp(id, "WAVE"), "Cannot prepare WAV stream: Not a WAVE file. (Got %s)", id)) {
+    read = fread(&file_size, sizeof(uint32), 1, infile);
+    read += fread(&id, sizeof(char), 4, infile);
+    if(check_error(read == 5 && !strcmp(id, "WAVE"), "Cannot prepare WAV stream: Not a WAVE file. (Got %s)", id)) {
         fclose(infile);
         return false;
     }
     
-    fread(&id, sizeof(char), 4, infile);
-    if(check_error(!strcmp(id, "fmt "), "Cannot prepare WAV stream: Unrecognized format. (fmt not found, got %s)", id)) {
+    read = fread(&id, sizeof(char), 4, infile);
+    if(check_error(read == 4 && !strcmp(id, "fmt "), "Cannot prepare WAV stream: Unrecognized format. (fmt not found, got %s)", id)) {
         fclose(infile);
         return false;
     }
-    fread(&format_size, sizeof(uint32), 1, infile);
-    if(check_error(format_size == 16, "Cannot prepare WAV stream: Unrecognized format. (nonstandard formatting length: %d)", format_size)) {
+    read = fread(&format_size, sizeof(uint32), 1, infile);
+    if(check_error(read == 1 && format_size == 16, "Cannot prepare WAV stream: Unrecognized format. (nonstandard formatting length: %d)", format_size)) {
         fclose(infile);
         return false;
     }
-    fread(&tag, sizeof(uint16), 1, infile);
-    fread(&channel_count, sizeof(uint16), 1, infile);
-    fread(&sample_rate, sizeof(uint32), 1, infile);
-    fread(&bytes_per_sec, sizeof(uint32), 1, infile);
-    fread(&block_alignment, sizeof(uint16), 1, infile);
-    fread(&bits_per_sample, sizeof(uint16), 1, infile);
+    read  = fread(&tag, sizeof(uint16), 1, infile);
+    read += fread(&channel_count, sizeof(uint16), 1, infile);
+    read += fread(&sample_rate, sizeof(uint32), 1, infile);
+    read += fread(&bytes_per_sec, sizeof(uint32), 1, infile);
+    read += fread(&block_alignment, sizeof(uint16), 1, infile);
+    read += fread(&bits_per_sample, sizeof(uint16), 1, infile);
+
+    if(check_error(read == 6, "Cannot prepare WAV stream: Stream information missing")) {
+        fclose(infile);
+        return false;
+    }
     
-    fread(&id, sizeof(uint8), 4, infile);
-    if(check_error(!strcmp(id, "data"), "Cannot prepare WAV stream: Unrecognized format. (data not found)")) {
+    read = fread(&id, sizeof(uint8), 4, infile);
+    if(check_error(read == 4 && !strcmp(id, "data"), "Cannot prepare WAV stream: Unrecognized format. (data not found)")) {
         fclose(infile);
         return false;
     }
 
-    fread(&data_size, sizeof(uint32), 1, infile);
+    read = fread(&data_size, sizeof(uint32), 1, infile);
+    if(check_error(read == 1, "Cannot prepare WAV stream: Stream length missing")) {
+        fclose(infile);
+        return false;
+    }
     data_size -= 8;
     
     if(channel_count == 1) {
@@ -106,10 +115,10 @@ audio_source load_wav_audio(const char* path, bool preload) {
     if(preload) {
         stream_wav_audio(&input_buffer, 0, data_size, &final_length, infile);
         fclose(infile);
-        return audio_source_new_buffer(input_buffer, final_length, channels, sample_rate);
+        return audio_source_new_buffer(input_buffer, final_length, channels, sample_rate, path);
     }
 
-    return audio_source_new_stream(&(audio_stream_event){ .func=stream_wav_audio, .user=infile }, data_size, channels, sample_rate);
+    return audio_source_new_stream(&(audio_stream_event){ .func=stream_wav_audio, .user=infile }, data_size, channels, sample_rate, path);
 }
 
 void stream_ogg_audio(byte** data, uint32 position, uint32 requested_length, uint32* final_length, void* user) {
@@ -181,8 +190,8 @@ audio_source load_ogg_audio(const char* path, bool preload) {
         info("Preloading %d bytes", data_size);
         stream_ogg_audio(&input_buffer, 0, data_size, &final_length, infile);
         ov_clear(infile);
-        return audio_source_new_buffer(input_buffer, final_length, channels, sample_rate);
+        return audio_source_new_buffer(input_buffer, final_length, channels, sample_rate, path);
     }
 
-    return audio_source_new_stream(&(audio_stream_event){ .func=stream_ogg_audio, .user=infile }, data_size, channels, sample_rate);
+    return audio_source_new_stream(&(audio_stream_event){ .func=stream_ogg_audio, .user=infile }, data_size, channels, sample_rate, path);
 }

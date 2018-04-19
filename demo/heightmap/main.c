@@ -115,6 +115,9 @@ void init_resources() {
     s_default = shader_new_vf((const char**)&vert, (const char**)&frag);
     shaders_init();
 
+    sfree(vert);
+    sfree(frag);
+
     s_water = shader_basic_untex_get();
     s_text = shader_basic_tex_get();
 
@@ -135,7 +138,7 @@ void prepare_mesh() {
             mesh_data[(i * MESH_DIM + j) * 6 + 5] = (vt_p){.data={j + 0, 0, i + 1}};
         }
     }
-    m_terrain = mesh_new(square(MESH_DIM) * 6, mesh_data);
+    m_terrain = mesh_new(square(MESH_DIM) * 6, mesh_data, NULL);
 }
 void cleanup_resources() {
     mesh_free(m_terrain);
