@@ -148,3 +148,25 @@ char* combine_paths(char* a, char* b, bool free) {
 
     return output;
 }
+
+char* get_relative_base(const char* a, const char* b) {
+    check_return(a, "Can't compare paths, one path is null", NULL);
+    check_return(b, "Can't compare paths, one path is null", NULL);
+    size_t last_a = strlen(a);
+    size_t last_b = strlen(b);
+
+    int j = 0;
+    for(int i = 0; i < last_a && i < last_b; ++i) {
+        if(a[i] != b[i])
+            break;
+
+        if(a[i] == '/')
+            j = i + 1;
+    }
+
+    char* base = mscalloc(j + 1, char);
+    if(j > 0)
+        strncpy(base, a, j);
+
+    return base;
+}
