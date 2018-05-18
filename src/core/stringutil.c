@@ -1,7 +1,8 @@
 #define LOG_CATEGORY "Core"
 #include "stringutil.h"
 
-#include "memory/alloc.h"
+#include "core/check.h"
+#include "core/memory/alloc.h"
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -30,4 +31,24 @@ char* vsaprintf(const char* format, va_list args) {
     vsnprintf(final, length, format, args);
 
     return final;
+}
+bool aisi(const char* str) {
+    check_return(str, "str is NULL", false);
+    for(int i = 0; str[i] != '\0'; ++i) {
+        if((str[i] < '0' || str[i] > '9') && str[i] != '-') {
+            return false;
+        }
+    }
+
+    return true;
+}
+bool aisf(const char* str) {
+    check_return(str, "str is NULL", false);
+    for(int i = 0; str[i] != '\0'; ++i) {
+        if((str[i] < '0' || str[i] > '9') && str[i] != '.' && str[i] != '-') {
+            return false;
+        }
+    }
+
+    return true;
 }

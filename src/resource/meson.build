@@ -23,8 +23,8 @@ if get_option('enable_tga') == true
     resourcepkglibs += '-ltga'
 endif
 
-resourcesrc  = [ 'audio_loader.c', 'data_loader.c', 'font_loader.c', 'mesh_loader.c', 'paths.c', 'sprite_loader.c', 'texture_loader.c' ]
-resourceinc  = [ include_directories('../audio'), include_directories('../core'), include_directories('../graphics'), include_directories('../math') ]
+resourcesrc  = [ 'audio_loader.c', 'data_loader.c', 'font_loader.c', 'mesh_loader.c', 'paths.c', 'sprite_loader.c', 'texture_loader.c', 'xmlutil.c' ]
+resourceinc  = [ include_directories('..'), include_directories('../audio'), include_directories('../core'), include_directories('../graphics'), include_directories('../math') ]
 resourcelib  = static_library('dfgame_resource', resourcesrc,
                          include_directories : resourceinc,
                          dependencies : resourcedeps,
@@ -35,7 +35,7 @@ resourcelib  = static_library('dfgame_resource', resourcesrc,
 
 run_command('ctags', '-R', '.')
 
-pkgconfig.generate(libraries : resourcelib,
+pkgconfig.generate(resourcelib,
                     version : '1.0.0',
                     name : 'dfgame-resource',
                     filebase : 'dfgame-resource',
@@ -45,7 +45,7 @@ pkgconfig.generate(libraries : resourcelib,
                     description : 'dfgame resource module, loads assets for other modules')
 
 install_headers(
-    [ 'audio_loader.h', 'data_loader.h', 'font_loader.h', 'mesh_loader.h', 'paths.h', 'sprite_loader.h', 'texture_loader.h' ],
+    [ 'audio_loader.h', 'data_loader.h', 'font_loader.h', 'mesh_loader.h', 'paths.h', 'sprite_loader.h', 'texture_loader.h', 'xmlutil.h' ],
     subdir : 'dfgame/resource')
 
-resource = declare_dependency(include_directories : include_directories('.'), link_with : resourcelib)
+resource = declare_dependency(include_directories : include_directories('.', '..'), link_with : resourcelib)

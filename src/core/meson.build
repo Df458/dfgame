@@ -1,6 +1,6 @@
 coredeps = []
 coresrc  = [ 'check.c', 'log/log.c', 'memory/alloc.c', 'container/array.c', 'container/hashmap.c', 'power.c', 'crc.c', 'stringutil.c' ]
-coreinc  = [ include_directories('log'), include_directories('memory'), include_directories('container') ]
+coreinc  = [ include_directories('..'), include_directories('log'), include_directories('memory'), include_directories('container') ]
 corelib  = static_library('dfgame_core', coresrc,
                          include_directories : coreinc,
                          dependencies : coredeps,
@@ -27,4 +27,4 @@ install_headers(
     [ 'memory/alloc.h' ],
     subdir : 'dfgame/core/memory')
 
-core = declare_dependency(include_directories : coreinc + [include_directories('.')], link_with : corelib)
+core = declare_dependency(include_directories : coreinc + [include_directories('.', '..')], link_with : corelib)

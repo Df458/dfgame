@@ -81,7 +81,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
                     if(box->free_marker.y == 0) {
                         box->box.dimensions.x += new_size - prev_size;
                     } else {
-                        atlas_box new_box = (atlas_box) {
+                        atlas_box new_box =  {
                             .box = (aabb_2d) {
                                 .position = (vec2){ .x = prev_size, .y = box->box.position.y },
                                 .dimensions = (vec2){ .x = new_size - prev_size, .y = box->box.dimensions.y }

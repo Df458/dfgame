@@ -265,22 +265,19 @@ mat4 mat4_lookat(vec3 eye, vec3 target, vec3 up) {
 // Converts a rotation matrix into a quaternion
 quat mat4_to_quat(mat4 m) {
     float t = 1;
-    quat q = quat_ident;
+    quat q;
     if(m.data[10] < 0) {
         if(m.data[0] > m.data[5]) {
             t = 1 + m.data[0] - m.data[5] - m.data[10];
             q = (quat){ .x=t, .y=m.data[4]+m.data[1], .z=m.data[2]+m.data[8], .w=m.data[9]-m.data[6]};
-            info("x");
         } else {
             t = 1 - m.data[0] + m.data[5] - m.data[10];
             q = (quat){ .x=m.data[4]+m.data[1], .y=t, .z=m.data[9]+m.data[6], .w=m.data[2]-m.data[8]};
-            info("y");
         }
     } else {
         if(m.data[0] < -m.data[5]) {
             t = 1 - m.data[0] - m.data[5] + m.data[10];
             q = (quat){ .x=m.data[2]+m.data[8], .y=m.data[9]+m.data[6], .z=t, .w=m.data[4]-m.data[1]};
-            info("z");
         } else {
             t = 1 + m.data[0] + m.data[5] + m.data[10];
             q = (quat){
@@ -288,7 +285,6 @@ quat mat4_to_quat(mat4 m) {
                 .y=m.data[2]-m.data[8],
                 .z=m.data[4]-m.data[1],
                 .w=t};
-            info("w");
         }
     }
     return quat_mul(q, 0.5f / sqrt(t));

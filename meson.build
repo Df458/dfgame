@@ -9,6 +9,8 @@ gnome = import('gnome')
 pkgconfig = import('pkgconfig')
 
 m = compiler.find_library('m', required : false)
+
+cunit = dependency('cunit')
 freetype = dependency('freetype2')
 gl = dependency('gl')
 glfw = subproject('glfw').get_variable('glfw_dep')
@@ -44,6 +46,9 @@ subdir('src/graphics')
 subdir('src/application')
 subdir('src/audio')
 subdir('src/resource')
+
+subdir('test/core')
+subdir('test/resource')
 
 subdir('demo/logo')
 subdir('demo/comets')

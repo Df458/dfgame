@@ -235,6 +235,10 @@ void write_file(FILE* output, const char* infilename, const char* filename, cons
     fprintf(output, "};\n");
 
     free(varname);
+
+    for(long i = 0; i < linecount; ++i)
+        free(lines[i]);
+    free(lines);
 }
 
 void end_file(FILE* output, const char* filename, bool has_vert, bool has_frag, bool has_geom, bool has_tess) {
