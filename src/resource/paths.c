@@ -1,13 +1,14 @@
 #define LOG_CATEGORY "Resource"
 
-#include "paths.h"
+#include "resource/paths.h"
 
-#include "check.h"
-#include "memory/alloc.h"
+#include "core/check.h"
+#include "core/memory/alloc.h"
+#include "core/stringutil.h"
 #include <stdlib.h>
 #include <string.h>
 #ifdef WIN32
-#include "windows.h"
+#include <windows.h>
 #elif __GNUC__
 #include <unistd.h>
 #endif
@@ -20,8 +21,6 @@ static char* resource_path = NULL;
 #define DELIM '/'
 #endif
 
-// TODO: This code is OS-specific. Adding new build targets will require this
-// to be updated
 void get_exe_path(char* buf, size_t bufsize) {
 #ifdef WIN32
     GetModuleFileName(NULL, buf, bufsize);
@@ -92,14 +91,58 @@ char* get_resource_path(const char* prefix, const char* suffix, uint16* len) {
 }
 
 const char* get_extension(const char* path) {
-    const char* ext = strrchr(path, (int)'.');
-    if(ext == NULL || strlen(ext) <= 1)
+    check_return(path, "Can't get extension, path is null", NULL);
+
+    const char* file_start = strrchr(path, (int)DELIM);
+
+    const char* ext = NULL;
+    if(file_start && file_start[1]) {
+        ext = strchr(file_start + 2, (int)'.');
+    } else if(path[1]) {
+        ext = strchr(path + 2, (int)'.');
+    }
+
+    if(ext == NULL || strlen(ext) <= 1) {
         return NULL;
-    else
+    } else {
         return ext + 1;
+    }
+}
+
+char* get_filename(const char* path, bool keep_extension) {
+    check_return(path, "Can't get filename, path is null", NULL);
+
+    const char* file_start = strrchr(path, (int)DELIM);
+    if(!file_start) {
+        file_start = path;
+    } else {
+        file_start += 1;
+    }
+
+    // If the last slash was at the end of the string, we have no file
+    if(!file_start[0]) {
+        return NULL;
+    }
+
+    if(keep_extension) {
+        return nstrdup(file_start);
+    }
+
+    const char* file_end = strchr(file_start + 1, '.');
+
+    if(!file_end) {
+        return nstrdup(file_start);
+    }
+
+    char* str = mscalloc(file_end - file_start + 1, char);
+    strncpy(str, file_start, file_end - file_start);
+
+    return str;
 }
 
 char* get_folder(const char* path) {
+    check_return(path, "Can't get folder, path is null", NULL);
+
     const char* file_start = strrchr(path, (int)DELIM);
     if(!file_start) {
         char* c = scalloc(2, sizeof(char));
