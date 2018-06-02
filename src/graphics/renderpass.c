@@ -46,7 +46,7 @@ void _renderpass_free(renderpass pass) {
 void renderpass_start(renderpass pass) {
     if(pass == NULL) {
         call_event(default_response, prev_pass)
-        else // call_event expands to an if-statement, so we can use an else here to react to cases where it's ubound
+        else // call_event expands to an if-statement, so we can use an else here to react to cases where it's unbound
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         prev_pass = NULL;

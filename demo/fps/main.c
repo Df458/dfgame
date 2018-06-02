@@ -212,7 +212,7 @@ bool loop(mainloop l, float dt) {
     sprite_draw(pistol_sprite, s_default, mat4_translate(mat4_scale(mat4_ident, 15), (vec3){.y = 120}), camera_get_vp(c_ui));
 
     window_redraw(win);
-    return !window_should_close(win);
+    return !window_get_should_close(win);
 }
 
 void prepare_mesh(const char* path) {
@@ -380,8 +380,8 @@ void prepare_mesh(const char* path) {
 }
 
 int main() {
-    win = window_new_default(1280, 720, "FPS Demo");
-    window_cursor_mode(win, CM_DISABLED);
+    win = window_new(1280, 720, false, "FPS Demo");
+    window_set_cursor_mode(win, CM_DISABLED);
     shaders_init();
     audio_init();
 

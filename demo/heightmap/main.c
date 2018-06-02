@@ -18,7 +18,7 @@
 
 #define MESH_DIM 100
 
-void* win;
+window win;
 
 camera      c_main;
 camera      c_ui;
@@ -90,7 +90,7 @@ bool loop(mainloop l, float dt) {
     text_draw(info_text, s_text, mat4_mul(camera_get_vp(c_ui), mat4_translate(mat4_ident, offset)));
 
     window_redraw(win);
-    return !window_should_close(win);
+    return !window_get_should_close(win);
 }
 
 void init_resources() {
@@ -149,7 +149,7 @@ void cleanup_resources() {
 }
 
 int main() {
-    win = window_new_default(1280, 720, "Heightmap Demo");
+    win = window_new(1280, 720, false, "Heightmap Demo");
 
     init_resources();
 

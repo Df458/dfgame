@@ -15,8 +15,6 @@ namespace DFGame
             public static bool on_mouse_motion(Gdk.EventMotion event);
         [CCode (cname = "on_scroll")]
             public static bool on_scroll(Gdk.EventScroll event);
-        [CCode (cname = "on_enter")]
-            public static bool on_enter(double x, double y);
         [CCode (cname = "update_input")]
             public static void update_input();
     }
@@ -36,5 +34,44 @@ namespace DFGame
         }
         [CCode (cname = "set_default_renderpass_response")]
         void set_callback(CallbackData cb);
+    }
+
+    [CCode (cheader_filename = "editor/window.h")]
+    namespace Window
+    {
+        [CCode (cname = "struct window", free_function = "window_free")]
+        [Compact]
+        public class WindowProxy
+        {
+            [CCode (cname = "struct window_proxy")]
+            public struct ProxyContent
+            {
+                [CCode (cname = "mouse.x")]
+                public float mouse_x;
+                [CCode (cname = "mouse.y")]
+                public float mouse_y;
+                [CCode (cname = "dims.x")]
+                public float dims_x;
+                [CCode (cname = "dims.y")]
+                public float dims_y;
+            }
+
+            [CCode (cname = "window_resize_func", has_target = false)]
+            public delegate void ResizeCallback(uint16 width, uint16 height, void* user);
+            [CCode (cname = "window_resize", destroy_function = "", has_type_id = false)]
+            public struct CallbackData
+            {
+                [CCode (cname = "func", has_target = false)]
+                ResizeCallback cb;
+                [CCode (cname = "user")]
+                void* user;
+            }
+
+            [CCode (cname = "window_new")]
+            public WindowProxy(void* widget);
+
+            public void* platform_data;
+            public CallbackData* resize_event;
+        }
     }
 }

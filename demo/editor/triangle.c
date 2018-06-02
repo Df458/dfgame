@@ -64,7 +64,7 @@ void triangle_free(triangle* t) {
     sfree(t);
 }
 void triangle_draw(triangle* t) {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(s_main.id);
     shader_bind_uniform_name(s_main, "transform", mat4_rotate_2d(mat4_scale(mat4_ident, t->size), degtorad(t->angle + 180)));

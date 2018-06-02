@@ -9,7 +9,7 @@
 #include "vector.h"
 #include "window.h"
 
-void*  win;
+window win;
 camera c_main;
 shader s_default;
 float  timer;
@@ -29,11 +29,11 @@ bool loop(mainloop l, float dt) {
     mesh_render(s_default, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 
     window_redraw(win);
-    return !window_should_close(win) && timer < 4.0f;
+    return !window_get_should_close(win) && timer < 4.0f;
 }
 
 int main() {
-    win = window_new_default(1280, 720, "Logo Demo");
+    win = window_new(1280, 720, false, "Logo Demo");
     init_base_resource_path(NULL);
     shaders_init();
 

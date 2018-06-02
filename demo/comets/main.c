@@ -298,11 +298,11 @@ bool loop(mainloop l, float dt) {
     text_draw(info_text, s_default, mat4_mul(camera_get_vp(c_main), mat4_translate(mat4_ident, offset)));
 
     window_redraw(win);
-    return !window_should_close(win);
+    return !window_get_should_close(win);
 }
 
 int main() {
-    win = window_new_default(1280, 720, "Comets Demo");
+    win = window_new(1280, 720, false, "Comets Demo");
     shaders_init();
 
     s_default = shader_basic_tex_get();

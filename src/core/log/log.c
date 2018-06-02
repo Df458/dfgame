@@ -11,6 +11,7 @@
 #include <windows.h>
 #elif __GNUC__
 #define _GNU_SOURCE
+#include <signal.h>
 #include <unistd.h>
 #endif
 
@@ -125,8 +126,14 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
     call_event(current_handler, file, line, level, final_message);
     free(final_message);
 
-    if(level == LOG_FATAL)
+    if(level == LOG_FATAL) {
+#ifdef WINDOWS
+    DEBUGBREAK();
+#elif __GNUC__
+    raise(SIGTRAP);
+#endif
         exit(1);
+    }
 }
 
 void register_log_handler(log_handler* handler)

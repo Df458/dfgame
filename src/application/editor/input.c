@@ -32,8 +32,6 @@ static axis_binding mouse_position_axis_bindings[2] = {0};
 static axis_binding key_axis_bindings[K_LAST + 1] = {0};
 static axis_binding mouse_button_axis_bindings[MB_LAST + 1] = {0};
 
-double __application_editor_mouse_x, __application_editor_mouse_y = 0;
-
 void input_bind_key_action(key_id key, action_id id) {
     check_return(key > K_INVALID && key <= K_LAST, "Can't bind key: Index is out of range", );
 
@@ -174,9 +172,6 @@ bool on_key_release(GdkEventKey* event) {
     return true;
 }
 bool on_mouse_motion(GdkEventMotion* event) {
-
-    __application_editor_mouse_x = event->x;
-    __application_editor_mouse_y = event->y;
     if(event->axes[0] != 0) {
         if(mouse_position_axis_bindings[0].value != 0)
             mouse_position_axis_bindings[0].offset = mouse_position_axis_bindings[0].value - event->axes[0];
@@ -208,10 +203,6 @@ bool on_scroll(GdkEventScroll* event) {
     mouse_button_axis_bindings[MB_SCROLL_UP].set = event->delta_y < 0;
 
     return true;
-}
-void on_enter(double x, double y) {
-    __application_editor_mouse_x = x;
-    __application_editor_mouse_y = y;
 }
 
 void update_input() {

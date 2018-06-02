@@ -8,15 +8,16 @@ applicationeditorclib  = static_library('dfgame_application_editor_backend', app
 
 
 applicationeditordeps = [ gtk ]
-applicationeditorsrc  = [ 'Viewport.vala']
+applicationeditorsrc  = [ 'Viewport.vala' ]
+applicationeditorvapi  = [ 'editorc.vapi' ]
 applicationeditorinc  = [ include_directories('.') ] + applicationinc
-applicationeditorlib  = shared_library('dfgame_application_editor', applicationeditorsrc,
+applicationeditorlib  = shared_library('dfgame_application_editor', applicationeditorsrc + applicationeditorvapi,
                         include_directories : applicationeditorinc,
                         vala_header : 'dfgame-application-editor.h',
                         vala_vapi : 'dfgame-application-editor.vapi',
                         dependencies : applicationeditordeps,
                         link_with : [ gameplaylib, graphicslib, applicationeditorclib ],
-                        vala_args : ['--target-glib=2.38', '--pkg=editorc', ['--vapidir', join_paths(meson.current_source_dir())]],
+                        vala_args : ['--target-glib=2.38'],
                         install : true,
                        install_dir : [ true, true, true ])
 
@@ -39,4 +40,4 @@ pkgconfig.generate(libraries : applicationeditorlib,
 install_data(sources : '../../../data/catalog/dfgame-editor.xml', install_dir : '/usr/share/glade/catalogs')
 
 application_editor_c = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorclib)
-application_editor_vala = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorlib)
+application_editor_vala = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorlib, sources : applicationeditorvapi)
