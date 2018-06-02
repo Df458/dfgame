@@ -67,7 +67,7 @@ vec2 window_get_mouse_position(window win) {
     vec2 v = window_get_mouse_position_raw(win);
     vec2 v2 = window_get_dims(win);
 
-    if(!check_warn(eq0(v2.x) && !eq0(v2.y), "Failed to calculate mouse position")) {
+    if(check_warn(!eq0(v2.x) && !eq0(v2.y), "Failed to calculate mouse position")) {
         return (vec2){0};
     }
 
