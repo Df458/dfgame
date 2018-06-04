@@ -59,6 +59,8 @@ void _mesh_free(mesh m) {
 
 // Returns the OpenGL handle for the mesh's data.
 GLuint mesh_get_handle(mesh m) {
+    check_return(m, "Can't get handle: mesh is NULL", 0);
+
     return m->handle;
 }
 

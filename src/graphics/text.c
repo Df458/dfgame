@@ -3,6 +3,7 @@
 
 #include "text.h"
 
+#include "core/check.h"
 #include "container/array.h"
 #include "font.h"
 #include "log/log.h"
@@ -108,6 +109,9 @@ iter_result iter_arrange_lines(void* data, void* user) {
 
 void text_update_mesh(text t) {
     uint16 len = strlen(t->str);
+
+    if(!len)
+        return;
 
     vt_pt* buf = scalloc(len * 6, sizeof(vt_pt));
 
@@ -231,14 +235,19 @@ void text_set_font(text t, font f) {
 }
 
 void text_draw(text t, shader s, mat4 m) {
-    glUseProgram(s.id);
-    shader_bind_uniform_name(s, "u_transform", m);
-    shader_bind_uniform_texture_name(s, "u_texture", font_get_texture(t->fnt), GL_TEXTURE0);
-    vec2 v0 = (vec2){.x=0,.y=0};
-    vec2 v1 = (vec2){.x=1,.y=1};
-    shader_bind_uniform_name(s, "uv_offset", v0);
-    shader_bind_uniform_name(s, "uv_scale", v1);
-    mesh_render(s, t->msh, GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
+    check_return(t, "Can't draw, test is NULL", );
+
+    if(t->msh)
+    {
+        glUseProgram(s.id);
+        shader_bind_uniform_name(s, "u_transform", m);
+        shader_bind_uniform_texture_name(s, "u_texture", font_get_texture(t->fnt), GL_TEXTURE0);
+        vec2 v0 = (vec2){.x=0,.y=0};
+        vec2 v1 = (vec2){.x=1,.y=1};
+        shader_bind_uniform_name(s, "uv_offset", v0);
+        shader_bind_uniform_name(s, "uv_scale", v1);
+        mesh_render(s, t->msh, GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
+    }
 }
 
 void _text_free(text t, bool free_src) {
