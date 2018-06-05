@@ -40,6 +40,7 @@ namespace DFGame
 
             Framebuffer.set_callback({ framebuffer_callback, this });
 
+            can_focus = true;
             events = Gdk.EventMask.ALL_EVENTS_MASK;
             update_id = Signal.lookup("update_step", typeof(Viewport));
             render.connect(run_update);
