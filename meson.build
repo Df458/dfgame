@@ -48,6 +48,7 @@ subdir('src/audio')
 subdir('src/resource')
 
 subdir('test/core')
+subdir('test/math')
 subdir('test/resource')
 
 subdir('demo/logo')

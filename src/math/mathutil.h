@@ -1,5 +1,6 @@
 #ifndef DF_MATH_UTIL
 #define DF_MATH_UTIL
+#include "core/types.h"
 
 // Ensures that v is between the range of low and hi.
 #define clamp(v, low, hi) ((v) > (low) ? ((v) > (hi) ? (hi) : (v)) : (low))
@@ -22,7 +23,7 @@
 #define degtorad(theta) ((theta) * 0.01745329251)
 #define radtodeg(theta) ((theta) * 57.2957795131)
 
-#define eq0(f) ((f) < 1e-6)
+#define eq0(f) (f < 1e-6 && f > -1e-6)
 
 #define PI 3.14159265358979323846
 

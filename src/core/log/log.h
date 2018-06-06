@@ -6,7 +6,7 @@
 #define LOG_CATEGORY "GENERIC"
 #endif // LOG_CATEGORY
 
-#include "types.h"
+#include "core/types.h"
 #include <errno.h>
 #include <string.h>
 #include <stdarg.h>
