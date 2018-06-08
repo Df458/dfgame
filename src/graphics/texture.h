@@ -1,6 +1,6 @@
 #ifndef DF_GRAPHICS_TEXTURE
 #define DF_GRAPHICS_TEXTURE
-#include "types.h"
+#include "core/types.h"
 #include <GL/glew.h>
 #include <GL/gl.h>
 

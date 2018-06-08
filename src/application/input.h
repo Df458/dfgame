@@ -1,8 +1,8 @@
 #ifndef DF_APPLICATION_INPUT
 #define DF_APPLICATION_INPUT
 
-#include "control.h"
-#include "input_id.h"
+#include "gameplay/control.h"
+#include "application/input_id.h"
 
 void input_bind_key_action(key_id key, action_id id);
 void input_bind_mouse_button_action(mouse_button_id button, action_id id);

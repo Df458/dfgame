@@ -1,7 +1,7 @@
 #ifndef DF_MATH_CAMERA_D
 #define DF_MATH_CAMERA_D
 
-#include "types.h"
+#include "core/types.h"
 
 // Represents a camera, containing a normal transform and a view matrix
 declarep(struct, camera);

@@ -1,7 +1,7 @@
 #ifndef DF_APPLICATION_MAINLOOP_D
 #define DF_APPLICATION_MAINLOOP_D
 
-#include "types.h"
+#include "core/types.h"
 
 // Represents a loop manually-interruptable loop
 declarep(struct, mainloop)

@@ -1,8 +1,8 @@
 #ifndef DF_GRAPHICS_VERTEX_D
 #define DF_GRAPHICS_VERTEX_D
 
-#include "types.h"
-#include "vector.h"
+#include "core/types.h"
+#include "math/vector.h"
 
 #include <GL/glew.h>
 #include <GL/gl.h>

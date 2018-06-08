@@ -2,13 +2,13 @@
 #define DF_GRAPHICS_SHADER
 #include <stdarg.h>
 
-#include "camera.hd"
-#include "matrix.hd"
-#include "mesh.hd"
-#include "text.h"
-#include "texture.h"
-#include "transform.hd"
-#include "vector.hd"
+#include "graphics/camera.hd"
+#include "math/matrix.hd"
+#include "graphics/mesh.hd"
+#include "graphics/text.h"
+#include "graphics/texture.h"
+#include "math/transform.hd"
+#include "math/vector.hd"
 #include <GL/glew.h>
 #include <GL/gl.h>
 

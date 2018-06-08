@@ -10,6 +10,8 @@ namespace DFGame
         public uint update_interval { get { return _update_interval; } set { set_update_timer(value); } }
         public unowned WindowProxy proxy { get { return _proxy; } }
 
+        public bool is_active { get; set; }
+
         construct
         {
             _proxy = new WindowProxy(this);
@@ -48,6 +50,9 @@ namespace DFGame
 
         public bool update()
         {
+            if(!is_active)
+                return true;
+
             update_input();
 
             queue_render();
@@ -71,6 +76,9 @@ namespace DFGame
 
         private bool run_update()
         {
+            if(!is_active)
+                return true;
+
             should_continue = !Signal.has_handler_pending(this, update_id, {}, false) || update_step(_update_interval > 0 ? 1.0f / update_interval : 0);
 
             return true;

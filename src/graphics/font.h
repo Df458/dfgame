@@ -1,9 +1,9 @@
 #ifndef DF_GRAPHICS_FONT
 #define DF_GRAPHICS_FONT
 
-#include "font.hd"
-#include "aabb.h"
-#include "texture.h"
+#include "graphics/font.hd"
+#include "graphics/texture.h"
+#include "math/aabb.h"
 
 typedef struct glyph {
     int16 index;

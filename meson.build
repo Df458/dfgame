@@ -56,5 +56,6 @@ subdir('demo/comets')
 subdir('demo/heightmap')
 subdir('demo/fps')
 subdir('demo/editor')
+subdir('demo/text')
 
 run_command('ctags', '-R', '.')

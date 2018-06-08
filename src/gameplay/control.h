@@ -1,6 +1,6 @@
 #ifndef DF_GAMEPLAY_CONTROL
 #define DF_GAMEPLAY_CONTROL
-#include "types.h"
+#include "core/types.h"
 
 typedef int16 action_id;
 typedef int16 axis_id;

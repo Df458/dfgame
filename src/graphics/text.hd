@@ -1,7 +1,7 @@
 #ifndef DF_GRAPHICS_TEXT_D
 #define DF_GRAPHICS_TEXT_D
 
-#include "types.h"
+#include "core/types.h"
 
 // Represents a text object
 declarep(struct, text)

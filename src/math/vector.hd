@@ -1,7 +1,7 @@
 #ifndef DF_MATH_VECTOR_D
 #define DF_MATH_VECTOR_D
 
-#include "types.h"
+#include "core/types.h"
 
 // Represents a 2D vector
 declare(struct, vec2);

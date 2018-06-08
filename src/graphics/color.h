@@ -1,4 +1,4 @@
-#include "vector.h"
+#include "math/vector.h"
 
 static const vec4 color_black   = { .r = 0.0f,  .g = 0.0f,  .b = 0.0f,  .a = 1.0f };
 static const vec4 color_white   = { .r = 1.0f,  .g = 1.0f,  .b = 1.0f,  .a = 1.0f };

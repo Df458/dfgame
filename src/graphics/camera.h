@@ -2,9 +2,9 @@
 #define DF_GRAPHICS_CAMERA
 #include "camera.hd"
 
-#include "matrix.h"
-#include "transform.hd"
-#include "vector.h"
+#include "math/matrix.h"
+#include "math/transform.hd"
+#include "math/vector.h"
 
 // Creates a new camera
 camera camera_new(projection_settings settings);

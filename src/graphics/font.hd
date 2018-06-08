@@ -1,7 +1,7 @@
 #ifndef DF_GRAPHICS_FONT_D
 #define DF_GRAPHICS_FONT_D
 
-#include "types.h"
+#include "core/types.h"
 
 // Represents a font
 declarep(struct, font)
