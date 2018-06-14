@@ -58,7 +58,8 @@ void wrap(action_id id, void* user) {
 }
 
 void draw_lines(text_alignment align, vec2 pos, float level) {
-    vt_pc a,b;
+    vt_pc a = {0};
+    vt_pc b = {0};
     a.position.xy = (vec2){ .x = 0, .y = pos.y - 100 };
     a.color = color_red;
     b.position.xy = (vec2){ .x = 0, .y = pos.y + 100 };
