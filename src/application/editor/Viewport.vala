@@ -46,18 +46,29 @@ namespace DFGame
             events = Gdk.EventMask.ALL_EVENTS_MASK;
             update_id = Signal.lookup("update_step", typeof(Viewport));
             render.connect(run_update);
+
+            add_tick_callback(tick);
         }
 
         public bool update()
         {
-            if(!is_active)
+            if(!is_active || needs_draw)
                 return true;
+
+            needs_draw = true;
 
             update_input();
 
             queue_render();
 
             return should_continue;
+        }
+
+        private static bool tick(Gtk.Widget viewport, Gdk.FrameClock clock)
+        {
+            Viewport v = (Viewport)viewport;
+            v.update();
+            return true;
         }
 
         private void set_update_timer(uint fps)
@@ -81,6 +92,8 @@ namespace DFGame
 
             should_continue = !Signal.has_handler_pending(this, update_id, {}, false) || update_step(_update_interval > 0 ? 1.0f / update_interval : 0);
 
+            needs_draw = false;
+
             return true;
         }
 
@@ -94,6 +107,7 @@ namespace DFGame
         private TimeoutSource update_timer;
         private uint update_id;
         private bool should_continue;
+        private bool needs_draw = false;
         private WindowProxy _proxy;
     }
 }

@@ -13,6 +13,7 @@
 typedef struct input_binding {
     uarray actions;
     bool active;
+    bool triggered;
 } input_binding;
 typedef struct axis {
     axis_id id;
@@ -139,6 +140,7 @@ bool on_button_press(GdkEventButton* event) {
     uint32 mb = convert_mouse_button(event->button);
     if(mb != MB_INVALID) {
         mouse_button_bindings[mb].active = true;
+        mouse_button_bindings[mb].triggered = true;
         mouse_button_axis_bindings[mb].set = true;
     }
 
@@ -157,6 +159,7 @@ bool on_key_press(GdkEventKey* event) {
     uint32 key = convert_key(event->keyval);
     if(key != K_INVALID) {
         key_bindings[key].active = true;
+        key_bindings[key].triggered = true;
         key_axis_bindings[key].set = true;
     }
 
@@ -208,14 +211,18 @@ bool on_scroll(GdkEventScroll* event) {
 void update_input() {
     update_controls();
     for(int i = 0; i < K_LAST; ++i) {
-        if(key_bindings[i].actions != NULL && key_bindings[i].active)
+        if(key_bindings[i].actions != NULL && (key_bindings[i].active || key_bindings[i].triggered)) {
+            key_bindings[i].triggered = false;
             array_foreach(key_bindings[i].actions, action_active_foreach, NULL);
+        }
         if(key_axis_bindings[i].axes != NULL && key_axis_bindings[i].set)
             array_foreach(key_axis_bindings[i].axes, axis_value_foreach, NULL);
     }
     for(int i = 0; i < MB_LAST; ++i) {
-        if(mouse_button_bindings[i].actions != NULL && mouse_button_bindings[i].active)
+        if(mouse_button_bindings[i].actions != NULL && (mouse_button_bindings[i].active || mouse_button_bindings[i].triggered)) {
+            mouse_button_bindings[i].triggered = false;
             array_foreach(mouse_button_bindings[i].actions, action_active_foreach, NULL);
+        }
         if(mouse_button_axis_bindings[i].axes != NULL && mouse_button_axis_bindings[i].set)
             array_foreach(mouse_button_axis_bindings[i].axes, axis_value_foreach, NULL);
     }
@@ -234,8 +241,7 @@ void update_input() {
     mouse_position_axis_bindings[1].offset = 0;
 }
 
-void clear_input_bindings()
-{
+void clear_input_bindings() {
     for(int i = 0; i < K_LAST; ++i) {
         if(key_bindings[i].actions != NULL)
             array_free_deep(key_bindings[i].actions);

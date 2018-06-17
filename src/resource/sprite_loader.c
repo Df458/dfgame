@@ -15,7 +15,7 @@
 
 void read_animation(spriteset set, xmlNodePtr node, const char* path) {
     animation anim = {
-        .orient_count = 0,
+        .orient_count = 1,
         .origin = {
             .x = 0,
             .y = 0
