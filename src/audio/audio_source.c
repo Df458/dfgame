@@ -33,7 +33,7 @@ typedef struct audio_source {
 
 // Common initialization for audio_source structs
 audio_source _audio_source_new_common(uint32 length, ALenum channels, uint32 sample_rate, const char* path) {
-    audio_source src = salloc(sizeof(struct audio_source));
+    audio_source src = mscalloc(1, struct audio_source);
 
     src->length = length;
     src->channels = channels;
