@@ -1,19 +1,23 @@
 #define LOG_CATEGORY "Resource"
 
-#include "audio_loader.h"
+#include "resource/audio_loader.h"
 
-#include "audio_source.h"
-#include "check.h"
-#include "log/log.h"
-#include "mathutil.h"
-#include "memory/alloc.h"
-#include "paths.h"
-#include "power.h"
+#include "audio/audio_source.h"
+#include "core/check.h"
+#include "core/log/log.h"
+#include "core/memory/alloc.h"
+#include "math/mathutil.h"
+#include "core/power.h"
+#include "resource/paths.h"
+
 #include <AL/al.h>
 #include <stdio.h>
 #include <string.h>
 #include <vorbis/vorbisfile.h>
 
+// Prepare an audio_source from the provided file
+// Setting preload to true will load the data into memory, false will stream
+// from the disk
 audio_source load_audio_source(const char* path, bool preload) {
     const char* ext = get_extension(path);
     if(!strcmp(ext, "wav"))
@@ -40,6 +44,9 @@ void stream_wav_audio(byte** data, uint32 position, uint32 requested_length, uin
     *final_length = fread(*data, sizeof(byte), requested_length, infile);
 }
 
+// Prepare an audio_source from the provided wav file
+// Setting preload to true will load the data into memory, false will stream
+// from the disk
 audio_source load_wav_audio(const char* path, bool preload) {
     FILE* infile = fopen(path, "r");
     check_return(infile, "Failed to prepare WAV stream, file %s not found", false, path);
@@ -121,6 +128,8 @@ audio_source load_wav_audio(const char* path, bool preload) {
     return audio_source_new_stream(&(audio_stream_event){ .func=stream_wav_audio, .user=infile }, data_size, channels, sample_rate, path);
 }
 
+#define VORBIS_MAX_SAMPLE_SIZE 32
+
 void stream_ogg_audio(byte** data, uint32 position, uint32 requested_length, uint32* final_length, void* user) {
     if(!data) { // Null data indicates a close request
         ov_clear(user);
@@ -141,7 +150,15 @@ void stream_ogg_audio(byte** data, uint32 position, uint32 requested_length, uin
     
         if(result > 0)
             size += result;
-        else if(check_error(result == 0, "Failed to stream ogg file: Error code %d", result)) {
+        else if(result != 0) {
+            const char* message = "Unknown Error";
+            switch(result) {
+                case OV_HOLE: message = "Streaming interrupted"; break;
+                case OV_EBADLINK: message = "Invalid stream/link"; break;
+                case OV_EINVAL: message = "Corrupt header"; break;
+                default: message = "Unknown Error"; break;
+            }
+            error("Failed to stream Ogg file: %s", message);
             sfree(data);
             return;
         }
@@ -152,6 +169,9 @@ void stream_ogg_audio(byte** data, uint32 position, uint32 requested_length, uin
     *final_length = size;
 }
 
+// Prepare an audio_source from the provided ogg file
+// Setting preload to true will load the data into memory, false will stream
+// from the disk
 audio_source load_ogg_audio(const char* path, bool preload) {
     int result;
 
@@ -175,6 +195,8 @@ audio_source load_ogg_audio(const char* path, bool preload) {
         return NULL;
     }
     info = ov_info(infile, -1);
+
+    check_return(info, "Ogg bitstream does not exist", NULL);
  
     if(info->channels == 1)
         channels = AL_FORMAT_MONO16;
@@ -182,13 +204,19 @@ audio_source load_ogg_audio(const char* path, bool preload) {
         channels = AL_FORMAT_STEREO16;
 
     sample_rate = info->rate;
-    data_size = ov_pcm_total(infile, -1) * sample_rate;
+    data_size = ov_pcm_total(infile, -1);
+
+    check_return(data_size != OV_EINVAL, "Ogg bitstream is missing or non-seekable", NULL);
+
+    data_size *= VORBIS_MAX_SAMPLE_SIZE; // Unlikely that samples will be larger than this. We scale down the buffer afterwards
 
     if(check_warn(infile->seekable, "Ogg file %s is non-seekable, and will be preloaded", path))
         preload = true;
     if(preload) {
-        info("Preloading %d bytes", data_size);
+        info("Preloading up to %u bytes", data_size);
         stream_ogg_audio(&input_buffer, 0, data_size, &final_length, infile);
+        input_buffer = resalloc(input_buffer, final_length);
+        info("Done. Loaded %u bytes", final_length);
         ov_clear(infile);
         return audio_source_new_buffer(input_buffer, final_length, channels, sample_rate, path);
     }
