@@ -11,7 +11,7 @@
 
 typedef struct sprite {
     spriteset src;
-    animation current_animation;
+    animation* current_animation;
 
     float position;
     uint8 orient;
@@ -31,21 +31,21 @@ sprite sprite_new(spriteset set) {
 }
 
 void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset) {
-    animation anim = spriteset_get_animation(spr->src, handle);
-    if(anim.texture_id == spr->current_animation.texture_id && !force_reset)
-        return;
+    animation* anim = spriteset_get_animation(spr->src, handle);
     spr->current_animation = anim;
+    if(anim->texture_id == spr->current_animation->texture_id && !force_reset)
+        return;
     spr->position = 0;
-    sprite_set_playing(spr, spr->current_animation.autoplay);
+    sprite_set_playing(spr, spr->current_animation->autoplay);
 }
 
 void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset) {
-    animation anim = spriteset_get_animation(spr->src, handle);
-    if(anim.texture_id == spr->current_animation.texture_id && !force_reset)
-        return;
+    animation* anim = spriteset_get_animation(spr->src, handle);
     spr->current_animation = anim;
+    if(anim->texture_id == spr->current_animation->texture_id && !force_reset)
+        return;
     spr->position = 0;
-    sprite_set_playing(spr, spr->current_animation.autoplay);
+    sprite_set_playing(spr, spr->current_animation->autoplay);
 }
 
 void sprite_set_orientation(sprite spr, uint8 orient) {
@@ -73,31 +73,31 @@ void sprite_update(sprite spr, float dt) {
         return;
 
     spr->position += dt;
-    if((spr->position - spr->current_animation.start_delay) * spr->current_animation.fps >= spr->current_animation.frame_count) {
-        if(spr->current_animation.autoloop) {
-            while((spr->position - spr->current_animation.start_delay) * spr->current_animation.fps >= spr->current_animation.frame_count) {
-                spr->position -= (spr->current_animation.frame_count + spr->current_animation.start_delay) / (float)spr->current_animation.fps;
+    if((spr->position - spr->current_animation->start_delay) * spr->current_animation->fps >= spr->current_animation->frame_count) {
+        if(spr->current_animation->autoloop) {
+            while((spr->position - spr->current_animation->start_delay) * spr->current_animation->fps >= spr->current_animation->frame_count) {
+                spr->position -= (spr->current_animation->frame_count + spr->current_animation->start_delay) / (float)spr->current_animation->fps;
             }
         } else {
-            spr->position = (spr->current_animation.frame_count - 1) * spr->current_animation.start_delay;
+            spr->position = (spr->current_animation->frame_count - 1) * spr->current_animation->start_delay;
             sprite_set_playing(spr, false);
-            if(spr->current_animation.default_on_finish)
+            if(spr->current_animation->default_on_finish)
                 sprite_set_animation(spr, NULL, false);
             else
-                spr->position = (spr->current_animation.frame_count - 1 + spr->current_animation.start_delay) / (float)spr->current_animation.fps;
+                spr->position = (spr->current_animation->frame_count - 1 + spr->current_animation->start_delay) / (float)spr->current_animation->fps;
         }
     }
 }
 
 aabb_2d sprite_get_box(sprite spr) {
-    aabb_2d box = spr->current_animation.texture_box;
-    box.width /= spr->current_animation.frame_count;
-    box.height /= spr->current_animation.orient_count;
+    aabb_2d box = spr->current_animation->texture_box;
+    box.width /= spr->current_animation->frame_count;
+    box.height /= spr->current_animation->orient_count;
 
-    int frame = (spr->position - spr->current_animation.start_delay) * spr->current_animation.fps;
+    int frame = (spr->position - spr->current_animation->start_delay) * spr->current_animation->fps;
 
     box.x += box.width * frame;
-    box.y += box.height * (spr->orient % spr->current_animation.orient_count);
+    box.y += box.height * (spr->orient % spr->current_animation->orient_count);
 
     return box;
 }
@@ -111,7 +111,7 @@ spriteset sprite_get_data(sprite spr) {
 }
 
 int16 sprite_get_anim_id(sprite spr) {
-    return spr->current_animation.texture_id;
+    return spr->current_animation->texture_id;
 }
 
 void sprite_draw(sprite spr, shader s, mat4 model, mat4 view) {

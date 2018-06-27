@@ -13,6 +13,7 @@ texture_atlas texture_atlas_new();
 )(a, t, GL_RGBA)
 int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode);
 int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode);
+void texture_atlas_remove(texture_atlas atlas, int16 index);
 aabb_2d texture_atlas_get(texture_atlas atlas, int16 index);
 
 // Frees the given atlas, and all resources contained within it

@@ -167,6 +167,11 @@ aabb_2d texture_atlas_get(texture_atlas atlas, int16 index) {
     return *(aabb_2d*)array_get(atlas->textures, index);
 }
 
+void texture_atlas_remove(texture_atlas atlas, int16 index) {
+    void* data = array_remove_at(atlas->textures, index);
+    sfree(data);
+}
+
 // Frees the given atlas, and all resources contained within it
 // NOTE: Don't call this function. Use the macro without
 // the leading _ instead, as it also NULLs your pointer.

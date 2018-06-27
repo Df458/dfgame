@@ -60,4 +60,7 @@ void hashmap_remove(hashmap map, hash_key);
 // users must still free memory as usual.
 void hashmap_foreach(hashmap map, foreach_delegate d, void* user);
 
+// Returns an array containing all values
+void** hashmap_to_array(hashmap map);
+
 #endif // DF_CORE_HASHMAP

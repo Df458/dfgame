@@ -19,7 +19,7 @@
 #include "paths.h"
 #include "shader_init.h"
 #include "sprite.h"
-#include "sprite_loader.h"
+#include "sprite_io.h"
 #include "spriteset.h"
 #include "text.h"
 #include "transform.h"

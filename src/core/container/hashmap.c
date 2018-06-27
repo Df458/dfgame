@@ -203,4 +203,24 @@ void hashmap_foreach(hashmap map, foreach_delegate d, void* user) {
     }
 }
 
+// Returns an array containing all values
+void** hashmap_to_array(hashmap map) {
+    uint16 size = hashmap_size(map);
+
+    if(size == 0)
+        return NULL;
+
+    void** array = mscalloc(size, void*);
+
+    uint16 k = 0;
+    for(uint16 i = 0; i < HASHMAP_BUCKET_COUNT; ++i) {
+        for(uint16 j = 0; j < map->buckets[i].size; ++j) {
+            array[k] = map->buckets[i].data[j];
+            k++;
+        }
+    }
+
+    return array;
+}
+
 #undef LOG_CATEGORY
