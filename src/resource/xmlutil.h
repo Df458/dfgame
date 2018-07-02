@@ -5,19 +5,22 @@
 #include <libxml/tree.h>
 #include <libxml/xmlwriter.h>
 
-bool xml_property_read_bool(xmlNodePtr node, const char* name, bool* val);
-bool xml_property_read_int8(xmlNodePtr node, const char* name, int8* val);
-bool xml_property_read_uint8(xmlNodePtr node, const char* name, uint8* val);
-bool xml_property_read_int16(xmlNodePtr node, const char* name, int16* val);
-bool xml_property_read_uint16(xmlNodePtr node, const char* name, uint16* val);
-bool xml_property_read_int32(xmlNodePtr node, const char* name, int32* val);
-bool xml_property_read_uint32(xmlNodePtr node, const char* name, uint32* val);
-bool xml_property_read_float(xmlNodePtr node, const char* name, float* val);
-bool xml_property_read_double(xmlNodePtr node, const char* name, double* val);
-bool xml_property_read_vec2(xmlNodePtr node, const char* name, vec2* val);
-bool xml_property_read_vec3(xmlNodePtr node, const char* name, vec3* val);
-bool xml_property_read_vec4(xmlNodePtr node, const char* name, vec4* val);
-bool xml_property_read_string(xmlNodePtr node, const char* name, char** val);
+// Finds the next sibling of node (including itself) that has a given name
+xmlNodePtr xml_match_name(const xmlNodePtr node, const char* name);
+
+bool xml_property_read_bool(const xmlNodePtr node, const char* name, bool* val);
+bool xml_property_read_int8(const xmlNodePtr node, const char* name, int8* val);
+bool xml_property_read_uint8(const xmlNodePtr node, const char* name, uint8* val);
+bool xml_property_read_int16(const xmlNodePtr node, const char* name, int16* val);
+bool xml_property_read_uint16(const xmlNodePtr node, const char* name, uint16* val);
+bool xml_property_read_int32(const xmlNodePtr node, const char* name, int32* val);
+bool xml_property_read_uint32(const xmlNodePtr node, const char* name, uint32* val);
+bool xml_property_read_float(const xmlNodePtr node, const char* name, float* val);
+bool xml_property_read_double(const xmlNodePtr node, const char* name, double* val);
+bool xml_property_read_vec2(const xmlNodePtr node, const char* name, vec2* val);
+bool xml_property_read_vec3(const xmlNodePtr node, const char* name, vec3* val);
+bool xml_property_read_vec4(const xmlNodePtr node, const char* name, vec4* val);
+bool xml_property_read_string(const xmlNodePtr node, const char* name, char** val);
                                                 
 #define xml_property_read(node, name, val) _Generic(val,\
     bool*: xml_property_read_bool,\

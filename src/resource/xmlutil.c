@@ -3,7 +3,16 @@
 #include "core/check.h"
 #include "core/stringutil.h"
 
-bool xml_property_read_bool(xmlNodePtr node, const char* name, bool* val) {
+// Finds the next sibling of node (including itself) that has a given name
+xmlNodePtr xml_match_name(const xmlNodePtr node, const char* name) {
+    for(xmlNodePtr cursor = node; cursor; cursor = cursor->next)
+        if(cursor->type == XML_ELEMENT_NODE && !xmlStrcmp(cursor->name, (const xmlChar*)name))
+            return cursor;
+
+    return NULL;
+}
+
+bool xml_property_read_bool(const xmlNodePtr node, const char* name, bool* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop) {
         return false;
@@ -24,7 +33,7 @@ bool xml_property_read_bool(xmlNodePtr node, const char* name, bool* val) {
 
     return true;
 }
-bool xml_property_read_int8(xmlNodePtr node, const char* name, int8* val) {
+bool xml_property_read_int8(const xmlNodePtr node, const char* name, int8* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop) {
         return false;
@@ -46,7 +55,7 @@ bool xml_property_read_int8(xmlNodePtr node, const char* name, int8* val) {
 
     return true;
 }
-bool xml_property_read_uint8(xmlNodePtr node, const char* name, uint8* val) {
+bool xml_property_read_uint8(const xmlNodePtr node, const char* name, uint8* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop) {
         return false;
@@ -71,7 +80,7 @@ bool xml_property_read_uint8(xmlNodePtr node, const char* name, uint8* val) {
 
     return true;
 }
-bool xml_property_read_int16(xmlNodePtr node, const char* name, int16* val) {
+bool xml_property_read_int16(const xmlNodePtr node, const char* name, int16* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop) {
         return false;
@@ -93,7 +102,7 @@ bool xml_property_read_int16(xmlNodePtr node, const char* name, int16* val) {
 
     return true;
 }
-bool xml_property_read_uint16(xmlNodePtr node, const char* name, uint16* val) {
+bool xml_property_read_uint16(const xmlNodePtr node, const char* name, uint16* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop) {
         return false;
@@ -118,7 +127,7 @@ bool xml_property_read_uint16(xmlNodePtr node, const char* name, uint16* val) {
 
     return true;
 }
-bool xml_property_read_int32(xmlNodePtr node, const char* name, int32* val) {
+bool xml_property_read_int32(const xmlNodePtr node, const char* name, int32* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop) {
         return false;
@@ -140,7 +149,7 @@ bool xml_property_read_int32(xmlNodePtr node, const char* name, int32* val) {
 
     return true;
 }
-bool xml_property_read_uint32(xmlNodePtr node, const char* name, uint32* val) {
+bool xml_property_read_uint32(const xmlNodePtr node, const char* name, uint32* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop) {
         return false;
@@ -165,7 +174,7 @@ bool xml_property_read_uint32(xmlNodePtr node, const char* name, uint32* val) {
 
     return true;
 }
-bool xml_property_read_float(xmlNodePtr node, const char* name, float* val) {
+bool xml_property_read_float(const xmlNodePtr node, const char* name, float* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop)
         return false;
@@ -181,7 +190,7 @@ bool xml_property_read_float(xmlNodePtr node, const char* name, float* val) {
 
     return true;
 }
-bool xml_property_read_double(xmlNodePtr node, const char* name, double* val) {
+bool xml_property_read_double(const xmlNodePtr node, const char* name, double* val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop)
         return false;
@@ -197,7 +206,7 @@ bool xml_property_read_double(xmlNodePtr node, const char* name, double* val) {
 
     return true;
 }
-bool xml_property_read_vec2(xmlNodePtr node, const char* name, vec2* val) {
+bool xml_property_read_vec2(const xmlNodePtr node, const char* name, vec2* val) {
     int props_read = false;
 
     char* prop_name = saprintf("%s_x", name);
@@ -210,7 +219,7 @@ bool xml_property_read_vec2(xmlNodePtr node, const char* name, vec2* val) {
 
     return props_read;
 }
-bool xml_property_read_vec3(xmlNodePtr node, const char* name, vec3* val) {
+bool xml_property_read_vec3(const xmlNodePtr node, const char* name, vec3* val) {
     bool props_read = false;
 
     props_read |= xml_property_read_vec2(node, name, &val->xy);
@@ -221,7 +230,7 @@ bool xml_property_read_vec3(xmlNodePtr node, const char* name, vec3* val) {
 
     return props_read;
 }
-bool xml_property_read_vec4(xmlNodePtr node, const char* name, vec4* val) {
+bool xml_property_read_vec4(const xmlNodePtr node, const char* name, vec4* val) {
     bool props_read = false;
 
     props_read |= xml_property_read_vec3(node, name, &val->xyz);
@@ -232,7 +241,7 @@ bool xml_property_read_vec4(xmlNodePtr node, const char* name, vec4* val) {
 
     return props_read;
 }
-bool xml_property_read_string(xmlNodePtr node, const char* name, char** val) {
+bool xml_property_read_string(const xmlNodePtr node, const char* name, char** val) {
     xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
     if(!prop)
         return false;

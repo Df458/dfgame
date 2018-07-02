@@ -4,11 +4,14 @@
 #include <libxml/parser.h>
 
 static const char test_file_1[] = "<root small_int=\"1\" big_int=\"1234567\" negative_int=\"-40\" vec_x=\"1.25\" vec_y=\"-35.7\" vec_z=\"0\" vec_w=\"45.01\" string=\"lorem ipsum\" bool=\"true\" Bool=\"False\"/>";
+static const char test_file_2[] = "<root><child v=\"1\"/><match v=\"2\"/><child v=\"3\"/><child v=\"4\"/><match v=\"5\"/></root>";
 
 static xmlDocPtr test_doc = NULL;
+static xmlDocPtr test_doc_2 = NULL;
 
 int test_xml_init() {
     test_doc = xmlReadMemory(test_file_1, strlen(test_file_1), "test.xml", NULL, 0);
+    test_doc_2 = xmlReadMemory(test_file_2, strlen(test_file_2), "test.xml", NULL, 0);
 
     return 0;
 }
@@ -17,11 +20,16 @@ int test_xml_cleanup() {
         xmlFreeDoc(test_doc);
         test_doc = NULL;
     }
+    if(test_doc_2) {
+        xmlFreeDoc(test_doc_2);
+        test_doc_2 = NULL;
+    }
     return 0;
 }
 
 void test_xml_build_tests(CU_pSuite suite) {
     CU_ADD_TEST(suite, test_xml_read);
+    CU_ADD_TEST(suite, test_xml_match);
 }
 
 void test_xml_read() {
@@ -127,4 +135,27 @@ void test_xml_read() {
     CU_ASSERT_TRUE(xml_property_read(root, "string", &test_string));
     CU_ASSERT_EQUAL(strcmp(test_string, "lorem ipsum"), 0);
     sfree(test_string);
+}
+
+void test_xml_match() {
+    xmlNodePtr root = xmlDocGetRootElement(test_doc_2);
+
+    uint8 test_val = 0;
+
+    xmlNodePtr match = xml_match_name(root->children, "match");
+    CU_ASSERT_TRUE(xml_property_read(match, "v", &test_val));
+    CU_ASSERT_EQUAL(test_val, 2);
+    match = xml_match_name(match->next, "match");
+    CU_ASSERT_TRUE(xml_property_read(match, "v", &test_val));
+    CU_ASSERT_EQUAL(test_val, 5);
+
+    match = xml_match_name(root->children, "child");
+    CU_ASSERT_TRUE(xml_property_read(match, "v", &test_val));
+    CU_ASSERT_EQUAL(test_val, 1);
+    match = xml_match_name(match->next, "child");
+    CU_ASSERT_TRUE(xml_property_read(match, "v", &test_val));
+    CU_ASSERT_EQUAL(test_val, 3);
+    match = xml_match_name(match->next, "child");
+    CU_ASSERT_TRUE(xml_property_read(match, "v", &test_val));
+    CU_ASSERT_EQUAL(test_val, 4);
 }

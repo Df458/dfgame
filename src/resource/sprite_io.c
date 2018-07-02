@@ -134,11 +134,7 @@ spriteset load_spriteset_from_xml(const char* path) {
     xmlDocPtr doc = xmlReadFile(path, NULL, 0);
     check_return(doc, "Failed to load spriteset at path %s", NULL, path);
 
-    xmlNodePtr root = xmlDocGetRootElement(doc);
-    for(; root; root = root->next)
-        if(root->type == XML_ELEMENT_NODE && !xmlStrcmp(root->name, (const xmlChar*)"spriteset"))
-            break;
-
+    xmlNodePtr root = xml_match_name(xmlDocGetRootElement(doc), "spriteset");
     check_return(root != NULL, "Spriteset file %s is invalid", NULL, path);
 
     spriteset spr = spriteset_new(NULL);

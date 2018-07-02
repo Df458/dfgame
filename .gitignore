@@ -3,6 +3,7 @@ obj
 lib/*.a
 
 *.un~
+*.taghl
 
 src/editor-front.h
 vapi/editor-frontend.vapi
