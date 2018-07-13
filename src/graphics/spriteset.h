@@ -1,9 +1,9 @@
 #ifndef DF_GRAPHICS_SPRITESET
 #define DF_GRAPHICS_SPRITESET
 
-#include "spriteset.hd"
-#include "aabb.h"
-#include "texture.h"
+#include "graphics/spriteset.hd"
+#include "math/aabb.h"
+#include "graphics/texture.h"
 
 typedef struct animation {
     uint8 orient_count;
