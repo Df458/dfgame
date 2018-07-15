@@ -82,6 +82,14 @@ void window_redraw(window win) {
     glfwSwapBuffers((GLFWwindow*)win->platform_data);
 }
 
+void window_set_title(window win, const char* title) {
+    if(check_warn(win, "Window is NULL") || check_warn(win->platform_data, "Window is invalid")) {
+        return;
+    }
+
+    glfwSetWindowTitle(win->platform_data, title);
+}
+
 // Returns whether or not the window has received a close request.
 bool window_get_should_close(window win) {
     if(check_warn(win, "Window is NULL") || check_warn(win->platform_data, "Window is invalid")) {
