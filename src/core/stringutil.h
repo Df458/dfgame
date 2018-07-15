@@ -8,6 +8,7 @@ char* saprintf(const char* format, ...);
 char* vsaprintf(const char* format, va_list args);
 
 #define nstrdup(str) (str ? strdup(str) : NULL)
+#define nstrndup(str, len) (str ? strndup(str, len) : NULL)
 
 bool aisi(const char* str);
 bool aisf(const char* str);

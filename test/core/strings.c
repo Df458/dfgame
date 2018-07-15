@@ -18,9 +18,19 @@ void test_strings_dup() {
 
     char* dup = nstrdup(teststr);
     CU_ASSERT_EQUAL(strcmp(teststr, dup), 0);
+    sfree(dup);
 
-    sfree(dup)
+    dup = nstrndup(teststr, 4);
+    CU_ASSERT_EQUAL(strcmp("Test", dup), 0);
+    sfree(dup);
+
+    dup = nstrndup(teststr, 256);
+    CU_ASSERT_EQUAL(strcmp(teststr, dup), 0);
+    sfree(dup);
+
+    sfree(dup);
     CU_ASSERT_EQUAL(nstrdup(dup), NULL);
+    CU_ASSERT_EQUAL(nstrndup(dup, 4), NULL);
 }
 void test_strings_checks() {
     const char* intstr = "45";
