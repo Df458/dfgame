@@ -50,12 +50,10 @@ texture_atlas texture_atlas_new() {
     atlas->textures = uarray_new(8);
     atlas->free_space = uarray_new(8);
 
-    atlas_box initial = (atlas_box) {
-        .box = (aabb_2d) {
-            .position = (vec2){0},
-            .dimensions = (vec2){ .x = 256, .y = 256 }
-        },
-        .free_marker = (vec3){0}
+    atlas_box initial = {0};
+    initial.box = (aabb_2d) {
+        .position = (vec2){0},
+        .dimensions = (vec2){ .x = 256, .y = 256 }
     };
     array_copyadd_simple(atlas->free_space, initial);
 
@@ -81,23 +79,19 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
                     if(box->free_marker.y == 0) {
                         box->box.dimensions.x += new_size - prev_size;
                     } else {
-                        atlas_box new_box =  {
-                            .box = (aabb_2d) {
-                                .position = (vec2){ .x = prev_size, .y = box->box.position.y },
-                                .dimensions = (vec2){ .x = new_size - prev_size, .y = box->box.dimensions.y }
-                            },
-                                .free_marker = (vec3){0}
+                        atlas_box new_box = {0};
+                        new_box.box = (aabb_2d) {
+                            .position = (vec2){ .x = prev_size, .y = box->box.position.y },
+                            .dimensions = (vec2){ .x = new_size - prev_size, .y = box->box.dimensions.y }
                         };
                         array_copyadd_simple(atlas->free_space, new_box);
                     }
                 }
             }
-            atlas_box new_box = (atlas_box) {
-                .box = (aabb_2d) {
-                    .position = (vec2){ .x = 0, .y = prev_size },
-                        .dimensions = (vec2){ .x = new_size, .y = new_size - prev_size }
-                },
-                    .free_marker = (vec3){0}
+            atlas_box new_box = {0};
+            new_box.box = (aabb_2d) {
+                .position = (vec2){ .x = 0, .y = prev_size },
+                    .dimensions = (vec2){ .x = new_size, .y = new_size - prev_size }
             };
             array_copyadd_simple(atlas->free_space, new_box);
         } else {

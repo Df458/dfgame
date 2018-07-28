@@ -1,7 +1,7 @@
 project('dfgame', 'c', 'vala',
         version : '1.1.0',
         license : 'MIT',
-        default_options : ['c_std=gnu11'])
+        default_options : ['c_std=gnu11', 'werror=true'])
 
 compiler = meson.get_compiler('c')
 

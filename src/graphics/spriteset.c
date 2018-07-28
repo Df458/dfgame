@@ -90,7 +90,7 @@ uint16 spriteset_get_animation_count(spriteset set) {
 animation* spriteset_get_animation_by_name(spriteset set, const char* handle) {
     check_return(set, "Spriteset is NULL", NULL);
 
-    if(!handle || !hashmap_has_key(set->animations, make_hash_key("default")))
+    if(!handle || !hashmap_has_key(set->animations, make_hash_key(handle)))
         return (animation*)hashmap_get(set->animations, make_hash_key("default"));
     return (animation*)hashmap_get(set->animations, make_hash_key(handle));
 }
