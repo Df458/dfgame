@@ -47,8 +47,8 @@ int32 width;
 int32 height;
 uint8* m_level;
 
-uarray bullets;
-uarray barrels;
+array bullets;
+array barrels;
 
 const char* const info_str =
 "Controls\n"
@@ -59,7 +59,6 @@ const char* const info_str =
 typedef struct bullet {
     vec3 position;
     vec3 velocity;
-    bool destroyed;
 } bullet;
 typedef struct barrel {
     transform trans;
@@ -84,9 +83,8 @@ void create_bullet(vec3 position, quat orient) {
     bullet b = (bullet) {
         .position = position,
         .velocity = vec3_mul(vec3_rotate(vec3_forward, orient), 10),
-        .destroyed = false
     };
-    array_copyadd_simple(bullets, b);
+    array_add(bullets, b);
 }
 void create_barrel(vec3 position) {
     barrel b = (barrel) {
@@ -97,27 +95,9 @@ void create_barrel(vec3 position) {
     transform_scale(b.trans, -10, false);
     transform_translate(b.trans, position, false);
 
-    array_copyadd_simple(barrels, b);
+    array_add(barrels, b);
 }
 
-iter_result barrel_collision(void* bar, void* user) {
-    barrel* br = (barrel*)bar;
-
-    if(br->destroyed)
-        return iter_continue;
-
-    bullet* bl = (bullet*)user;
-    vec3 pos1 = transform_get_position(br->trans);
-    vec3 pos2 = bl->position;
-
-    if(vec_len_squared(vec_sub(pos1, pos2)) < square(15)) {
-        sprite_set_playing(br->spr, true);
-        br->destroyed = true;
-        bl->destroyed = true;
-    }
-
-    return iter_continue;
-}
 iter_result update_bullet(void* bul, void* user) {
     bullet* b = (bullet*)bul;
     b->position = vec3_sub(b->position, b->velocity);
@@ -126,8 +106,21 @@ iter_result update_bullet(void* bul, void* user) {
         return iter_delete;
     }
 
-    array_foreach(barrels, barrel_collision, b);
-    return b->destroyed ? iter_delete : iter_continue;
+    array_foreach(barrels, i) {
+        barrel* br = i.data;
+        if(br->destroyed)
+            continue;
+
+        vec3 pos1 = transform_get_position(br->trans);
+        vec3 pos2 = b->position;
+
+        if(vec_len_squared(vec_sub(pos1, pos2)) < square(15)) {
+            sprite_set_playing(br->spr, true);
+            br->destroyed = true;
+            return iter_delete;
+        }
+    }
+    return iter_continue;
 }
 iter_result update_barrel(void* bar, void* user) {
     barrel* b = (barrel*)bar;
@@ -147,15 +140,6 @@ iter_result update_barrel(void* bar, void* user) {
         sprite_set_position(b->spr, 0.25);
 
     return iter_continue;
-}
-iter_result cleanup_barrel(void* bar, void* user) {
-    barrel* b = (barrel*)bar;
-
-    sprite_free(b->spr, false);
-    transform_free(b->trans);
-    sfree(b);
-
-    return iter_delete;
 }
 
 void shoot(action_id id, void* user) {
@@ -199,8 +183,8 @@ bool loop(mainloop l, float dt) {
     shader_bind_uniform_texture_name(s_default, "u_texture", t_floor, GL_TEXTURE0);
     mesh_render(s_default, m_floor, GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 
-    array_foreach(bullets, update_bullet, &dt);
-    array_foreach(barrels, update_barrel, &dt);
+    array_foreachd(bullets, update_bullet, &dt);
+    array_foreachd(barrels, update_barrel, &dt);
 
     vec2 offset = (vec2){ .x = -634, .y=354 };
     shader_bind_uniform_name(s_default, "u_color", color_white);
@@ -391,8 +375,8 @@ int main() {
 
     srand(time(NULL));
 
-    bullets = uarray_new(5);
-    barrels = uarray_new(5);
+    bullets = array_mnew(bullet, 5);
+    barrels = array_mnew(barrel, 5);
 
     init_base_resource_path(NULL);
     char* path = assets_path("OpenSans-Regular.ttf", NULL);
@@ -427,9 +411,14 @@ int main() {
 
     mainloop_create_run(loop);
 
-    array_free_deep(bullets);
-    array_foreach(barrels, cleanup_barrel, NULL);
-    array_free_deep(barrels);
+    array_free(bullets);
+    array_foreach(barrels, i) {
+        barrel* b = i.data;
+
+        sprite_free(b->spr, false);
+        transform_free(b->trans);
+    }
+    array_free(barrels);
 
     text_free(info_text, true);
 

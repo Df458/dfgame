@@ -16,7 +16,7 @@
 typedef struct font {
     FT_Face font_face;
     texture_atlas atlas;
-    uarray glyphs;
+    array glyphs;
     float height;
 
     char* asset_path;

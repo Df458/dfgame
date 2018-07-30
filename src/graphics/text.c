@@ -67,9 +67,7 @@ glyph* glyph_to_verts(text t, vt_pt* buffer, int index, vec2 offset, float line_
     return NULL;
 }
 
-iter_result iter_arrange_lines(void* data, void* user) {
-    text t = user;
-    text_line_data* line = data;
+void iter_arrange_lines(text_line_data* line, text t) {
     vt_pt* verts = mesh_get_data(t->msh);
 
     vec3 offset_value = {0};
@@ -91,18 +89,16 @@ iter_result iter_arrange_lines(void* data, void* user) {
     }
 
     mesh_update(t->msh);
-
-    return iter_continue;
 }
 
-text_line_data update_add_line(text t, sarray lines, text_line_data old, uint16 cursor, vec2* offset) {
+text_line_data update_add_line(text t, array lines, text_line_data old, uint16 cursor, vec2* offset) {
     float height = font_get_height(t->fnt);
 
     offset->x = 0;
     offset->y += height;
 
     old.end = cursor;
-    array_copyadd_simple(lines, old);
+    array_add(lines, old);
     if(old.box.dimensions.x > t->bounding_size.x)
         t->bounding_size.x = old.box.dimensions.x;
 
@@ -121,7 +117,7 @@ void text_update_mesh(text t) {
         return;
 
     vt_pt* buf = mscalloc(len * 6, vt_pt);
-    sarray line_data = sarray_new(4);
+    array line_data = array_mnew_ordered(text_line_data, 4);
 
     float height = font_get_height(t->fnt);
     t->bounding_size.x = 0;
@@ -175,7 +171,7 @@ void text_update_mesh(text t) {
                     int j = i;
                     for(; j >= 0 && t->str[j] != ' ' && t->str[j] != '\n' && t->str[j] != '\t'; --j);
 
-                    text_line_data* prev_data = array_get(line_data, array_size(line_data) - 1);
+                    text_line_data* prev_data = array_get(line_data, array_get_length(line_data) - 1);
                     prev_data->end -= i - j;
                     current_data.start -= i - j;
 
@@ -198,14 +194,16 @@ void text_update_mesh(text t) {
     }
     current_data.end = i;
     if(current_data.start < current_data.end)
-        array_copyadd_simple(line_data, current_data);
+        array_add(line_data, current_data);
 
     mesh_free(t->msh);
     t->msh = mesh_new(len * 6, buf, NULL);
     sfree(buf);
 
-    array_foreach(line_data, iter_arrange_lines, t);
-    array_free_deep(line_data);
+    array_foreach(line_data, i) {
+        iter_arrange_lines(i.data, t);
+    }
+    array_free(line_data);
 }
 
 void text_set_str_va(text t, const char* s, va_list args) {

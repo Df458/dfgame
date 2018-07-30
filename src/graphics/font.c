@@ -22,7 +22,7 @@ bool find_glyph_with_id(void* o1, void* o2, void* user) {
 typedef struct font {
     FT_Face font_face;
     texture_atlas atlas;
-    uarray glyphs;
+    array glyphs;
     float height;
 
     char* asset_path;
@@ -31,7 +31,7 @@ typedef struct font {
 font font_new(uint16 height, const char* path) {
     font f = salloc(sizeof(struct font));
     f->atlas = texture_atlas_new();
-    f->glyphs = uarray_new(256);
+    f->glyphs = array_mnew(glyph, 256);
     f->height = height;
     f->font_face = NULL;
     f->asset_path = nstrdup(path);
@@ -39,7 +39,7 @@ font font_new(uint16 height, const char* path) {
 }
 
 void font_add_glyph(font f, glyph gp) {
-    array_copyadd(f->glyphs, &gp, sizeof(gp));
+    array_add(f->glyphs, gp);
 }
 
 glyph* font_get_glyph(font f, int16 id) {
@@ -69,7 +69,7 @@ void _font_free(font f) {
     if(f->font_face)
         FT_CALL_NORETURN(FT_Done_Face(f->font_face));
 
-    uarray_free_deep(f->glyphs);
+    array_free(f->glyphs);
     texture_atlas_free(f->atlas);
     if(f->asset_path)
         sfree(f->asset_path);

@@ -37,8 +37,8 @@ bool find_fitting_atlas_box(void* o1, void* o2, void* user) {
 
 typedef struct texture_atlas {
     gltex texture_data;
-    uarray textures;
-    uarray free_space;
+    array textures;
+    array free_space;
 }* texture_atlas;
 
 texture_atlas texture_atlas_new() {
@@ -47,15 +47,15 @@ texture_atlas texture_atlas_new() {
     uint8 clearcolor[4] = { 0, 0, 0, 0 };
     glClearTexImage(atlas->texture_data.handle, 0, GL_RGBA, GL_UNSIGNED_BYTE, &clearcolor);
 
-    atlas->textures = uarray_new(8);
-    atlas->free_space = uarray_new(8);
+    atlas->textures = array_mnew(aabb_2d, 8);
+    atlas->free_space = array_mnew(atlas_box, 8);
 
     atlas_box initial = {0};
     initial.box = (aabb_2d) {
         .position = (vec2){0},
         .dimensions = (vec2){ .x = 256, .y = 256 }
     };
-    array_copyadd_simple(atlas->free_space, initial);
+    array_add(atlas->free_space, initial);
 
     return atlas;
 }
@@ -70,7 +70,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
         if(res == -1) {
             uint16 prev_size = new_size;
             new_size = next_power_of_two(new_size);
-            uint16 len = array_size(atlas->free_space);
+            uint16 len = array_get_length(atlas->free_space);
 
             for(uint16 i = 0; i < len; ++i) {
                 atlas_box* box = array_get(atlas->free_space, i);
@@ -84,7 +84,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
                             .position = (vec2){ .x = prev_size, .y = box->box.position.y },
                             .dimensions = (vec2){ .x = new_size - prev_size, .y = box->box.dimensions.y }
                         };
-                        array_copyadd_simple(atlas->free_space, new_box);
+                        array_add(atlas->free_space, new_box);
                     }
                 }
             }
@@ -93,7 +93,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
                 .position = (vec2){ .x = 0, .y = prev_size },
                     .dimensions = (vec2){ .x = new_size, .y = new_size - prev_size }
             };
-            array_copyadd_simple(atlas->free_space, new_box);
+            array_add(atlas->free_space, new_box);
         } else {
             found_box = array_get(atlas->free_space, res);
         }
@@ -114,7 +114,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
 
     box.position = vec2_add(found_box->box.position, found_box->free_marker.xy);
     found_box->free_marker.x += box.dimensions.x;
-    array_copyadd_simple(atlas->textures, box);
+    array_add(atlas->textures, box);
 
     return box;
 }
@@ -133,7 +133,7 @@ int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
 
     glCopyImageSubData(tex.handle, tex.type, 0, 0, 0, 0, atlas->texture_data.handle, atlas->texture_data.type, 0, container.position.x, container.position.y, 0, container.dimensions.x, container.dimensions.y, 1);
 
-    return array_size(atlas->textures) - 1;
+    return array_get_length(atlas->textures) - 1;
 }
 
 int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
@@ -152,18 +152,17 @@ int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
     for(int i = 0; i < tex.height; ++i)
         glTexSubImage2D(GL_TEXTURE_2D, 0, container.position.x, container.position.y + i, container.dimensions.x, 1, mode, GL_UNSIGNED_BYTE, tex.data + ((tex.height - i - 1) * tex.width * tex.elements));
 
-    return array_size(atlas->textures) - 1;
+    return array_get_length(atlas->textures) - 1;
 }
 
 aabb_2d texture_atlas_get(texture_atlas atlas, int16 index) {
-    check_return(array_size(atlas->textures) > index, "Can't get texture bounds in atlas: Index %d is out of bounds", (aabb_2d){0}, index);
+    check_return(array_get_length(atlas->textures) > index, "Can't get texture bounds in atlas: Index %d is out of bounds", (aabb_2d){0}, index);
 
     return *(aabb_2d*)array_get(atlas->textures, index);
 }
 
 void texture_atlas_remove(texture_atlas atlas, int16 index) {
-    void* data = array_remove_at(atlas->textures, index);
-    sfree(data);
+    array_remove_at(atlas->textures, index);
 }
 
 // Frees the given atlas, and all resources contained within it
@@ -172,8 +171,8 @@ void texture_atlas_remove(texture_atlas atlas, int16 index) {
 void _texture_atlas_free(texture_atlas atlas) {
     check_return(atlas, "Can't destroy atlas: Atlas is null", );
 
-    array_free_deep(atlas->textures);
-    array_free_deep(atlas->free_space);
+    array_free(atlas->textures);
+    array_free(atlas->free_space);
     gltex_cleanup(&atlas->texture_data);
     sfree(atlas);
 }

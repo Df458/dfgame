@@ -11,7 +11,7 @@
 #include "memory/alloc.h"
 
 typedef struct input_binding {
-    uarray actions;
+    array actions;
     bool active;
 } input_binding;
 typedef struct axis {
@@ -19,7 +19,7 @@ typedef struct axis {
     float   mod;
 } axis;
 typedef struct axis_binding {
-    uarray axes;
+    array axes;
     float value;
     float offset;
     bool set;
@@ -36,16 +36,16 @@ void input_bind_key_action(key_id key, action_id id) {
     check_return(key > K_INVALID && key <= K_LAST, "Can't bind key: Index is out of range", );
 
     if(!key_bindings[key].actions)
-        key_bindings[key].actions = uarray_new(1);
+        key_bindings[key].actions = array_mnew(action_id, 1);
 
-    array_copyadd_simple(key_bindings[key].actions, id);
+    array_add(key_bindings[key].actions, id);
 }
 void input_bind_mouse_button_action(mouse_button_id button, action_id id) {
     check_return(button <= MB_LAST, "Can't bind mouse button: Index is out of range", )
 
     if(!mouse_button_bindings[button].actions)
-        mouse_button_bindings[button].actions = uarray_new(1);
-    array_copyadd_simple(mouse_button_bindings[button].actions, id);
+        mouse_button_bindings[button].actions = array_mnew(action_id, 1);
+    array_add(mouse_button_bindings[button].actions, id);
 }
 action_id input_add_key_action(key_id key, action_event* event) {
     action_id id = create_action(event);
@@ -62,28 +62,31 @@ action_id input_add_mouse_button_action(mouse_button_id button, action_event* ev
 
 void input_bind_key_axis(key_id key, axis_id id, float mod) {
     if(!key_axis_bindings[key].axes)
-        key_axis_bindings[key].axes = uarray_new(1);
-    axis* ax = salloc(sizeof(axis));
-    ax->id = id;
-    ax->mod = mod;
+        key_axis_bindings[key].axes = array_mnew(axis, 1);
+    axis ax = {
+        .id = id,
+        .mod = mod
+    };
     array_add(key_axis_bindings[key].axes, ax);
 }
 void input_bind_mouse_button_axis(mouse_button_id button, axis_id id, float mod) {
     if(!mouse_button_axis_bindings[button].axes)
-        mouse_button_axis_bindings[button].axes = uarray_new(1);
-    axis* ax = salloc(sizeof(axis));
-    ax->id = id;
-    ax->mod = mod;
+        mouse_button_axis_bindings[button].axes = array_mnew(axis, 1);
+    axis ax = {
+        .id = id,
+        .mod = mod
+    };
     array_add(mouse_button_axis_bindings[button].axes, ax);
 }
 void input_bind_mouse_position_axis(bool vertical, axis_id id, float mod) {
     uint8 index = vertical ? 1 : 0;
 
     if(!mouse_position_axis_bindings[index].axes)
-        mouse_position_axis_bindings[index].axes = uarray_new(1);
-    axis* ax = salloc(sizeof(axis));
-    ax->id = id;
-    ax->mod = mod;
+        mouse_position_axis_bindings[index].axes = array_mnew(axis, 1);
+    axis ax = {
+        .id = id,
+        .mod = mod
+    };
     array_add(mouse_position_axis_bindings[index].axes, ax);
 }
 axis_id input_add_key_axis(key_id key, float limit, float mod, bool digital) {
@@ -105,19 +108,8 @@ axis_id input_add_mouse_position_axis(bool vertical, float limit, float mod, boo
     return id;
 }
 
-iter_result action_active_foreach(void* iter_data, void* user) {
-    activate_action(*(action_id*)iter_data);
-
-    return iter_continue;
-}
-iter_result axis_value_foreach(void* iter_data, void* user) {
-    float value = 1.0f;
-    if(user)
-        value = *(float*)user;
-    axis* a = (axis*)iter_data;
-    set_axis_value(a->id, value * a->mod, user == NULL);
-
-    return iter_continue;
+void axis_value_foreach(axis* a, float value) {
+    set_axis_value(a->id, value * a->mod, value == 1.0f);
 }
 
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -165,16 +157,29 @@ void input_mouse_position_callback(GLFWwindow* window, double xoffset, double yo
 void update_input() {
     update_controls();
     for(int i = 0; i < K_LAST; ++i) {
-        if(key_bindings[i].actions != NULL && key_bindings[i].active)
-            array_foreach(key_bindings[i].actions, action_active_foreach, NULL);
-        if(key_axis_bindings[i].axes != NULL && key_axis_bindings[i].set)
-            array_foreach(key_axis_bindings[i].axes, axis_value_foreach, NULL);
+        if(key_bindings[i].actions != NULL && key_bindings[i].active) {
+            array_foreach(key_bindings[i].actions, a) {
+                activate_action(*(action_id*)a.data);
+            }
+        }
+        if(key_axis_bindings[i].axes != NULL && key_axis_bindings[i].set) {
+            array_foreach(key_axis_bindings[i].axes, it) {
+                axis_value_foreach(it.data, 1.0f);
+            }
+        }
     }
     for(int i = 0; i < MB_LAST; ++i) {
-        if(mouse_button_bindings[i].actions != NULL && mouse_button_bindings[i].active)
-            array_foreach(mouse_button_bindings[i].actions, action_active_foreach, NULL);
+        if(mouse_button_bindings[i].actions != NULL && mouse_button_bindings[i].active) {
+            array_foreach(mouse_button_bindings[i].actions, a) {
+                activate_action(*(action_id*)a.data);
+            }
+        }
         if(mouse_button_axis_bindings[i].axes != NULL && mouse_button_axis_bindings[i].set)
-            array_foreach(mouse_button_axis_bindings[i].axes, axis_value_foreach, NULL);
+            array_foreach(mouse_button_axis_bindings[i].axes, it) {
+                array_foreach(mouse_button_axis_bindings[i].axes, it) {
+                    axis_value_foreach(it.data, 1.0f);
+                }
+            }
     }
 
     for(int i = MB_SCROLL_UP; i < MB_SCROLL_RIGHT; ++i) {
@@ -182,9 +187,16 @@ void update_input() {
     }
 
     if(mouse_position_axis_bindings[0].axes != NULL)
-        array_foreach(mouse_position_axis_bindings[0].axes, axis_value_foreach, &mouse_position_axis_bindings[0].offset);
-    if(mouse_position_axis_bindings[1].axes != NULL)
-        array_foreach(mouse_position_axis_bindings[1].axes, axis_value_foreach, &mouse_position_axis_bindings[1].offset);
+        array_foreach(mouse_position_axis_bindings[0].axes, it) {
+            array_foreach(mouse_position_axis_bindings[0].axes, it) {
+                axis_value_foreach(it.data, mouse_position_axis_bindings[0].offset);
+            }
+        }
+    if(mouse_position_axis_bindings[1].axes != NULL) {
+        array_foreach(mouse_position_axis_bindings[1].axes, it) {
+            axis_value_foreach(it.data, mouse_position_axis_bindings[1].offset);
+        }
+    }
     mouse_position_axis_bindings[0].set = false;
     mouse_position_axis_bindings[0].offset = 0;
     mouse_position_axis_bindings[1].set = false;
@@ -195,19 +207,19 @@ void clear_input_bindings()
 {
     for(int i = 0; i < K_LAST; ++i) {
         if(key_bindings[i].actions != NULL)
-            array_free_deep(key_bindings[i].actions);
+            array_free(key_bindings[i].actions);
         if(key_axis_bindings[i].axes != NULL)
-            array_free_deep(key_axis_bindings[i].axes);
+            array_free(key_axis_bindings[i].axes);
     }
     for(int i = 0; i < MB_LAST; ++i) {
         if(mouse_button_bindings[i].actions != NULL)
-            array_free_deep(mouse_button_bindings[i].actions);
+            array_free(mouse_button_bindings[i].actions);
         if(mouse_button_axis_bindings[i].axes != NULL)
-            array_free_deep(mouse_button_axis_bindings[i].axes);
+            array_free(mouse_button_axis_bindings[i].axes);
     }
 
     if(mouse_position_axis_bindings[0].axes != NULL)
-        array_free_deep(mouse_position_axis_bindings[0].axes);
+        array_free(mouse_position_axis_bindings[0].axes);
     if(mouse_position_axis_bindings[1].axes != NULL)
-        array_free_deep(mouse_position_axis_bindings[1].axes);
+        array_free(mouse_position_axis_bindings[1].axes);
 }

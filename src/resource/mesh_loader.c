@@ -30,10 +30,10 @@ mesh load_mesh(const char* path) {
 mesh load_obj_mesh(const char* path) {
     char* buf = (char*)load_data_buffer(path, NULL);
     check_return(buf, "Failed to load mesh", NULL);
-    sarray position_list = sarray_new(0);
-    sarray normal_list = sarray_new(0);
-    sarray uv_list = sarray_new(0);
-    sarray index_list = sarray_new(0);
+    array position_list = array_mnew_ordered(vec3, 0);
+    array normal_list = array_mnew_ordered(vec3, 0);
+    array uv_list = array_mnew_ordered(vec2, 0);
+    array index_list = array_mnew_ordered(mesh_index, 0);
     char* c = buf;
     while(c[0] != 0) {
         switch(c[0]) {
@@ -101,14 +101,14 @@ mesh load_obj_mesh(const char* path) {
             ++c;
     }
     uint8 type = VT_POSITION;
-    if(array_size(normal_list) > 0)
+    if(array_get_length(normal_list) > 0)
         type |= VT_NORMAL;
-    if(array_size(uv_list) > 0)
+    if(array_get_length(uv_list) > 0)
         type |= VT_TEXTURE;
-    mesh m = mesh_new_type(array_size(index_list) * 3, type, NULL, path);
+    mesh m = mesh_new_type(array_get_length(index_list) * 3, type, NULL, path);
     if(type & VT_NORMAL && type & VT_TEXTURE) {
         vt_pnt* data = (vt_pnt*)mesh_get_data(m);
-        for(int i = 0; array_size(index_list) > 0; i += 3) {
+        for(int i = 0; array_get_length(index_list) > 0; i += 3) {
             struct mesh_index* in = array_pop(index_list);
             vec3* p1 = array_get(position_list, in->pos[0]-1);
             vec3* n1 = array_get(normal_list, in->norm[0]-1);
@@ -126,7 +126,7 @@ mesh load_obj_mesh(const char* path) {
         }
     } else if(type & VT_NORMAL) {
         vt_pn* data = (vt_pn*)mesh_get_data(m);
-        for(int i = 0; array_size(index_list) > 0; i += 3) {
+        for(int i = 0; array_get_length(index_list) > 0; i += 3) {
             struct mesh_index* in = array_pop(index_list);
             vec3* p1 = array_get(position_list, in->pos[0]-1);
             vec3* n1 = array_get(normal_list, in->norm[0]-1);
@@ -141,7 +141,7 @@ mesh load_obj_mesh(const char* path) {
         }
     } else if(type & VT_TEXTURE) {
         vt_pt* data = (vt_pt*)mesh_get_data(m);
-        for(int i = 0; array_size(index_list) > 0; i += 3) {
+        for(int i = 0; array_get_length(index_list) > 0; i += 3) {
             struct mesh_index* in = array_pop(index_list);
             vec3* p1 = array_get(position_list, in->pos[0]-1);
             vec2* t1 = array_get(uv_list, in->uv[0]-1);
@@ -156,7 +156,7 @@ mesh load_obj_mesh(const char* path) {
         }
     } else {
         vt_p* data = (vt_p*)mesh_get_data(m);
-        for(int i = 0; array_size(index_list) > 0; i += 3) {
+        for(int i = 0; array_get_length(index_list) > 0; i += 3) {
             struct mesh_index* in = array_pop(index_list);
             vec3* p1 = array_get(position_list, in->pos[0]-1);
             vec3* p2 = array_get(position_list, in->pos[1]-1);
@@ -168,10 +168,10 @@ mesh load_obj_mesh(const char* path) {
         }
     }
 
-    array_free_deep(index_list);
-    array_free_deep(position_list);
-    array_free_deep(normal_list);
-    array_free_deep(uv_list);
+    array_free(index_list);
+    array_free(position_list);
+    array_free(normal_list);
+    array_free(uv_list);
     sfree(buf);
     mesh_update(m);
     return m;

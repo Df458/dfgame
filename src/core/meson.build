@@ -18,7 +18,7 @@ install_headers(
     [ 'check.h', 'crc.h', 'power.h', 'stringutil.h', 'types.h' ],
     subdir : 'dfgame/core')
 install_headers(
-    [ 'container/array.h', 'container/delegate.h', 'container/hashmap.h', 'container/array.hd', 'container/hashmap.hd' ],
+    [ 'container/array.h', 'container/delegate.h', 'container/hashmap.h', 'container/hashmap.hd' ],
     subdir : 'dfgame/core/container')
 install_headers(
     [ 'log/log.h' ],
@@ -28,3 +28,14 @@ install_headers(
     subdir : 'dfgame/core/memory')
 
 core = declare_dependency(include_directories : coreinc + [include_directories('.', '..')], link_with : corelib)
+
+clangtidy = find_program('clang-tidy', required: false)
+if clangtidy.found()
+    run_target(
+        'tidy',
+        command: [
+            clangtidy,
+            '-checks=*',
+            '-p', meson.build_root()
+        ] + coresrc)
+endif

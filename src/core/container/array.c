@@ -8,26 +8,6 @@
 #include "power.h"
 #include <assert.h>
 
-// Struct Definitions
-
-// Represents an order-preserving auto-resizing array. The order of the contents
-// can only be changed manually.
-typedef struct sarray {
-    uint16 size;
-    uint16 alloc_size;
-    void** data;
-}* sarray;
-
-// Represents an unsorted auto-resizing array. The order of the contents is
-// subject to change, but this structure is more speed efficient than sarray.
-typedef struct uarray {
-    uint16 size;
-    uint16 alloc_size;
-    void** data;
-}* uarray;
-
-// ----------------------------------------------------------------------------
-
 // Private Functions
 
 // Shifts the elements of an array from start to end, leaving a vacant space at
@@ -37,266 +17,202 @@ typedef struct uarray {
 //
 // NOTE: The points are NOT bounds-checked. Inputs are assumed to be correct,
 //       and must be validated by the calling function.
-static void shift(void** data, uint16 start, uint16 end) {
+static void shift(void* data, uint16 start, uint16 end, uint16 member_size) {
     // Determine the direction that we'll be shifting.
     int8 shiftval = 1;
     if(end > start)
         shiftval = -1;
 
     for(uint16 i = end; i != start; i += shiftval) {
-        data[i] = data[i + shiftval];
+        memcpy(data + (member_size * i), data + (member_size * (i + shiftval)), member_size);
     }
 }
 
 // Checks if the array's new size exceeds the allocated length, and grows the
 // data to the next power of two spaces. Obviously, the size should be updated
 // before this function is called.
-static void sarray_resize_if_full(sarray array) {
-    if(array->size > array->alloc_size) {
-        if(array->alloc_size == 0)
-            array->alloc_size = 1;
+static void array_resize_if_full(array a) {
+    if(a->length > a->alloc_length) {
+        if(a->alloc_length == 0)
+            a->alloc_length = 1;
         else
-            array->alloc_size = next_power_of_two(array->alloc_size);
+            a->alloc_length = next_power_of_two(a->alloc_length);
 
-        array->data = resalloc(array->data, array->alloc_size * sizeof(void*));
-    }
-}
-static void uarray_resize_if_full(uarray array) {
-    if(array->size > array->alloc_size) {
-        if(array->alloc_size == 0)
-            array->alloc_size = 1;
-        else
-            array->alloc_size = next_power_of_two(array->alloc_size);
-
-        array->data = resalloc(array->data, array->alloc_size * sizeof(void*));
+        a->data = resalloc(a->data, a->alloc_length * a->member_size);
     }
 }
 
 // Heap-sorts an array, using predicate p to determine ordering.
-static void heap_sort(void** data, uint16 size, comparison_predicate p, void* user) {
+static void heap_sort(void* data, uint16 length, uint16 member_size, comparison_predicate p, void* user) {
     uint16 i, index, back_index;
-    void* temp;
+    void* temp = salloc(member_size);
     // Build the heap
 
-    for(i = 0; i < size; ++i) {
+    for(i = 0; i < length; ++i) {
         index = i;
         back_index = (index - 1) / 2;
-        temp = data[index];
+        memcpy(temp, data + (member_size * index), member_size);
 
-        while(index > 0 && p(temp, data[back_index], user) == COMPARE_GREATER_THAN) {
-            data[index] = data[back_index];
+        while(index > 0 && p(temp, data + (member_size * back_index), user) == COMPARE_GREATER_THAN) {
+            memcpy(data + (member_size * index), data + (member_size * back_index), member_size);
             index = back_index;
             back_index = (index - 1) / 2;
         }
-        data[index] = temp;
+        memcpy(data + (member_size * index), temp, member_size);
     }
 
-    for(i = size - 1; i > 0; --i) {
-        temp = data[0];
-        data[0] = data[i];
-        data[i] = temp;
+    for(i = length - 1; i > 0; --i) {
+        memcpy(temp, data, member_size);
+        memcpy(data, data + (member_size * i), member_size);
+        memcpy(data + (member_size * i), temp, member_size);
 
         // Shift
         back_index = 0;
         index = 1;
-        temp = data[0];
+        memcpy(temp, data, member_size);
         while(index <= i - 1) {
-            if(index != (i - 1) && p(data[index], data[index + 1], user) == COMPARE_LESS_THAN)
+            if(index != (i - 1) && p(data + (member_size * index), data + (member_size * (index + 1)), user) == COMPARE_LESS_THAN)
                 ++index;
-            if(p(temp, data[index], user) == COMPARE_LESS_THAN) {
-                data[back_index] = data[index];
+            if(p(temp, data + (member_size * index), user) == COMPARE_LESS_THAN) {
+                memcpy(data + (member_size * back_index), data + (member_size * index), member_size);
                 back_index = index;
                 index = 2 * back_index + 1;
             } else {
                 break;
             }
         }
-        data[back_index] = temp;
+        memcpy(data + (member_size * back_index), temp, member_size);
     }
+
+    sfree(temp);
 }
 
 // ----------------------------------------------------------------------------
 
 // Creates a new array with enough space allocated to hold up to size members.
 // 0 is a valid size, since it will grow to fit new members.
-sarray sarray_new(uint16 size) {
-    sarray new_array = salloc(sizeof(struct sarray));
+array array_new_common(uint16 size, uint16 reserve) {
+    check_return(reserve > 0, "Array elements must have a size", NULL);
 
-    new_array->data       = NULL;
-    new_array->size       = 0;
-    new_array->alloc_size = size;
+    array new_array = salloc(sizeof(struct array));
 
-    if(size > 0)
-        new_array->data = scalloc(size, sizeof(void*));
+    new_array->member_size  = size;
+    new_array->length       = 0;
+    new_array->alloc_length = reserve;
+
+    new_array->data         = NULL;
+
+    if(reserve > 0)
+        new_array->data = scalloc(new_array->alloc_length, new_array->member_size);
 
     return new_array;
 }
-uarray uarray_new(uint16 size) {
-    uarray new_array = salloc(sizeof(struct uarray));
+array array_new(uint16 size, uint16 reserve) {
+    array new_array = array_new_common(size, reserve);
 
-    new_array->data       = NULL;
-    new_array->size       = 0;
-    new_array->alloc_size = size;
+    if(new_array)
+        new_array->preserve_order = false;
 
-    if(size > 0)
-        new_array->data = scalloc(size, sizeof(void*));
+    return new_array;
+}
+array array_new_ordered(uint16 size, uint16 reserve) {
+    array new_array = array_new_common(size, reserve);
+
+    if(new_array)
+        new_array->preserve_order = true;
 
     return new_array;
 }
 
 // Frees the array. NOTE: Don't call these functions. Use the macros without
 // the leading _ instead, as they also NULL your pointer.
-void _sarray_free(sarray array) {
-    if(array && array->data != NULL)
-        sfree(array->data);
-    sfree(array);
-}
-void _uarray_free(uarray array) {
-    if(array && array->data != NULL)
-        sfree(array->data);
-    sfree(array);
-}
+void _array_free(array a) {
+    check_return(a, "Array is NULL", );
 
-void _sarray_free_deep(sarray array) {
-    for(int i = 0; i < array->size; ++i)
-        sfree(array->data[i]);
-    _sarray_free(array);
-}
-void _uarray_free_deep(uarray array) {
-    for(int i = 0; i < array->size; ++i)
-        sfree(array->data[i]);
-    _uarray_free(array);
+    if(a->data != NULL)
+        sfree(a->data);
+    sfree(a);
 }
 
 // Returns the number of actual members stored in this array.
-uint16 sarray_size(sarray array) {
-    return array->size;
-}
-uint16 uarray_size(uarray array) {
-    return array->size;
-}
+uint16 array_get_length(array a) {
+    check_return(a, "Array is NULL", 0);
 
-// Adds a new member to the end of this array, resizing it if necessary.
-void sarray_copyadd(sarray array, void* data, uint32 size) {
-    void* copy = salloc(size);
-    memcpy(copy, data, size);
-
-    sarray_add(array, copy);
-}
-void uarray_copyadd(uarray array, void* data, uint32 size) {
-    void* copy = salloc(size);
-    memcpy(copy, data, size);
-
-    uarray_add(array, copy);
+    return a->length;
 }
 
 // Adds a new member to the end of this array, resizing it if necessary.
-void sarray_add(sarray array, void* data) {
-    array->size++;
-    sarray_resize_if_full(array);
+void _array_add(array a, void* data, uint16 size) {
+    check_return(a, "Array is NULL", );
+    check_return(a->member_size == size, "Array member size mismatch (%d != %d)", , a->member_size, size);
 
-    array->data[array->size - 1] = data;
-}
-void uarray_add(uarray array, void* data) {
-    array->size++;
-    uarray_resize_if_full(array);
-
-    array->data[array->size - 1] = data;
+    array_insert(a, data, a->length);
 }
 
-// Adds a new member to a specified position in this array, resizing it if
-// necessary.
-void sarray_insert(sarray array, void* data, uint16 position) {
-    if(position == array->size) {
-        sarray_add(array, data);
-        return;
+// Adds a new member to a specified position in this array, resizing it if necessary.
+void array_insert(array a, void* data, uint16 position) {
+    check_return(a, "Array is NULL", );
+
+    assert(position <= a->length);
+    a->length++;
+    array_resize_if_full(a);
+
+    if(position + 1 < a->length) {
+        if(a->preserve_order) { // Shift the contents forward if we care about order
+            shift(a->data, position, a->length, a->member_size);
+        } else { // Or just copy the element into the last slot instead
+            memcpy(a->data + (a->member_size * (a->length - 1)), a->data + (a->member_size * position), a->member_size);
+        }
     }
 
-    assert(position < array->size);
-    array->size++;
-    sarray_resize_if_full(array);
-
-    shift(array->data, position, array->size);
-    array->data[position] = data;
-}
-void uarray_insert(uarray array, void* data, uint16 position) {
-    if(position == array->size) {
-        uarray_add(array, data);
-        return;
-    }
-
-    assert(position < array->size);
-    array->size++;
-    uarray_resize_if_full(array);
-
-    uarray_add(array, array->data[position]);
-    array->data[position] = data;
+    memcpy(a->data + (a->member_size * position), data, a->member_size);
 }
 
 // Returns true if data is a member of this array, or false if it isn't.
-bool sarray_contains(sarray array, void* data) {
-    return sarray_find(array, data) != -1;
-}
-bool uarray_contains(uarray array, void* data) {
-    return uarray_find(array, data) != -1;
+bool array_contains(array a, void* data) {
+    check_return(a, "Array is NULL", false);
+
+    return array_find(a, data) != -1;
 }
 
 // Returns true if data is a member of this array, or false if it isn't. Uses
 // predicate p to check the array for data.
-bool sarray_containsp(sarray array, void* data, equality_predicate p, void* user) {
-    return sarray_findp(array, data, p, user) != -1;
-}
-bool uarray_containsp(uarray array, void* data, equality_predicate p, void* user) {
-    return uarray_findp(array, data, p, user) != -1;
+bool array_containsp(array a, void* data, equality_predicate p, void* user) {
+    check_return(a, "Array is NULL", false);
+
+    return array_findp(a, data, p, user) != -1;
 }
 
 // Returns the position of data in this array, or INVALID_INDEX if array does
 // not contain data.
-int32 sarray_find(sarray array, void* data) {
-    for(int32 i = 0; i < array->size; ++i)
-        if(array->data[i] == data)
-            return i;
-    return INVALID_INDEX;
-}
-int32 uarray_find(uarray array, void* data) {
-    for(int32 i = 0; i < array->size; ++i)
-        if(array->data[i] == data)
+int32 array_find(array a, void* data) {
+    check_return(a, "Array is NULL", INVALID_INDEX);
+
+    for(int32 i = 0; i < a->length; ++i)
+        if(!memcmp(a->data + (a->member_size * i), data, a->member_size))
             return i;
     return INVALID_INDEX;
 }
 
 // Returns the position of data using predicate p to check the array, or
 // INVALID_INDEX if array does not contain data.
-int32 sarray_findp(sarray array, void* data, equality_predicate p, void* user) {
-    for(int32 i = 0; i < array->size; ++i)
-        if(p(array->data[i], data, user))
-            return i;
-    return INVALID_INDEX;
-}
-int32 uarray_findp(uarray array, void* data, equality_predicate p, void* user) {
-    for(int32 i = 0; i < array->size; ++i)
-        if(p(array->data[i], data, user))
+int32 array_findp(array a, void* data, equality_predicate p, void* user) {
+    check_return(a, "Array is NULL", INVALID_INDEX);
+
+    for(int32 i = 0; i < a->length; ++i)
+        if(p(a->data + (a->member_size * i), data, user))
             return i;
     return INVALID_INDEX;
 }
 
 // Tries to remove data from this array, returning true if it succeeeds. This
 // will remove the first copy of data it finds.
-bool sarray_remove(sarray array, void* data) {
-    int32 index = sarray_find(array, data);
+bool array_remove(array a, void* data) {
+    check_return(a, "Array is NULL", false);
 
-    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an sarray, but it couldn't be found", false, data);
-
-    sarray_remove_at(array, index);
-
-    return true;
-}
-bool uarray_remove(uarray array, void* data) {
-    int32 index = uarray_find(array, data);
-
-    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an sarray, but it couldn't be found", false, data);
-
-    uarray_remove_at(array, index);
+    int32 index = array_find(a, data);
+    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
+    array_remove_at(a, index);
 
     return true;
 }
@@ -304,91 +220,72 @@ bool uarray_remove(uarray array, void* data) {
 // Tries to remove data from this array, using predicate p to check the data
 // and returning true if it succeeeds. This will remove the first copy of data
 // it finds.
-bool sarray_removep(sarray array, void* data, equality_predicate p, void* user) {
-    int32 index = sarray_findp(array, data, p, user);
+bool array_removep(array a, void* data, equality_predicate p, void* user) {
+    check_return(a, "Array is NULL", false);
 
-    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an sarray, but it couldn't be found", false, data);
-
-    sarray_remove_at(array, index);
-
-    return true;
-}
-bool uarray_removep(uarray array, void* data, equality_predicate p, void* user) {
-    int32 index = uarray_findp(array, data, p, user);
-
-    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an sarray, but it couldn't be found", false, data);
-
-    uarray_remove_at(array, index);
+    int32 index = array_findp(a, data, p, user);
+    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
+    array_remove_at(a, index);
 
     return true;
-}
-
-// Removes the element at position in this array.
-void* sarray_remove_at(sarray array, uint16 position) {
-    assert(position < array->size);
-    --array->size;
-
-    void* data = array->data[position];
-    shift(array->data, array->size, position);
-    return data;
-}
-void* uarray_remove_at(uarray array, uint16 position) {
-    assert(position < array->size);
-    --array->size;
-
-    void* data = array->data[position];
-    array->data[position] = array->data[array->size];
-    return data;
-}
-
-// Returns the element at position in this array.
-void* sarray_get(sarray array, uint16 position) {
-    check_kill(position < array->size, "Array index %u is out of bounds in array of size %u", position, array->size);
-
-    return array->data[position];
-}
-void* uarray_get(uarray array, uint16 position) {
-    check_kill(position < array->size, "Array index %u is out of bounds in array of size %u", position, array->size);
-
-    return array->data[position];
-}
-
-// Replaces the element at position in this array with data.
-void sarray_set(sarray array, uint16 position, void* data) {
-    assert(position < array->size);
-
-    array->data[position] = data;
-}
-void uarray_set(uarray array, uint16 position, void* data) {
-    assert(position < array->size);
-
-    array->data[position] = data;
 }
 
 // Removes the element at the end of this array and returns it
-void* sarray_pop(sarray array) {
-    assert(array->size > 0);
+void* array_pop(array a) {
+    check_return(a, "Array is NULL", NULL);
+    check_return(a->length > 0, "Array is empty", NULL);
 
-    void* data = array->data[array->size - 1];
-    sarray_remove_at(array, array->size - 1);
+    void* data = array_get(a, a->length - 1);
+    array_remove_at(a, a->length - 1);
 
     return data;
 }
-void* uarray_pop(uarray array) {
-    assert(array->size > 0);
 
-    void* data = array->data[array->size - 1];
-    uarray_remove_at(array, array->size - 1);
+// Removes the element at position in this array.
+void array_remove_at(array a, uint16 position) {
+    check_return(a, "Array is NULL", );
+    check_return(position < a->length, "Trying to remove out-of-bounds element %d from an array of length %d", , position, a->length);
+    --a->length;
 
-    return data;
+    if(position != a->length) {
+        if(a->preserve_order) {
+            shift(a->data, a->length, position, a->member_size);
+        } else {
+            memcpy(a->data + (a->member_size * position), a->data + (a->member_size * a->length), a->member_size);
+        }
+    }
+}
+
+// Removes the element pointed to by it from this array
+void array_remove_iter(array a, array_iter* it) {
+    check_return(a, "Array is NULL", );
+    check_return(it && it->is_valid, "Attempting to access an array with an invalid iterator", );
+
+    array_remove_at(a, it->index);
+    if(it->increment > 0) {
+        it->index -= it->increment;
+    }
+}
+
+// Returns the element at position in this array.
+void* array_get(array a, uint16 position) {
+    check_return(a, "Array is NULL", NULL);
+    check_return(position < a->length, "Array index %u is out of bounds in array of size %u", NULL, position, a->length);
+
+    return a->data + (a->member_size * position);
+}
+
+// Replaces the element at position in this array with data.
+void array_set(array a, uint16 position, void* data) {
+    check_return(a, "Array is NULL", );
+    check_return(position < a->length, "Array index %u is out of bounds in array of size %u", , position, a->length);
+
+    memcpy(a->data + (a->member_size * position), data, a->member_size);
 }
 
 // Performs a heapsort on array using predicate p for comparison.
-void sarray_sort(sarray array, comparison_predicate p, void* user) {
-    heap_sort(array->data, array->size, p, user);
-}
-void uarray_sort(uarray array, comparison_predicate p, void* user) {
-    heap_sort(array->data, array->size, p, user);
+void array_sort(array a, comparison_predicate p, void* user) {
+    heap_sort(a->data, a->length, a->member_size, p, user);
 }
 
 // Calls d on each object in the array. Values an be replaced
@@ -396,17 +293,17 @@ void uarray_sort(uarray array, comparison_predicate p, void* user) {
 // a decision of *_DELETE.
 // Values can be safely deleted without worrying about skipping entries, but
 // users must still free memory as usual.
-void sarray_foreach(sarray array, foreach_delegate d, void* user) {
+void array_foreachd(array a, foreach_delegate d, void* user) {
     // Call d on each item
-    for(uint16 i = 0; i < array->size; ++i) {
-        iter_result res = d(array->data[i], user);
+    for(uint16 i = 0; i < a->length; ++i) {
+        iter_result res = d(a->data + (a->member_size * i), user);
 
         // Respond to delete/replace decisions
         if(res.decision % 3 == 1) { // DELETE or BREAK_DELETE
-            sarray_remove_at(array, i);
+            array_remove_at(a, i);
             --i;
         } else if(res.decision % 3 == 2) { // REPLACE or BREAK_REPLACE
-            sarray_set(array, i, res.replacement_value);
+            array_set(a, i, res.replacement_value);
         }
 
         // If the decision involves breaking, break
@@ -414,22 +311,44 @@ void sarray_foreach(sarray array, foreach_delegate d, void* user) {
             break;
     }
 }
-void uarray_foreach(uarray array, foreach_delegate d, void* user) {
-    // Call d on each item
-    for(uint16 i = 0; i < array->size; ++i) {
-        iter_result res = d(array->data[i], user);
 
-        // Respond to delete/replace decisions
-        if(res.decision % 3 == 1) { // DELETE or BREAK_DELETE
-            uarray_remove_at(array, i);
-            --i;
-        } else if(res.decision % 3 == 2) { // REPLACE or BREAK_REPLACE
-            uarray_set(array, i, res.replacement_value);
-        }
+// Gets an iterator to the start of the array
+array_iter array_get_start(array a) {
+    if(a->length == 0) {
+        return (array_iter) {0};
+    }
 
-        // If the decision involves breaking, break
-        if(res.decision >= DECISION_BREAK)
-            break;
+    return (array_iter) {
+        .index = 0,
+        .increment = 1,
+        .data = a->length > 0 ? a->data : NULL,
+        .is_valid = true
+    };
+}
+
+// Advances an iterator to the next spot in the array
+void array_get_next(array a, array_iter* i) {
+    check_return(i && i->is_valid, "Attempting to advance an invalid iterator", );
+
+    i->index += i->increment;
+    if(i->index < a->length) {
+        i->data = a->data + (a->member_size * i->index);
+    } else {
+        i->data = NULL;
+        i->is_valid = false;
+    }
+}
+
+// Advances an iterator to the previous spot in the array
+void array_get_prev(array a, array_iter* i) {
+    check_return(i && i->is_valid, "Attempting to advance an invalid iterator", );
+
+    i->index -= i->increment;
+    if(i->index < a->length) {
+        i->data = a->data + (a->member_size * i->index);
+    } else {
+        i->data = NULL;
+        i->is_valid = false;
     }
 }
 
