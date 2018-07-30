@@ -321,7 +321,21 @@ array_iter array_get_start(array a) {
     return (array_iter) {
         .index = 0,
         .increment = 1,
-        .data = a->length > 0 ? a->data : NULL,
+        .data = a->data,
+        .is_valid = true
+    };
+}
+
+// Gets an iterator to the end of the array
+array_iter array_get_end(array a) {
+    if(a->length == 0) {
+        return (array_iter) {0};
+    }
+
+    return (array_iter) {
+        .index = a->length - 1,
+        .increment = -1,
+        .data = a->data + (a->member_size * (a->length - 1)),
         .is_valid = true
     };
 }

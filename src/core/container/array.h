@@ -90,6 +90,9 @@ void array_sort(array a, comparison_predicate p, void* user);
 // Gets an iterator to the start of the array
 array_iter array_get_start(array array);
 
+// Gets an iterator to the end of the array
+array_iter array_get_end(array array);
+
 // Advances an iterator to the next spot in the array
 void array_get_next(array a, array_iter* i);
 
