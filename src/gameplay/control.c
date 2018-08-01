@@ -5,9 +5,10 @@
 
 #include "check.h"
 #include "interpolate.h"
-#include <stdlib.h>
 #include "mathutil.h"
 #include "memory/alloc.h"
+
+#include <math.h>
 
 typedef struct action {
     action_event* event;
@@ -46,7 +47,7 @@ void update_controls() {
         }
         if(!axis_list[i].is_digital && axis_list[i].effective_value != axis_list[i].digital_value) {
             axis_list[i].effective_value = lerp(axis_list[i].effective_value, axis_list[i].digital_value, 0.1);
-            if(abs(axis_list[i].digital_value - axis_list[i].effective_value) < 0.01)
+            if(fabsf(axis_list[i].digital_value - axis_list[i].effective_value) < 0.01)
                 axis_list[i].effective_value = axis_list[i].digital_value;
         }
         axis_list[i].set = false;

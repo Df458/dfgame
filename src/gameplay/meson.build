@@ -21,3 +21,13 @@ install_headers(
     subdir : 'dfgame/gameplay')
 
 gameplay = declare_dependency(include_directories : include_directories('.'), link_with : gameplaylib)
+
+if tidy.found()
+    run_target(
+        'tidy-gameplay',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + gameplaysrc)
+endif

@@ -8,16 +8,16 @@
 
 struct option options[] = {
     {
-        name:    "help",
-        has_arg: 0,
-        flag:    NULL,
-        val:     'h'
+        .name =    "help",
+        .has_arg = 0,
+        .flag =    NULL,
+        .val =     'h'
     },
     {
-        name:    "depfile",
-        has_arg: 1,
-        flag:    NULL,
-        val:     'd'
+        .name =    "depfile",
+        .has_arg = 1,
+        .flag =    NULL,
+        .val =     'd'
     }
 };
 
@@ -121,9 +121,10 @@ void make_path_relative(const char* base_path, char** rel_path) {
 
     if(pos) {
         char* temp = *rel_path;
-        *rel_path = calloc(strlen(*rel_path) + (pos - base_path) / sizeof(char) + 1, sizeof(char));
+        size_t new_len = strlen(*rel_path) + (pos - base_path) / sizeof(char) + 1;
+        *rel_path = calloc(new_len, sizeof(char));
         memcpy(*rel_path, base_path, (pos - base_path) + sizeof(char));
-        strcat(*rel_path, temp);
+        strncat(*rel_path, temp, new_len);
 
         free(temp);
     }
@@ -213,6 +214,13 @@ void write_file(FILE* output, const char* infilename, const char* filename, cons
             }
             trailing_cursor = i + 1;
         }
+    }
+
+    if(linecount == 0) {
+        fprintf(stderr, "Error: file '%s' has no lines",  filename);
+        free(varname);
+
+        return;
     }
 
     char** lines = calloc(linecount, sizeof(char*));

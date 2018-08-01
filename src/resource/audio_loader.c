@@ -53,8 +53,8 @@ audio_source load_wav_audio(const char* path, bool preload) {
     
     char id[5];
     id[4] = 0;
-    byte* input_buffer;
-    uint32 file_size, data_size, format_size, bytes_per_sec, final_length, sample_rate;
+    byte* input_buffer = NULL;
+    uint32 file_size, data_size, format_size, bytes_per_sec, final_length = 0, sample_rate;
     uint16 tag, channel_count, block_alignment, bits_per_sample;
     ALenum channels = AL_FORMAT_MONO8;
     
@@ -178,7 +178,7 @@ audio_source load_ogg_audio(const char* path, bool preload) {
     OggVorbis_File* infile = salloc(sizeof(OggVorbis_File));
     vorbis_info* info;
     byte* input_buffer;
-    uint32 data_size, sample_rate, final_length;
+    uint32 data_size, sample_rate, final_length = 0;
     ALenum channels;
     
     if((result = ov_fopen(path, infile)) < 0) {

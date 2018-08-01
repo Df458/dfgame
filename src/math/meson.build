@@ -22,3 +22,13 @@ install_headers(
     subdir : 'dfgame/math')
 
 math = declare_dependency(include_directories : include_directories('.'), link_with : mathlib)
+
+if tidy.found()
+    run_target(
+        'tidy-math',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + mathsrc)
+endif

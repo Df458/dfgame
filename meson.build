@@ -10,6 +10,8 @@ pkgconfig = import('pkgconfig')
 
 m = compiler.find_library('m', required : false)
 
+tidy = find_program('clang-tidy', required: false)
+
 cunit = dependency('cunit')
 freetype = dependency('freetype2')
 gl = dependency('gl')
@@ -36,6 +38,7 @@ gtk = dependency('gtk+-3.0')
 add_project_arguments('-I/usr/include/freetype2', language: 'c')
 
 args = []
+allsrc = []
 
 subdir('tools/glslc')
 
@@ -57,5 +60,15 @@ subdir('demo/heightmap')
 subdir('demo/fps')
 subdir('demo/editor')
 subdir('demo/text')
+
+if tidy.found()
+    run_target(
+        'tidy',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + allsrc)
+endif
 
 run_command('ctags', '-R', '.')

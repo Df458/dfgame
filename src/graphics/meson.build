@@ -28,3 +28,13 @@ install_headers(
     subdir : 'dfgame/graphics')
 
 graphics = declare_dependency(include_directories : include_directories('.'), link_with : graphicslib)
+
+if tidy.found()
+    run_target(
+        'tidy-graphics',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + graphicssrc)
+endif

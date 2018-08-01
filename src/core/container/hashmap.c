@@ -2,10 +2,11 @@
 
 #include "hashmap.h"
 
-#include "log/log.h"
 #include "alloc.h"
 #include "crc.h"
+#include "log/log.h"
 #include "power.h"
+
 #include <assert.h>
 
 // Struct Definitions
@@ -110,8 +111,9 @@ uint16 hashmap_size(hashmap map) {
 // Setting value to NULL will automatically unmap hash_key.
 void hashmap_set(hashmap map, hash_key, void* value) {
     // If we're mapping NULL, remove the key.
-    if(value == NULL)
+    if(value == NULL) {
         hashmap_remove(map, hash_key_data);
+    }
 
     uint32 crc = make_crc();
     uint16 bucket_index = crc % HASHMAP_BUCKET_COUNT;
@@ -155,17 +157,21 @@ void* hashmap_get(hashmap map, hash_key) {
     uint32 crc = make_crc();
     int32 index = hashmap_bucket_index_of(map, crc);
 
-    if(index == INVALID_INDEX)
+    if(index == INVALID_INDEX) {
         return NULL;
+    }
 
     return map->buckets[crc % HASHMAP_BUCKET_COUNT].data[index];
 }
 
 void* hashmap_get_value(hashmap map, void* data, equality_predicate p, void* user) {
-    for(uint16 i = 0; i < HASHMAP_BUCKET_COUNT; ++i)
-        for(uint16 j = 0; j < map->buckets[i].size; ++j)
-            if(p(map->buckets[i].data[j], data, user))
+    for(uint16 i = 0; i < HASHMAP_BUCKET_COUNT; ++i) {
+        for(uint16 j = 0; j < map->buckets[i].size; ++j) {
+            if(p(map->buckets[i].data[j], data, user)) {
                 return map->buckets[i].data[j];
+            }
+        }
+    }
 
     return NULL;
 }
@@ -197,8 +203,9 @@ void hashmap_foreach(hashmap map, foreach_delegate d, void* user) {
             }
 
             // If the decision involves breaking, break
-            if(res.decision >= DECISION_BREAK)
+            if(res.decision >= DECISION_BREAK) {
                 return;
+            }
         }
     }
 }
@@ -207,8 +214,9 @@ void hashmap_foreach(hashmap map, foreach_delegate d, void* user) {
 void** hashmap_to_array(hashmap map) {
     uint16 size = hashmap_size(map);
 
-    if(size == 0)
+    if(size == 0) {
         return NULL;
+    }
 
     void** array = mscalloc(size, void*);
 

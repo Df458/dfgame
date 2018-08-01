@@ -12,3 +12,13 @@ glsl_gen = generator(glslc,
                     depfile: '@BASENAME@.d')
 
 run_command('ctags', '-R', '.')
+
+if tidy.found()
+    run_target(
+        'tidy-glslc',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + glslcsrc)
+endif

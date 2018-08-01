@@ -23,10 +23,11 @@ uint32 df_crc32(hash_key) {
     for(uint16 i = 0; i < hash_data_size; ++i) {
         val = crc_reverse(hash_data[i]);
         for(uint16 j = 0; j <= 7; ++j) {
-            if((int32)(crc ^ val) < 0)
+            if((int32)(crc ^ val) < 0) {
                 crc = (crc << 1) ^ 0x04C11DB7;
-            else
+            } else {
                 crc <<= 1;
+            }
             val <<= 1;
         }
     }

@@ -30,8 +30,9 @@ static const char* const log_format = "[%s] %s:%d, LOG LEVEL %s: %s\n";
 
 void _log(const char* file, uint32 line, const char* category, log_level level, const char* message, ...)
 {
-    if(!current_file)
+    if(!current_file) {
         current_file = stderr;
+    }
 
     if(level > LOG_FATAL) {
         warn("Invalid log level %d received. Level reset to WARN.", level);
@@ -70,19 +71,21 @@ void _log(const char* file, uint32 line, const char* category, log_level level, 
 
     free(format);
 
-    fprintf(current_file, final_message);
+    fprintf(current_file, "%s", final_message);
 
     call_event(current_handler, file, line, level, final_message);
     free(final_message);
 
-    if(level == LOG_FATAL)
+    if(level == LOG_FATAL) {
         exit(1);
+    }
 }
 
 void _log_va(const char* file, uint32 line, const char* category, log_level level, const char* message, va_list args)
 {
-    if(!current_file)
+    if(!current_file) {
         current_file = stderr;
+    }
 
     if(level > LOG_FATAL) {
         warn("Invalid log level %d received. Level reset to WARN.", level);
@@ -121,7 +124,7 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
 
     free(format);
 
-    fprintf(current_file, final_message);
+    fprintf(current_file, "%s", final_message);
 
     call_event(current_handler, file, line, level, final_message);
     free(final_message);

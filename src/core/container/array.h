@@ -82,16 +82,16 @@ void* array_get(array a, uint16 position);
 void array_set(array a, uint16 position, void* data);
 
 // Removes the element at the end of this array and returns it
-void* array_pop(array array);
+void* array_pop(array a);
 
 // Performs a heapsort on array using predicate p for comparison.
 void array_sort(array a, comparison_predicate p, void* user);
 
 // Gets an iterator to the start of the array
-array_iter array_get_start(array array);
+array_iter array_get_start(array a);
 
 // Gets an iterator to the end of the array
-array_iter array_get_end(array array);
+array_iter array_get_end(array a);
 
 // Advances an iterator to the next spot in the array
 void array_get_next(array a, array_iter* i);

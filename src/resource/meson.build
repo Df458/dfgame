@@ -49,3 +49,13 @@ install_headers(
     subdir : 'dfgame/resource')
 
 resource = declare_dependency(include_directories : include_directories('.', '..'), link_with : resourcelib)
+
+if tidy.found()
+    run_target(
+        'tidy-resource',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + resourcesrc)
+endif

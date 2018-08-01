@@ -20,8 +20,9 @@
 static void shift(void* data, uint16 start, uint16 end, uint16 member_size) {
     // Determine the direction that we'll be shifting.
     int8 shiftval = 1;
-    if(end > start)
+    if(end > start) {
         shiftval = -1;
+    }
 
     for(uint16 i = end; i != start; i += shiftval) {
         memcpy(data + (member_size * i), data + (member_size * (i + shiftval)), member_size);
@@ -33,10 +34,11 @@ static void shift(void* data, uint16 start, uint16 end, uint16 member_size) {
 // before this function is called.
 static void array_resize_if_full(array a) {
     if(a->length > a->alloc_length) {
-        if(a->alloc_length == 0)
+        if(a->alloc_length == 0) {
             a->alloc_length = 1;
-        else
+        } else {
             a->alloc_length = next_power_of_two(a->alloc_length);
+        }
 
         a->data = resalloc(a->data, a->alloc_length * a->member_size);
     }
@@ -71,8 +73,9 @@ static void heap_sort(void* data, uint16 length, uint16 member_size, comparison_
         index = 1;
         memcpy(temp, data, member_size);
         while(index <= i - 1) {
-            if(index != (i - 1) && p(data + (member_size * index), data + (member_size * (index + 1)), user) == COMPARE_LESS_THAN)
+            if(index != (i - 1) && p(data + (member_size * index), data + (member_size * (index + 1)), user) == COMPARE_LESS_THAN) {
                 ++index;
+            }
             if(p(temp, data + (member_size * index), user) == COMPARE_LESS_THAN) {
                 memcpy(data + (member_size * back_index), data + (member_size * index), member_size);
                 back_index = index;
@@ -102,24 +105,27 @@ array array_new_common(uint16 size, uint16 reserve) {
 
     new_array->data         = NULL;
 
-    if(reserve > 0)
+    if(reserve > 0) {
         new_array->data = scalloc(new_array->alloc_length, new_array->member_size);
+    }
 
     return new_array;
 }
 array array_new(uint16 size, uint16 reserve) {
     array new_array = array_new_common(size, reserve);
 
-    if(new_array)
+    if(new_array) {
         new_array->preserve_order = false;
+    }
 
     return new_array;
 }
 array array_new_ordered(uint16 size, uint16 reserve) {
     array new_array = array_new_common(size, reserve);
 
-    if(new_array)
+    if(new_array) {
         new_array->preserve_order = true;
+    }
 
     return new_array;
 }
@@ -129,8 +135,9 @@ array array_new_ordered(uint16 size, uint16 reserve) {
 void _array_free(array a) {
     check_return(a, "Array is NULL", );
 
-    if(a->data != NULL)
+    if(a->data != NULL) {
         sfree(a->data);
+    }
     sfree(a);
 }
 
@@ -188,9 +195,11 @@ bool array_containsp(array a, void* data, equality_predicate p, void* user) {
 int32 array_find(array a, void* data) {
     check_return(a, "Array is NULL", INVALID_INDEX);
 
-    for(int32 i = 0; i < a->length; ++i)
-        if(!memcmp(a->data + (a->member_size * i), data, a->member_size))
+    for(int32 i = 0; i < a->length; ++i) {
+        if(!memcmp(a->data + (a->member_size * i), data, a->member_size)) {
             return i;
+        }
+    }
     return INVALID_INDEX;
 }
 
@@ -199,9 +208,11 @@ int32 array_find(array a, void* data) {
 int32 array_findp(array a, void* data, equality_predicate p, void* user) {
     check_return(a, "Array is NULL", INVALID_INDEX);
 
-    for(int32 i = 0; i < a->length; ++i)
-        if(p(a->data + (a->member_size * i), data, user))
+    for(int32 i = 0; i < a->length; ++i) {
+        if(p(a->data + (a->member_size * i), data, user)) {
             return i;
+        }
+    }
     return INVALID_INDEX;
 }
 
@@ -307,8 +318,9 @@ void array_foreachd(array a, foreach_delegate d, void* user) {
         }
 
         // If the decision involves breaking, break
-        if(res.decision >= DECISION_BREAK)
+        if(res.decision >= DECISION_BREAK) {
             break;
+        }
     }
 }
 

@@ -23,3 +23,13 @@ install_headers(
     subdir : 'dfgame/audio')
 
 audio = declare_dependency(include_directories : include_directories('.'), link_with : audiolib)
+
+if tidy.found()
+    run_target(
+        'tidy-audio',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + audiosrc)
+endif

@@ -3,8 +3,9 @@
 
 #include "core/check.h"
 #include "core/memory/alloc.h"
-#include <stdio.h>
+
 #include <stdarg.h>
+#include <stdio.h>
 
 char* saprintf(const char* format, ...) {
     va_list args;
@@ -15,8 +16,9 @@ char* saprintf(const char* format, ...) {
     return final;
 }
 char* vsaprintf(const char* format, va_list args) {
-    if(!format)
+    if(!format) {
         return NULL;
+    }
 
     va_list tempargs;
     size_t length;

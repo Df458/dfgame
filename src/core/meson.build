@@ -29,13 +29,12 @@ install_headers(
 
 core = declare_dependency(include_directories : coreinc + [include_directories('.', '..')], link_with : corelib)
 
-clangtidy = find_program('clang-tidy', required: false)
-if clangtidy.found()
+if tidy.found()
     run_target(
-        'tidy',
+        'tidy-core',
         command: [
-            clangtidy,
-            '-checks=*',
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
             '-p', meson.build_root()
         ] + coresrc)
 endif

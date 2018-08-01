@@ -19,3 +19,13 @@ install_headers(
     subdir : 'dfgame/application/game')
 
 application_game = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationgamelib)
+
+if tidy.found()
+    run_target(
+        'tidy-application',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + applicationgamesrc)
+endif

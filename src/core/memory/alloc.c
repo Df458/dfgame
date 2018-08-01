@@ -50,8 +50,9 @@ void* _resalloc(const char* file, unsigned line, void* ptr, size_t size)
 //       in code for logging purposes. Use the sfree macro instead.
 void _sfree(const char* file, unsigned line, void* ptr)
 {
-    if(!_check(file, line, LOG_CATEGORY, ptr != NULL, LOG_WARNING, "sfree: Can't free a null pointer"))
+    if(!_check(file, line, LOG_CATEGORY, ptr != NULL, LOG_WARNING, "sfree: Can't free a null pointer")) {
         free(ptr);
+    }
 }
 
 #undef LOG_CATEGORY
