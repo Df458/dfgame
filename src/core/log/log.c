@@ -26,9 +26,9 @@ static const char* const log_level_names[4] =
 static log_handler* current_handler;
 static FILE* current_file = 0;
 
-static const char* const log_format = "[%s] %s:%d, LOG LEVEL %s: %s\n";
+static const char* const log_format = "[%s] %s:%d [%s()], LOG LEVEL %s: %s\n";
 
-void _log(const char* file, uint32 line, const char* category, log_level level, const char* message, ...)
+void _log(const char* file, uint32 line, const char* function, const char* category, log_level level, const char* message, ...)
 {
     if(!current_file) {
         current_file = stderr;
@@ -42,14 +42,14 @@ void _log(const char* file, uint32 line, const char* category, log_level level, 
 	size_t length;
 
     // Get the length of the format string
-    length = snprintf(0, 0, log_format, category, file, line, log_level_names[level], message);
+    length = snprintf(0, 0, log_format, category, file, line, function, log_level_names[level], message);
     ++length;
     char* format = malloc(sizeof(char) * length);
     if(!format) {
         fprintf(current_file, "%s:%d, LOG LEVEL FATAL: Cannot write message: Out of memory\n Partial message text: %s\n", __FILE__, __LINE__, message);
         exit(1);
     }
-    snprintf(format, length, log_format, category, file, line, log_level_names[level], message);
+    snprintf(format, length, log_format, category, file, line, function, log_level_names[level], message);
 
 	va_start(args, message);
     length = vsnprintf(0, 0, format, args);
@@ -73,7 +73,7 @@ void _log(const char* file, uint32 line, const char* category, log_level level, 
 
     fprintf(current_file, "%s", final_message);
 
-    call_event(current_handler, file, line, level, final_message);
+    call_event(current_handler, file, line, function, level, final_message);
     free(final_message);
 
     if(level == LOG_FATAL) {
@@ -81,7 +81,7 @@ void _log(const char* file, uint32 line, const char* category, log_level level, 
     }
 }
 
-void _log_va(const char* file, uint32 line, const char* category, log_level level, const char* message, va_list args)
+void _log_va(const char* file, uint32 line, const char* function, const char* category, log_level level, const char* message, va_list args)
 {
     if(!current_file) {
         current_file = stderr;
@@ -94,14 +94,14 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
 	size_t length;
 
     // Get the length of the format string
-    length = snprintf(0, 0, log_format, category, file, line, log_level_names[level], message);
+    length = snprintf(0, 0, log_format, category, file, line, function, log_level_names[level], message);
     ++length;
     char* format = malloc(sizeof(char) * length);
     if(!format) {
         fprintf(current_file, "%s:%d, LOG LEVEL FATAL: Cannot write message: Out of memory\n Partial message text: %s\n", __FILE__, __LINE__, message);
         exit(1);
     }
-    snprintf(format, length, log_format, category, file, line, log_level_names[level], message);
+    snprintf(format, length, log_format, category, file, line, function, log_level_names[level], message);
 
     va_list tempargs;
 	va_copy(tempargs, args);
@@ -126,7 +126,7 @@ void _log_va(const char* file, uint32 line, const char* category, log_level leve
 
     fprintf(current_file, "%s", final_message);
 
-    call_event(current_handler, file, line, level, final_message);
+    call_event(current_handler, file, line, function, level, final_message);
     free(final_message);
 
     if(level == LOG_FATAL) {

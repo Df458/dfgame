@@ -27,14 +27,14 @@ typedef enum log_level {
                   // that will guarantee a crash, such as memory errors.
 } log_level;
 
-event(log_handler, const char*, uint32, log_level, const char*);
+event(log_handler, const char*, uint32, const char*, log_level, const char*);
 
-void _log(const char* file, uint32 line, const char* category, log_level level, const char* message, ...);
-void _log_va(const char* file, uint32 line, const char* category, log_level level, const char* message, va_list args);
-#define info(message, ...)  _log(__FILE__, __LINE__, LOG_CATEGORY, LOG_INFO,    message, ## __VA_ARGS__)
-#define warn(message, ...)  _log(__FILE__, __LINE__, LOG_CATEGORY, LOG_WARNING, message, ## __VA_ARGS__)
-#define error(message, ...) _log(__FILE__, __LINE__, LOG_CATEGORY, LOG_ERROR,   message, ## __VA_ARGS__)
-#define fatal(message, ...) _log(__FILE__, __LINE__, LOG_CATEGORY, LOG_FATAL,   message, ## __VA_ARGS__)
+void _log(const char* file, uint32 line, const char* function, const char* category, log_level level, const char* message, ...);
+void _log_va(const char* file, uint32 line, const char* function, const char* category, log_level level, const char* message, va_list args);
+#define info(message, ...)  _log(__FILE__, __LINE__, __FUNCTION__, LOG_CATEGORY, LOG_INFO,    message, ## __VA_ARGS__)
+#define warn(message, ...)  _log(__FILE__, __LINE__, __FUNCTION__, LOG_CATEGORY, LOG_WARNING, message, ## __VA_ARGS__)
+#define error(message, ...) _log(__FILE__, __LINE__, __FUNCTION__, LOG_CATEGORY, LOG_ERROR,   message, ## __VA_ARGS__)
+#define fatal(message, ...) _log(__FILE__, __LINE__, __FUNCTION__, LOG_CATEGORY, LOG_FATAL,   message, ## __VA_ARGS__)
 
 // TODO: This code is OS-specific. We'll want to block it from compiling on
 // certain targets

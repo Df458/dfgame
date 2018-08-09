@@ -60,6 +60,6 @@ void graphics_log(GLenum src, GLenum type, GLuint id, GLenum level, GLsizei len,
     }
 }
 
-void _LogFTError(const char* file, unsigned line, const char* category, int err) {
-    _log(file, line, category, LOG_ERROR, "FreeType error: %s", ft_errors[err].err_msg);
+void _LogFTError(const char* file, unsigned line, const char* function, const char* category, int err) {
+    _log(file, line, function, category, LOG_ERROR, "FreeType error: %s", ft_errors[err].err_msg);
 }
