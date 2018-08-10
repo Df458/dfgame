@@ -18,10 +18,6 @@ vt_p triangle_verts[3] = {
     (vt_p){.data={-1, 1, 0}},
 };
 
-void boop(action_id id, void* user) {
-    info("?????");
-}
-
 void init() {
     glewExperimental = 1;
     check_kill(glewInit() == GLEW_OK, "Failed to initialize GLEW");
@@ -41,8 +37,6 @@ void init() {
     shaders_init();
 
     s_main = shader_basic_untex_get();
-
-    input_add_mouse_button_action(MB_LEFT, as_event(action_event, boop, NULL));
 }
 
 void cleanup() {

@@ -20,12 +20,13 @@ public class MainWindow : ApplicationWindow
     public MainWindow()
     {
         color_selector.notify["rgba"].connect(color_changed);
-        viewport.update_interval = 60;
-        viewport.update_step.connect(on_loop);
     }
 
     public void prepare()
     {
+        viewport.is_active = true;
+        viewport.update_interval = 60;
+        viewport.update_step.connect(on_loop);
         viewport.make_current();
 
         Demo.init();
@@ -34,15 +35,9 @@ public class MainWindow : ApplicationWindow
 
     private bool on_loop(float dt)
     {
-        triangle.draw();
-        return true;
-    }
+        viewport.make_current();
 
-    [GtkCallback]
-    public bool on_render(Gdk.GLContext ctx)
-    {
         triangle.draw();
-
         return true;
     }
 
