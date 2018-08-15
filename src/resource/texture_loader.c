@@ -75,6 +75,18 @@ rawtex load_texture_raw(const char* path) {
 }
 
 #ifdef enable_png
+
+void rawtex_fill_png_rgba(rawtex* tex, png_structp pstruct, int rowbytes) {
+    png_bytep* row_ptrs = (png_bytep*)salloc(sizeof(png_bytep) * tex->height);
+    for(int i = 0; i < tex->height; i++) {
+        row_ptrs[tex->height - 1 - i] = tex->data + i * rowbytes;
+    }
+
+    png_read_image(pstruct, row_ptrs);
+
+    sfree(row_ptrs);
+}
+
 rawtex load_png_raw(const char* path) {
     rawtex tex = (rawtex){0};
     FILE* infile = fopen(path, "rb");
@@ -83,7 +95,6 @@ rawtex load_png_raw(const char* path) {
     uint8 header[8];
     png_structp pstruct;
     png_infop info_struct;
-    png_bytep* row_ptrs;
     
     size_t read = fread(header, sizeof(uint8), 8, infile);
     if(check_error(read == 8 && !png_sig_cmp(header, 0, 8), "File has an invalid header.")) {
@@ -99,41 +110,46 @@ rawtex load_png_raw(const char* path) {
         png_destroy_read_struct(&pstruct, NULL, NULL);
         return tex;
     }
-    if(setjmp(png_jmpbuf(pstruct)))
+    if(setjmp(png_jmpbuf(pstruct))) {
+        png_destroy_read_struct(&pstruct, NULL, NULL);
         return tex;
+    }
     
     png_init_io(pstruct, infile);
     png_set_sig_bytes(pstruct, 8);
     png_read_info(pstruct, info_struct);
 
     png_byte color_type = png_get_color_type(pstruct, info_struct);
-    /* png_byte bit_depth = png_get_bit_depth(pstruct, info_struct); */
-    /* int number_of_passes = png_set_interlace_handling(pstruct); */
     
-    if(color_type == PNG_COLOR_TYPE_RGB)
-        png_set_filler(pstruct, 0xff, PNG_FILLER_AFTER);
+    // Convert other types to RGBA
+    switch(color_type) {
+        case PNG_COLOR_TYPE_GRAY:
+              png_set_gray_to_rgb(pstruct);
+              png_set_filler(pstruct, 0xff, PNG_FILLER_AFTER);
+            break;
+        case PNG_COLOR_TYPE_GRAY_ALPHA:
+              png_set_gray_to_rgb(pstruct);
+            break;
+        case PNG_COLOR_TYPE_PALETTE:
+              png_set_palette_to_rgb(pstruct);
+              png_set_filler(pstruct, 0xff, PNG_FILLER_AFTER);
+            break;
+        case PNG_COLOR_TYPE_RGB:
+              png_set_filler(pstruct, 0xff, PNG_FILLER_AFTER);
+            break;
+    }
     
     png_read_update_info(pstruct, info_struct);
-    
-    if(setjmp(png_jmpbuf(pstruct)))
+    if(setjmp(png_jmpbuf(pstruct))) {
+        png_destroy_read_struct(&pstruct, &info_struct, NULL);
         return tex;
-    
-    int rowbytes = png_get_rowbytes(pstruct, info_struct);
+    }
     
     tex = rawtex_new(png_get_image_width(pstruct, info_struct), png_get_image_height(pstruct, info_struct), 4);
     tex.asset_path = nstrdup(path);
+    rawtex_fill_png_rgba(&tex, pstruct, png_get_rowbytes(pstruct, info_struct));
 
-    row_ptrs = (png_bytep*)salloc(sizeof(png_bytep) * tex.height);
-    for(int i = 0; i < tex.height; i++)
-        row_ptrs[tex.height - 1 - i] = tex.data + i * rowbytes;
-    
-    png_read_image(pstruct, row_ptrs);
-    
-    if(png_get_color_type(pstruct, info_struct) != PNG_COLOR_TYPE_RGBA)
-        png_set_add_alpha(pstruct, 0xff, PNG_FILLER_AFTER);
-    
     png_destroy_read_struct(&pstruct, &info_struct, NULL);
-    sfree(row_ptrs);
     fclose(infile);
 
     return tex;

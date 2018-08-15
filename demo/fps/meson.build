@@ -9,4 +9,4 @@ dfpsexe  = executable('demo_fps', dfpssrc,
                        install : false)
 
 run_command('ctags', '-R', '.')
-run_command('cp', '-rf', 'assets', '../../build/demo/fps')
+run_command('ln', '-rs', 'assets', '../../build/demo/fps')

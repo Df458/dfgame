@@ -9,4 +9,4 @@ dheightmapexe  = executable('demo_heightmap', dheightmapsrc,
                        install : false)
 
 run_command('ctags', '-R', '.')
-run_command('cp', '-rf', 'assets', '../../build/demo/heightmap')
+run_command('ln', '-rs', 'assets', '../../build/demo/heightmap')

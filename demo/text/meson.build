@@ -9,4 +9,4 @@ dtextexe  = executable('demo_text', dtextsrc,
                        install : false)
 
 run_command('ctags', '-R', '.')
-run_command('cp', '-rf', 'assets', '../../build/demo/text')
+run_command('ln', '-rs', 'assets', '../../build/demo/text')
