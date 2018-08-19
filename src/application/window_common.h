@@ -12,6 +12,7 @@ event(window_resize, uint16 width, uint16 height);
 typedef struct window {
     void* platform_data;
 
+    bool resizable;
     window_resize* resize_event;
 } *window;
 

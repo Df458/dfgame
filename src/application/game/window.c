@@ -36,6 +36,7 @@ window window_new(uint16 width, uint16 height, bool resizable, const char* title
     window w = msalloc(struct window);
     w->platform_data = win;
     w->resize_event = NULL;
+    w->resizable = resizable;
 
     glfwSetKeyCallback(win, input_key_callback);
     glfwSetMouseButtonCallback(win, input_mouse_button_callback);
@@ -46,8 +47,9 @@ window window_new(uint16 width, uint16 height, bool resizable, const char* title
     // This allows us to access window events from glfw events
     glfwSetWindowUserPointer(win, w);
 
-    if(!resizable)
+    if(!resizable) {
         glfwSetWindowSizeLimits(win, width, height, width, height);
+    }
 
     glfwMakeContextCurrent(win);
 
@@ -82,12 +84,23 @@ void window_redraw(window win) {
     glfwSwapBuffers((GLFWwindow*)win->platform_data);
 }
 
+// Gets/sets the window title
 void window_set_title(window win, const char* title) {
     if(check_warn(win, "Window is NULL") || check_warn(win->platform_data, "Window is invalid")) {
         return;
     }
 
     glfwSetWindowTitle(win->platform_data, title);
+}
+
+// Sets the dimensions of the window
+void window_set_dims(window win, uint16 width, uint16 height) {
+    // Update limits if the window is a fixed size
+    if(!win->resizable) {
+        glfwSetWindowSizeLimits(win->platform_data, width, height, width, height);
+    }
+
+    glfwSetWindowSize(win->platform_data, width, height);
 }
 
 // Returns whether or not the window has received a close request.

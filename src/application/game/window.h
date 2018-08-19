@@ -15,6 +15,9 @@ window window_new(uint16 width, uint16 height, bool resizable, const char* title
 // Gets/sets the window title
 void window_set_title(window win, const char* title);
 
+// Sets the dimensions of the window
+void window_set_dims(window win, uint16 width, uint16 height);
+
 // Returns whether or not the window has received a close request.
 bool window_get_should_close(window win);
 
