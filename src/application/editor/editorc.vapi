@@ -32,8 +32,6 @@ namespace DFGame
             [CCode (cname = "user")]
             void* user;
         }
-        [CCode (cname = "set_default_renderpass_response")]
-        void set_callback(CallbackData cb);
     }
 
     [CCode (cheader_filename = "editor/window.h")]

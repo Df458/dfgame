@@ -40,8 +40,6 @@ namespace DFGame
                     _proxy.resize_event->cb((uint16)ev.width, (uint16)ev.height, _proxy.resize_event.user);
             });
 
-            Framebuffer.set_callback({ framebuffer_callback, this });
-
             can_focus = true;
             events = Gdk.EventMask.ALL_EVENTS_MASK;
             update_id = Signal.lookup("update_step", typeof(Viewport));
@@ -95,11 +93,6 @@ namespace DFGame
             needs_draw = false;
 
             return true;
-        }
-
-        private static void framebuffer_callback(void* pass, void* user)
-        {
-            (user as GLArea).attach_buffers();
         }
 
         public signal bool update_step(float delta);

@@ -12,25 +12,26 @@
 #include "texture.h"
 
 static renderpass prev_pass = NULL;
-static renderpass_null_response* default_response;
 typedef struct renderpass {
     framebuffer fbo;
+    framebuffer primary_fbo;
     gltex texture;
     gltex depth;
 }* renderpass;
 
-renderpass renderpass_new(uint16 w, uint16 h) {
+renderpass renderpass_new(uint16 w, uint16 h, framebuffer primary) {
     renderpass pass = salloc(sizeof(struct renderpass));
     pass->fbo = framebuffer_new();
     pass->texture = gltex_new(GL_TEXTURE_2D, w, h);
     pass->depth = gltex_new_depth(GL_TEXTURE_2D, w, h);
+    pass->primary_fbo = primary;
     glBindFramebuffer(GL_FRAMEBUFFER, pass->fbo.handle);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pass->texture.handle, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, pass->depth.handle, 0);
     GLenum targets[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, targets);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, primary.handle);
 
     return pass;
 }
@@ -45,9 +46,11 @@ void _renderpass_free(renderpass pass) {
 
 void renderpass_start(renderpass pass) {
     if(pass == NULL) {
-        call_event(default_response, prev_pass)
-        else // call_event expands to an if-statement, so we can use an else here to react to cases where it's unbound
+        if(prev_pass) {
+            glBindFramebuffer(GL_FRAMEBUFFER, prev_pass->primary_fbo.handle);
+        } else {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
 
         prev_pass = NULL;
     } else {
@@ -71,8 +74,4 @@ void renderpass_present(renderpass pass, shader s) {
     shader_bind_uniform_name(s, "transform", mat4_scale(mat4_ident, 2));
     shader_bind_uniform_texture_name(s, "u_texture", pass->texture, GL_TEXTURE0);
     mesh_render(s, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
-}
-
-void set_default_renderpass_response(renderpass_null_response* res) {
-    bind_event(default_response, res);
 }
