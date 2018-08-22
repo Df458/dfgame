@@ -9,6 +9,8 @@
 #include "vector.h"
 #include "window.h"
 
+const char* logo_file = "logo.png";
+
 window win;
 camera c_main;
 shader s_default;
@@ -40,7 +42,7 @@ int main() {
     s_default  = shader_basic_tex_get();
     color      = color_white;
     c_main     = window_create_2d_camera(win);
-    char* path = assets_path("logo.png", NULL);
+    char* path = assets_path(logo_file, NULL);
     t_logo     = load_texture_gl(path);
     sfree(path);
 

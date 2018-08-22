@@ -5,6 +5,10 @@
 gltex  load_texture_gl(const char* path);
 rawtex load_texture_raw(const char* path);
 
+#ifdef enable_gif
+rawtex load_gif_raw(const char* path);
+#endif
+
 #ifdef enable_png
 rawtex load_png_raw(const char* path);
 #endif

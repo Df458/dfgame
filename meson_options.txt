@@ -1,3 +1,4 @@
+option('enable_gif',  type: 'boolean', value: true)
 option('enable_png',  type: 'boolean', value: true)
 option('enable_jpeg', type: 'boolean', value: true)
 option('enable_tga',  type: 'boolean', value: false)

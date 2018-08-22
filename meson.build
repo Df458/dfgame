@@ -14,6 +14,9 @@ tidy = find_program('clang-tidy', required: false)
 
 cunit = dependency('cunit')
 freetype = dependency('freetype2')
+if get_option('enable_gif') == true
+    gif = compiler.find_library('gif')
+endif
 gl = dependency('gl')
 glfw = subproject('glfw').get_variable('glfw_dep')
 glew = subproject('glew').get_variable('glew_dep')

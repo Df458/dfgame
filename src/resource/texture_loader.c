@@ -7,6 +7,9 @@
 #include "memory/alloc.h"
 #include "paths.h"
 #include "stringutil.h"
+#ifdef enable_gif
+#include <gif_lib.h>
+#endif
 #ifdef enable_png
 #include <png.h>
 #endif
@@ -52,6 +55,10 @@ gltex load_texture_gl(const char* path) {
 
 rawtex load_texture_raw(const char* path) {
     const char* ext = get_extension(path);
+#ifdef enable_gif
+    if(!strcmp(ext, "gif"))
+        return load_gif_raw(path);
+#endif
 #ifdef enable_png
     if(!strcmp(ext, "png"))
         return load_png_raw(path);
@@ -74,8 +81,55 @@ rawtex load_texture_raw(const char* path) {
     return (rawtex){0};
 }
 
-#ifdef enable_png
+#ifdef enable_gif
+rawtex load_gif_raw(const char* path) {
+    rawtex tex = {0};
 
+    // Open the file
+    int error;
+    GifFileType* file_type = DGifOpenFileName(path, &error);
+
+    check_return(file_type, "Can't load gif file %s: \"%s\"", tex, path, GifErrorString(error));
+
+    // Load the data into memory
+    error = DGifSlurp(file_type);
+    if(check_error(error == GIF_OK, "Failed to load data for gif file %s", path)) {
+        DGifCloseFile(file_type, &error);
+        return tex;
+    }
+
+    tex = rawtex_new(file_type->SWidth, file_type->SHeight, 4);
+
+    // Fill the texture with gif data
+    for(int i = 0; i < file_type->ImageCount; ++i) {
+        GifImageDesc desc = file_type->SavedImages[i].ImageDesc;
+        GifByteType* raster = file_type->SavedImages[i].RasterBits;
+
+        // One of these maps may be NULL, so we check the local one first
+        GifColorType* colors = desc.ColorMap ? desc.ColorMap->Colors : file_type->SColorMap->Colors;
+        /* int bit_count = desc.ColorMap->BitsPerPixel; */
+
+        for(int y = 0; y < desc.Height; ++y) {
+            for(int x = 0; x < desc.Width; ++x) {
+                int index = ((tex.height - y - desc.Top - 1) * tex.width) + (x + desc.Left);
+                int color = raster[y * desc.Width + x];
+                // Don't replace previous layers with the background
+                if(color != file_type->SBackGroundColor || i == 0) {
+                    tex.data[index * 4 + 0] = colors[color].Red;
+                    tex.data[index * 4 + 1] = colors[color].Green;
+                    tex.data[index * 4 + 2] = colors[color].Blue;
+                    tex.data[index * 4 + 3] = 0xff; // Alpha of 1
+                }
+            }
+        }
+    }
+
+    DGifCloseFile(file_type, &error);
+    return tex;
+}
+#endif
+
+#ifdef enable_png
 void rawtex_fill_png_rgba(rawtex* tex, png_structp pstruct, int rowbytes) {
     png_bytep* row_ptrs = (png_bytep*)salloc(sizeof(png_bytep) * tex->height);
     for(int i = 0; i < tex->height; i++) {

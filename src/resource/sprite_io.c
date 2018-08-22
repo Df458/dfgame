@@ -63,6 +63,7 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
     rawtex tex = {0};
     char* filename = NULL;
     if(xml_property_read(node, "file", &filename)) {
+        // TODO: Load gif as animation
         anim.filepath = combine_paths(get_folder(path), filename, true);
         tex = load_texture_raw(anim.filepath);
         anim.texture_box.dimensions.x = tex.width;
@@ -152,6 +153,7 @@ spriteset load_spriteset_from_xml(const char* path) {
 }
 
 spriteset load_spriteset_from_image(const char* path) {
+    // TODO: Load gif as animation
     rawtex tex = load_texture_raw(path);
     check_return(tex.asset_path, "Failed to load sprite texture", NULL);
 

@@ -2,6 +2,11 @@ resourcedeps = [ vorbis, xml ]
 resourceargs = []
 resourcepkglibs = []
 resourcerequires = ['vorbisfile', 'libxml-2.0', 'dfgame-audio', 'dfgame-core', 'dfgame-graphics', 'dfgame-math']
+if get_option('enable_gif') == true
+    resourcedeps += gif
+    resourceargs += '-Denable_gif'
+    resourcerequires += 'gif'
+endif
 if get_option('enable_jpeg') == true
     resourcedeps += jpeg
     resourceargs += '-Denable_jpeg'
