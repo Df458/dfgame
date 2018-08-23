@@ -25,7 +25,7 @@ sprite sprite_new(spriteset set) {
     spr->current_animation = spriteset_get_animation(set, NULL);
     spr->position = 0;
     spr->orient = 0;
-    spr->is_playing = false;
+    spr->is_playing = spr->current_animation->autoplay;
 
     return spr;
 }
