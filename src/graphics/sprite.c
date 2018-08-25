@@ -14,6 +14,7 @@ typedef struct sprite {
     animation* current_animation;
 
     float position;
+    uint16 frame;
     uint8 orient;
     bool is_playing;
 }* sprite;
@@ -24,28 +25,31 @@ sprite sprite_new(spriteset set) {
     spr->src = set;
     spr->current_animation = spriteset_get_animation(set, NULL);
     spr->position = 0;
+    spr->frame = 0;
     spr->orient = 0;
     spr->is_playing = spr->current_animation->autoplay;
 
     return spr;
 }
 
-void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset) {
-    animation* anim = spriteset_get_animation(spr->src, handle);
-    spr->current_animation = anim;
-    if(anim->texture_id == spr->current_animation->texture_id && !force_reset)
+void sprite_set_animation_common(sprite spr, animation* anim, bool force_reset) {
+    if(!anim || (anim->texture_id == spr->current_animation->texture_id && !force_reset)) {
         return;
+    }
+
+    spr->current_animation = anim;
+
     spr->position = 0;
+    spr->frame = 0;
     sprite_set_playing(spr, spr->current_animation->autoplay);
 }
 
+void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset) {
+    sprite_set_animation_common(spr, spriteset_get_animation(spr->src, handle), force_reset);
+}
+
 void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset) {
-    animation* anim = spriteset_get_animation(spr->src, handle);
-    spr->current_animation = anim;
-    if(anim->texture_id == spr->current_animation->texture_id && !force_reset)
-        return;
-    spr->position = 0;
-    sprite_set_playing(spr, spr->current_animation->autoplay);
+    sprite_set_animation_common(spr, spriteset_get_animation(spr->src, handle), force_reset);
 }
 
 void sprite_set_orientation(sprite spr, uint8 orient) {
@@ -66,27 +70,23 @@ bool sprite_get_playing(sprite spr) {
 
 void sprite_set_position(sprite spr, float position) {
     spr->position = position;
+    if(animation_get_frame(spr->current_animation, spr->position, &spr->frame, &spr->position) && !spr->current_animation->autoloop) {
+        spr->position = 0.001 * spr->current_animation->total_time;
+        spr->frame = spr->current_animation->frame_count - 1;
+        sprite_set_playing(spr, false);
+
+        // Reset to the default if the settings allow it
+        if(spr->current_animation->default_on_finish) {
+            sprite_set_animation(spr, NULL, true);
+        }
+    }
 }
 
 void sprite_update(sprite spr, float dt) {
     if(!spr->is_playing)
         return;
 
-    spr->position += dt;
-    if((spr->position - spr->current_animation->start_delay) * spr->current_animation->fps >= spr->current_animation->frame_count) {
-        if(spr->current_animation->autoloop) {
-            while((spr->position - spr->current_animation->start_delay) * spr->current_animation->fps >= spr->current_animation->frame_count) {
-                spr->position -= (spr->current_animation->frame_count + spr->current_animation->start_delay) / (float)spr->current_animation->fps;
-            }
-        } else {
-            spr->position = (spr->current_animation->frame_count - 1) * spr->current_animation->start_delay;
-            sprite_set_playing(spr, false);
-            if(spr->current_animation->default_on_finish)
-                sprite_set_animation(spr, NULL, false);
-            else
-                spr->position = (spr->current_animation->frame_count - 1 + spr->current_animation->start_delay) / (float)spr->current_animation->fps;
-        }
-    }
+    sprite_set_position(spr, spr->position + dt);
 }
 
 aabb_2d sprite_get_box(sprite spr) {
@@ -94,9 +94,7 @@ aabb_2d sprite_get_box(sprite spr) {
     box.width /= spr->current_animation->frame_count;
     box.height /= spr->current_animation->orient_count;
 
-    int frame = (spr->position - spr->current_animation->start_delay) * spr->current_animation->fps;
-
-    box.x += box.width * frame;
+    box.x += box.width * spr->frame;
     box.y += box.height * (spr->orient % spr->current_animation->orient_count);
 
     return box;

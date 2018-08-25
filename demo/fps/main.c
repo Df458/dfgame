@@ -136,8 +136,6 @@ iter_result update_barrel(void* bar, void* user) {
     mesh_render(s_default, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 
     sprite_update(b->spr, *(float*)user);
-    if(b->destroyed && !sprite_get_playing(b->spr))
-        sprite_set_position(b->spr, 0.25);
 
     return iter_continue;
 }

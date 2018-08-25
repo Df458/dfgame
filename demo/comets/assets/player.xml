@@ -1,3 +1,3 @@
 <spriteset>
-    <animation autoplay="true" autoloop="true"  frame_count="1"  orients="1" file="PlayerMove.png"/>
+    <animation autoloop="true" file="PlayerMove.png"/>
 </spriteset>

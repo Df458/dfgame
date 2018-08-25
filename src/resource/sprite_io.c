@@ -14,6 +14,9 @@
 #include "resource/texture_loader.h"
 #include "resource/xmlutil.h"
 
+#ifdef enable_gif
+#include <gif_lib.h>
+#endif
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <string.h>
@@ -30,6 +33,96 @@ typedef struct writer_data {
     xmlTextWriter* writer;
 } writer_data;
 
+#ifdef enable_gif
+void copy_frame(animation* anim, rawtex* tex, uint16 frame, uint16 target_frame) {
+    uint16 width = tex->width / anim->frame_count;
+    for(int y = 0; y < tex->height; ++y) {
+        for(int x = 0; x < width; ++x) {
+            int index = (y * tex->width) + (x + (frame * width));
+            int target_index = (y * tex->width) + (x + (target_frame * width));
+            tex->data[target_index * 4 + 0] = tex->data[index * 4 + 0];
+            tex->data[target_index * 4 + 1] = tex->data[index * 4 + 1];
+            tex->data[target_index * 4 + 2] = tex->data[index * 4 + 2];
+            tex->data[target_index * 4 + 3] = tex->data[index * 4 + 3];
+        }
+    }
+}
+
+bool read_animation_from_gif(animation* anim, rawtex* tex) {
+    // Open the file
+    int error;
+    GifFileType* file_type = load_and_slurp_gif(anim->filepath);
+    if(!file_type) {
+        return false;
+    }
+
+    *tex = rawtex_new(file_type->SWidth * file_type->ImageCount, file_type->SHeight, 4);
+    anim->frame_count = file_type->ImageCount;
+    resalloc(anim->frame_times, anim->frame_count * sizeof(uint16));
+
+    int transparency = -1;
+
+    // Fill the texture with gif data
+    int last_undisposed = 0;
+    for(int i = 0; i < file_type->ImageCount; ++i) {
+        GifImageDesc desc = file_type->SavedImages[i].ImageDesc;
+        GifByteType* raster = file_type->SavedImages[i].RasterBits;
+
+        // One of these maps may be NULL, so we check the local one first
+        GifColorType* colors = desc.ColorMap ? desc.ColorMap->Colors : file_type->SColorMap->Colors;
+
+        GraphicsControlBlock block;
+        if(gif_read_gcb(file_type, i, &block)) {
+            transparency = block.TransparentColor;
+            anim->frame_times[i] = block.DelayTime * 10;
+            if(block.DisposalMode == DISPOSE_DO_NOT) {
+                last_undisposed = i;
+                // Copy the previous frame
+                if(i > 0) {
+                    copy_frame(anim, tex, i - 1, i);
+                }
+            } else if(block.DisposalMode == DISPOSE_PREVIOUS) {
+                // Copy the last frame to not be disposed frame in
+                if(i > 0) {
+                    copy_frame(anim, tex, last_undisposed, i);
+                }
+            } else {
+                // Fill with background color
+                for(int y = 0; y < file_type->SHeight; ++y) {
+                    for(int x = 0; x < file_type->SWidth; ++x) {
+                        int index = (y * tex->width) + (x + (i * file_type->SWidth));
+                        int color = file_type->SBackGroundColor;
+                        if(color != transparency) {
+                            tex->data[index * 4 + 0] = colors[color].Red;
+                            tex->data[index * 4 + 1] = colors[color].Green;
+                            tex->data[index * 4 + 2] = colors[color].Blue;
+                            tex->data[index * 4 + 3] = 0xff;
+                        }
+                    }
+                }
+            }
+        }
+
+        for(int y = 0; y < desc.Height; ++y) {
+            for(int x = 0; x < desc.Width; ++x) {
+                int index = ((tex->height - y - desc.Top - 1) * tex->width) + (x + desc.Left + (i * file_type->SWidth));
+                int color = raster[y * desc.Width + x];
+                if(color != transparency) {
+                    tex->data[index * 4 + 0] = colors[color].Red;
+                    tex->data[index * 4 + 1] = colors[color].Green;
+                    tex->data[index * 4 + 2] = colors[color].Blue;
+                    tex->data[index * 4 + 3] = 0xff;
+                }
+            }
+        }
+    }
+
+    DGifCloseFile(file_type, &error);
+
+    return true;
+}
+#endif
+
 void read_animation(spriteset set, xmlNodePtr node, const char* path) {
     animation anim = {
         .orient_count = 1,
@@ -37,9 +130,9 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
             .x = 0,
             .y = 0
         },
-        .start_delay = 0,
         .frame_count = 1,
-        .fps = 60,
+        .frame_times = NULL,
+        .total_time = 0,
         .texture_id = -1,
         .autoplay = true,
         .autoloop = false,
@@ -49,27 +142,59 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
         .name = NULL,
     };
 
+    uint16 frame_delay = 16; // 60 FPS
+
     xml_property_read(node, "orients", &anim.orient_count);
     xml_property_read(node, "origin_x", &anim.origin.x);
     xml_property_read(node, "origin_y", &anim.origin.y);
-    xml_property_read(node, "delay", &anim.start_delay);
     xml_property_read(node, "frame_count", &anim.frame_count);
-    xml_property_read(node, "fps", &anim.fps);
+    xml_property_read(node, "frame_delay", &frame_delay);
     xml_property_read(node, "autoplay", &anim.autoplay);
     xml_property_read(node, "autoloop", &anim.autoloop);
     xml_property_read(node, "default_on_finish", &anim.default_on_finish);
+
+    anim.frame_times = mscalloc(anim.frame_count, uint16);
+    for(int i = 0; i < anim.frame_count; ++i) {
+        anim.frame_times[i] = frame_delay;
+    }
+
+    for(xmlNodePtr child = xml_match_name(node->children, "frame"); child; child = xml_match_name(child->next, "frame")) {
+        uint16 id = UINT16_MAX;
+        uint16 time = frame_delay;
+        xml_property_read(child, "id", &id);
+        xml_property_read(child, "delay", &time);
+
+        if(id < anim.frame_count) {
+            anim.frame_times[id] = time;
+        }
+    }
 
     bool should_keep = false;
     rawtex tex = {0};
     char* filename = NULL;
     if(xml_property_read(node, "file", &filename)) {
-        // TODO: Load gif as animation
         anim.filepath = combine_paths(get_folder(path), filename, true);
-        tex = load_texture_raw(anim.filepath);
-        anim.texture_box.dimensions.x = tex.width;
-        anim.texture_box.dimensions.y = tex.height;
-        if(tex.data)
+
+        // Override for loading animation data from gif files
+#ifdef enable_gif
+        const char* ext = get_extension(anim.filepath);
+        if(!strcmp(ext, "gif")) {
+            read_animation_from_gif(&anim, &tex);
             should_keep = true;
+        }
+#endif
+
+        if(!should_keep) {
+            tex = load_texture_raw(anim.filepath);
+            anim.texture_box.dimensions.x = tex.width;
+            anim.texture_box.dimensions.y = tex.height;
+            if(tex.data)
+                should_keep = true;
+        }
+    }
+
+    for(int i = 0; i < anim.frame_count; ++i) {
+        anim.total_time += anim.frame_times[i];
     }
 
     if(!check_warn(should_keep, "Failed to load animation as it lacks a texture")) {
@@ -90,9 +215,7 @@ iter_result write_animation(void* a, void* user) {
     xml_property_write(writer, "orients", anim->orient_count);
     xml_property_write(writer, "origin_x", anim->origin.x);
     xml_property_write(writer, "origin_y", anim->origin.y);
-    xml_property_write(writer, "delay", anim->start_delay);
     xml_property_write(writer, "frame_count", anim->frame_count);
-    xml_property_write(writer, "fps", anim->fps);
     xml_property_write(writer, "autoplay", anim->autoplay);
     xml_property_write(writer, "autoloop", anim->autoloop);
     xml_property_write(writer, "default_on_finish", anim->default_on_finish);
@@ -104,6 +227,12 @@ iter_result write_animation(void* a, void* user) {
     if(strcmp(anim->name, "default"))
         xml_property_write(writer, "name", anim->name);
 
+    for(int i = 0; i < anim->frame_count; ++i) {
+        xmlTextWriterStartElement(writer, (xmlChar*)"frame");
+        xml_property_write(writer, "id", i);
+        xml_property_write(writer, "time", anim->frame_times[i]);
+    }
+
     xmlTextWriterEndElement(writer);
 
     return iter_continue;
@@ -111,6 +240,10 @@ iter_result write_animation(void* a, void* user) {
 
 spriteset load_spriteset(const char* path) {
     const char* ext = get_extension(path);
+#ifdef enable_gif
+    if(!strcmp(ext, "gif"))
+        return load_spriteset_from_image(path);
+#endif
 #ifdef enable_png
     if(!strcmp(ext, "png"))
         return load_spriteset_from_image(path);
@@ -153,10 +286,6 @@ spriteset load_spriteset_from_xml(const char* path) {
 }
 
 spriteset load_spriteset_from_image(const char* path) {
-    // TODO: Load gif as animation
-    rawtex tex = load_texture_raw(path);
-    check_return(tex.asset_path, "Failed to load sprite texture", NULL);
-
     spriteset spr = spriteset_new(NULL);
 
     animation anim = {
@@ -165,9 +294,9 @@ spriteset load_spriteset_from_image(const char* path) {
             .x = 0,
             .y = 0
         },
-        .start_delay = 0,
         .frame_count = 1,
-        .fps = 0,
+        .frame_times = NULL,
+        .total_time = 0,
         .texture_id = -1,
         .autoplay = true,
         .autoloop = false,
@@ -176,6 +305,40 @@ spriteset load_spriteset_from_image(const char* path) {
         .filepath = nstrdup(path),
         .name = nstrdup("default"),
     };
+
+    uint16 frame_delay = 16; // 60 FPS
+    anim.frame_times = mscalloc(anim.frame_count, uint16);
+    for(int i = 0; i < anim.frame_count; ++i) {
+        anim.frame_times[i] = frame_delay;
+    }
+
+    bool loaded = false;
+    rawtex tex = {0};
+
+    // Override for loading animation data from gif files
+#ifdef enable_gif
+    const char* ext = get_extension(anim.filepath);
+    if(!strcmp(ext, "gif")) {
+        read_animation_from_gif(&anim, &tex);
+        loaded = true;
+    }
+#endif
+
+    for(int i = 0; i < anim.frame_count; ++i) {
+        anim.total_time += anim.frame_times[i];
+    }
+
+    if(!loaded) {
+        tex = load_texture_raw(path);
+        if(check_error(tex.asset_path, "Failed to load sprite texture", NULL)) {
+            sfree(anim.filepath);
+            sfree(anim.frame_times);
+            sfree(anim.name);
+            spriteset_free(spr);
+
+            return NULL;
+        }
+    }
 
     spriteset_add_animation(spr, anim, tex);
 

@@ -82,19 +82,40 @@ rawtex load_texture_raw(const char* path) {
 }
 
 #ifdef enable_gif
-rawtex load_gif_raw(const char* path) {
-    rawtex tex = {0};
-
+GifFileType* load_and_slurp_gif(const char* path) {
     // Open the file
     int error;
     GifFileType* file_type = DGifOpenFileName(path, &error);
 
-    check_return(file_type, "Can't load gif file %s: \"%s\"", tex, path, GifErrorString(error));
+    check_return(file_type, "Can't load gif file %s: \"%s\"", NULL, path, GifErrorString(error));
 
     // Load the data into memory
     error = DGifSlurp(file_type);
     if(check_error(error == GIF_OK, "Failed to load data for gif file %s", path)) {
         DGifCloseFile(file_type, &error);
+        return NULL;
+    }
+
+    return file_type;
+}
+
+bool gif_read_gcb(GifFileType* file_type, int index, GraphicsControlBlock* block) {
+    int error = DGifSavedExtensionToGCB(file_type, index, block);
+    if(error == GIF_OK) {
+        return true;
+    } 
+
+    warn("Failed to read gif GCB: %s. Animation may be a little screwed up...", GifErrorString(error));
+    return false;
+}
+
+rawtex load_gif_raw(const char* path) {
+    rawtex tex = {0};
+
+    // Open the file
+    int error;
+    GifFileType* file_type = load_and_slurp_gif(path);
+    if(!file_type) {
         return tex;
     }
 
@@ -107,14 +128,19 @@ rawtex load_gif_raw(const char* path) {
 
         // One of these maps may be NULL, so we check the local one first
         GifColorType* colors = desc.ColorMap ? desc.ColorMap->Colors : file_type->SColorMap->Colors;
-        /* int bit_count = desc.ColorMap->BitsPerPixel; */
+
+        int transparency = -1;
+        GraphicsControlBlock block;
+        if(gif_read_gcb(file_type, i, &block)) {
+            transparency = block.TransparentColor;
+        }
 
         for(int y = 0; y < desc.Height; ++y) {
             for(int x = 0; x < desc.Width; ++x) {
                 int index = ((tex.height - y - desc.Top - 1) * tex.width) + (x + desc.Left);
                 int color = raster[y * desc.Width + x];
-                // Don't replace previous layers with the background
-                if(color != file_type->SBackGroundColor || i == 0) {
+                // Don't replace previous layers with the transparent color
+                if(color != transparency) {
                     tex.data[index * 4 + 0] = colors[color].Red;
                     tex.data[index * 4 + 1] = colors[color].Green;
                     tex.data[index * 4 + 2] = colors[color].Blue;

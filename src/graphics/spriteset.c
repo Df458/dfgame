@@ -135,3 +135,21 @@ void _spriteset_free(spriteset set) {
         sfree(set->asset_path);
     sfree(set);
 }
+
+// Gets the frame of an animation based on a given time
+bool animation_get_frame(const animation* anim, float time, uint16* out_frame, float* adjusted_time) {
+    uint32 counter = 0;
+
+    uint16 ms = (uint16)(time * 1000) % anim->total_time;
+    *adjusted_time = ms * 0.001;
+
+    for(int frame = 0; frame < anim->frame_count; ++frame) {
+        counter += anim->frame_times[frame];
+        if(counter >= ms) {
+            *out_frame = frame;
+            break;
+        }
+    }
+
+    return time * 1000 > anim->total_time;
+}

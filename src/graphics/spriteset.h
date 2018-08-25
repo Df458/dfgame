@@ -13,9 +13,9 @@ typedef struct animation {
     } origin;
     aabb_2d texture_box;
 
-    uint16 start_delay;
     uint16 frame_count;
-    uint16 fps;
+    uint16* frame_times;
+    uint16 total_time;
 
     int16 texture_id;
 
@@ -63,5 +63,8 @@ char* spriteset_get_path(spriteset set);
 // Frees the given spriteset, and all resources contained within it
 #define spriteset_free(s) { _spriteset_free(s); s = NULL; }
 void _spriteset_free(spriteset set);
+
+// Gets the frame of an animation based on a given time
+bool animation_get_frame(const animation* anim, float time, uint16* out_frame, float* adjusted_time);
 
 #endif

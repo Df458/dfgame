@@ -131,6 +131,7 @@ void update_bullets(float dt) {
 
         glUseProgram(s_default.id);
         shader_bind_uniform_name(s_default, "u_color", color);
+        sprite_update(b->spr, dt);
         sprite_draw(b->spr, s_default, transform_get_matrix(b->trans), camera_get_vp(c_main));
     }
 }
