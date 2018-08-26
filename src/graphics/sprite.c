@@ -13,7 +13,7 @@ typedef struct sprite {
     spriteset src;
     animation* current_animation;
 
-    float position;
+    uint32 position;
     uint16 frame;
     uint8 orient;
     bool is_playing;
@@ -68,7 +68,10 @@ bool sprite_get_playing(sprite spr) {
     return spr->is_playing;
 }
 
-void sprite_set_position(sprite spr, float position) {
+float sprite_get_position(const sprite spr) {
+    return spr->position;
+}
+void sprite_set_position(sprite spr, uint32 position) {
     spr->position = position;
     if(animation_get_frame(spr->current_animation, spr->position, &spr->frame, &spr->position) && !spr->current_animation->autoloop) {
         spr->position = 0.001 * spr->current_animation->total_time;
@@ -82,11 +85,18 @@ void sprite_set_position(sprite spr, float position) {
     }
 }
 
+uint16 sprite_get_frame(const sprite spr) {
+    return spr->frame;
+}
+void sprite_set_frame(sprite spr, uint16 frame) {
+    sprite_set_position(spr, animation_get_time(spr->current_animation, frame));
+}
+
 void sprite_update(sprite spr, float dt) {
     if(!spr->is_playing)
         return;
 
-    sprite_set_position(spr, spr->position + dt);
+    sprite_set_position(spr, spr->position + (dt * 1000));
 }
 
 aabb_2d sprite_get_box(sprite spr) {

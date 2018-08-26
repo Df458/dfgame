@@ -142,29 +142,28 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
         .name = NULL,
     };
 
-    uint16 frame_delay = 16; // 60 FPS
-
     xml_property_read(node, "orients", &anim.orient_count);
     xml_property_read(node, "origin_x", &anim.origin.x);
     xml_property_read(node, "origin_y", &anim.origin.y);
     xml_property_read(node, "frame_count", &anim.frame_count);
-    xml_property_read(node, "frame_delay", &frame_delay);
+    xml_property_read(node, "frame_delay", &anim.default_frame_time);
     xml_property_read(node, "autoplay", &anim.autoplay);
     xml_property_read(node, "autoloop", &anim.autoloop);
     xml_property_read(node, "default_on_finish", &anim.default_on_finish);
 
-    anim.frame_times = mscalloc(anim.frame_count, uint16);
-    for(int i = 0; i < anim.frame_count; ++i) {
-        anim.frame_times[i] = frame_delay;
+    if(anim.default_frame_time == 0) {
+        anim.default_frame_time = 16;
     }
+
+    anim.frame_times = mscalloc(anim.frame_count, uint16);
 
     for(xmlNodePtr child = xml_match_name(node->children, "frame"); child; child = xml_match_name(child->next, "frame")) {
         uint16 id = UINT16_MAX;
-        uint16 time = frame_delay;
+        uint16 time = 0;
         xml_property_read(child, "id", &id);
         xml_property_read(child, "delay", &time);
 
-        if(id < anim.frame_count) {
+        if(id < anim.frame_count && time != 0) {
             anim.frame_times[id] = time;
         }
     }
@@ -193,9 +192,7 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
         }
     }
 
-    for(int i = 0; i < anim.frame_count; ++i) {
-        anim.total_time += anim.frame_times[i];
-    }
+    animation_calculate_total_time(&anim);
 
     if(!check_warn(should_keep, "Failed to load animation as it lacks a texture")) {
         if(!xml_property_read(node, "name", &anim.name)) {
@@ -216,6 +213,7 @@ iter_result write_animation(void* a, void* user) {
     xml_property_write(writer, "origin_x", anim->origin.x);
     xml_property_write(writer, "origin_y", anim->origin.y);
     xml_property_write(writer, "frame_count", anim->frame_count);
+    xml_property_write(writer, "frame_delay", anim->default_frame_time);
     xml_property_write(writer, "autoplay", anim->autoplay);
     xml_property_write(writer, "autoloop", anim->autoloop);
     xml_property_write(writer, "default_on_finish", anim->default_on_finish);
@@ -228,9 +226,11 @@ iter_result write_animation(void* a, void* user) {
         xml_property_write(writer, "name", anim->name);
 
     for(int i = 0; i < anim->frame_count; ++i) {
-        xmlTextWriterStartElement(writer, (xmlChar*)"frame");
-        xml_property_write(writer, "id", i);
-        xml_property_write(writer, "delay", anim->frame_times[i]);
+        if(anim->frame_times[i] != 0) {
+            xmlTextWriterStartElement(writer, (xmlChar*)"frame");
+            xml_property_write(writer, "id", i);
+            xml_property_write(writer, "delay", anim->frame_times[i]);
+        }
     }
 
     xmlTextWriterEndElement(writer);
@@ -295,8 +295,9 @@ spriteset load_spriteset_from_image(const char* path) {
             .y = 0
         },
         .frame_count = 1,
-        .frame_times = NULL,
+        .frame_times = mscalloc(anim.frame_count, uint16),
         .total_time = 0,
+        .default_frame_time = 16,
         .texture_id = -1,
         .autoplay = true,
         .autoloop = false,
@@ -305,12 +306,6 @@ spriteset load_spriteset_from_image(const char* path) {
         .filepath = nstrdup(path),
         .name = nstrdup("default"),
     };
-
-    uint16 frame_delay = 16; // 60 FPS
-    anim.frame_times = mscalloc(anim.frame_count, uint16);
-    for(int i = 0; i < anim.frame_count; ++i) {
-        anim.frame_times[i] = frame_delay;
-    }
 
     bool loaded = false;
     rawtex tex = {0};
@@ -324,9 +319,7 @@ spriteset load_spriteset_from_image(const char* path) {
     }
 #endif
 
-    for(int i = 0; i < anim.frame_count; ++i) {
-        anim.total_time += anim.frame_times[i];
-    }
+    animation_calculate_total_time(&anim);
 
     if(!loaded) {
         tex = load_texture_raw(path);

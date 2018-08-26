@@ -137,19 +137,58 @@ void _spriteset_free(spriteset set) {
 }
 
 // Gets the frame of an animation based on a given time
-bool animation_get_frame(const animation* anim, float time, uint16* out_frame, float* adjusted_time) {
+bool animation_get_frame(const animation* anim, uint32 time, uint16* out_frame, uint32* adjusted_time) {
     uint32 counter = 0;
 
-    uint16 ms = (uint16)(time * 1000) % anim->total_time;
-    *adjusted_time = ms * 0.001;
+    *adjusted_time = time % anim->total_time;
 
     for(int frame = 0; frame < anim->frame_count; ++frame) {
-        counter += anim->frame_times[frame];
-        if(counter >= ms) {
+        if(anim->frame_times[frame] != 0) {
+            counter += anim->frame_times[frame];
+        } else {
+            counter += anim->default_frame_time;
+        }
+        if(counter >= *adjusted_time) {
             *out_frame = frame;
             break;
         }
     }
 
-    return time * 1000 > anim->total_time;
+    return time > anim->total_time;
+}
+
+// Gets the time (ms) that a given frame starts at
+uint32 animation_get_time(const animation* anim, uint16 frame) {
+    if(check_warn(frame < anim->frame_count, "Frame %d is out of bounds, animation only has %d frames", frame, anim->frame_count + 1)) {
+        return 0;
+    }
+    uint32 counter = 1;
+
+    for(int i = 0; i < frame; ++i) {
+        if(anim->frame_times[i] != 0) {
+            counter += anim->frame_times[i];
+        } else {
+            counter += anim->default_frame_time;
+        }
+    }
+
+    return counter;
+}
+
+// Recalculates an animation's length
+void animation_calculate_total_time(animation* anim) {
+    anim->total_time = 0;
+    for(int i = 0; i < anim->frame_count; ++i) {
+        if(anim->frame_times[i] != 0) {
+            anim->total_time += anim->frame_times[i];
+        } else {
+            anim->total_time += anim->default_frame_time;
+        }
+    }
+
+    // Default the animation to 1ms if the total is 0
+    if(anim->total_time == 0) {
+        warn("Animations must be at least 1ms in length");
+        anim->total_time = 1;
+    }
 }
