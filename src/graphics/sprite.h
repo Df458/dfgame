@@ -21,7 +21,7 @@ void sprite_set_orientation(sprite spr, uint8 orient);
 uint8 sprite_get_orientation(sprite spr);
 void sprite_set_playing(sprite spr, bool playing);
 bool sprite_get_playing(sprite spr);
-float sprite_get_position(const sprite spr);
+uint32 sprite_get_position(const sprite spr);
 void sprite_set_position(sprite spr, uint32 position);
 uint16 sprite_get_frame(const sprite spr);
 void sprite_set_frame(sprite spr, uint16 frame);

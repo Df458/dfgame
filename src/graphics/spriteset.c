@@ -139,6 +139,7 @@ void _spriteset_free(spriteset set) {
 // Gets the frame of an animation based on a given time
 bool animation_get_frame(const animation* anim, uint32 time, uint16* out_frame, uint32* adjusted_time) {
     uint32 counter = 0;
+    bool loop = time >= anim->total_time;
 
     *adjusted_time = time % anim->total_time;
 
@@ -154,7 +155,7 @@ bool animation_get_frame(const animation* anim, uint32 time, uint16* out_frame, 
         }
     }
 
-    return time > anim->total_time;
+    return loop;
 }
 
 // Gets the time (ms) that a given frame starts at

@@ -68,13 +68,13 @@ bool sprite_get_playing(sprite spr) {
     return spr->is_playing;
 }
 
-float sprite_get_position(const sprite spr) {
+uint32 sprite_get_position(const sprite spr) {
     return spr->position;
 }
 void sprite_set_position(sprite spr, uint32 position) {
     spr->position = position;
     if(animation_get_frame(spr->current_animation, spr->position, &spr->frame, &spr->position) && !spr->current_animation->autoloop) {
-        spr->position = 0.001 * spr->current_animation->total_time;
+        spr->position = spr->current_animation->total_time - 1;
         spr->frame = spr->current_animation->frame_count - 1;
         sprite_set_playing(spr, false);
 
