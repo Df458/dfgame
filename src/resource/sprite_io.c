@@ -7,7 +7,6 @@
 #include "core/container/hashmap.h"
 #include "core/memory/alloc.h"
 #include "core/stringutil.h"
-#include "graphics/spriteset.h"
 #include "graphics/texture.h"
 #include "graphics/texture_atlas.h"
 #include "resource/paths.h"
@@ -286,16 +285,28 @@ spriteset load_spriteset_from_xml(const char* path) {
 }
 
 spriteset load_spriteset_from_image(const char* path) {
-    spriteset spr = spriteset_new(NULL);
+    animation anim;
+    rawtex tex;
+    check_return(load_animation_from_image(path, &anim, &tex), "", NULL);
 
-    animation anim = {
+
+    spriteset spr = spriteset_new(NULL);
+    spriteset_add_animation(spr, anim, tex);
+    spr->asset_path = nstrdup(path);
+
+    return spr;
+}
+
+// Load animation and texture data from an image file, for use in a spriteset
+bool load_animation_from_image(const char* path, animation* anim, rawtex* tex) {
+    *anim = (animation) {
         .orient_count = 1,
         .origin = {
             .x = 0,
             .y = 0
         },
         .frame_count = 1,
-        .frame_times = mscalloc(anim.frame_count, uint16),
+        .frame_times = mscalloc(1, uint16),
         .total_time = 0,
         .default_frame_time = 16,
         .texture_id = -1,
@@ -308,36 +319,31 @@ spriteset load_spriteset_from_image(const char* path) {
     };
 
     bool loaded = false;
-    rawtex tex = {0};
 
     // Override for loading animation data from gif files
 #ifdef enable_gif
-    const char* ext = get_extension(anim.filepath);
+    const char* ext = get_extension(anim->filepath);
     if(!strcmp(ext, "gif")) {
-        read_animation_from_gif(&anim, &tex);
+        read_animation_from_gif(anim, tex);
         loaded = true;
     }
 #endif
 
-    animation_calculate_total_time(&anim);
+    animation_calculate_total_time(anim);
 
     if(!loaded) {
-        tex = load_texture_raw(path);
-        if(check_error(tex.asset_path, "Failed to load sprite texture", NULL)) {
-            sfree(anim.filepath);
-            sfree(anim.frame_times);
-            sfree(anim.name);
-            spriteset_free(spr);
+        *tex = load_texture_raw(path);
+        if(check_error(tex->asset_path, "Failed to load sprite texture", NULL)) {
+            sfree(anim->filepath);
+            sfree(anim->frame_times);
+            sfree(anim->name);
+            *anim = (animation){0};
 
-            return NULL;
+            return false;
         }
     }
 
-    spriteset_add_animation(spr, anim, tex);
-
-    spr->asset_path = nstrdup(path);
-
-    return spr;
+    return true;
 }
 
 void save_spriteset(const char* path, spriteset set) {
