@@ -229,6 +229,7 @@ iter_result write_animation(void* a, void* user) {
             xmlTextWriterStartElement(writer, (xmlChar*)"frame");
             xml_property_write(writer, "id", i);
             xml_property_write(writer, "delay", anim->frame_times[i]);
+            xmlTextWriterEndElement(writer);
         }
     }
 
