@@ -150,6 +150,8 @@ rawtex load_gif_raw(const char* path) {
         }
     }
 
+    tex.asset_path = nstrdup(path);
+
     DGifCloseFile(file_type, &error);
     return tex;
 }
