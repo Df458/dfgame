@@ -130,7 +130,7 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
             .y = 0
         },
         .frame_count = 1,
-        .frame_times = NULL,
+        .frame_times = mscalloc(1, uint16),
         .total_time = 0,
         .texture_id = -1,
         .autoplay = true,
@@ -141,31 +141,6 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
         .name = NULL,
     };
 
-    xml_property_read(node, "orients", &anim.orient_count);
-    xml_property_read(node, "origin_x", &anim.origin.x);
-    xml_property_read(node, "origin_y", &anim.origin.y);
-    xml_property_read(node, "frame_count", &anim.frame_count);
-    xml_property_read(node, "frame_delay", &anim.default_frame_time);
-    xml_property_read(node, "autoplay", &anim.autoplay);
-    xml_property_read(node, "autoloop", &anim.autoloop);
-    xml_property_read(node, "default_on_finish", &anim.default_on_finish);
-
-    if(anim.default_frame_time == 0) {
-        anim.default_frame_time = 16;
-    }
-
-    anim.frame_times = mscalloc(anim.frame_count, uint16);
-
-    for(xmlNodePtr child = xml_match_name(node->children, "frame"); child; child = xml_match_name(child->next, "frame")) {
-        uint16 id = UINT16_MAX;
-        uint16 time = 0;
-        xml_property_read(child, "id", &id);
-        xml_property_read(child, "delay", &time);
-
-        if(id < anim.frame_count && time != 0) {
-            anim.frame_times[id] = time;
-        }
-    }
 
     bool should_keep = false;
     rawtex tex = {0};
@@ -188,6 +163,30 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
             anim.texture_box.dimensions.y = tex.height;
             if(tex.data)
                 should_keep = true;
+        }
+    }
+
+    xml_property_read(node, "orients", &anim.orient_count);
+    xml_property_read(node, "origin_x", &anim.origin.x);
+    xml_property_read(node, "origin_y", &anim.origin.y);
+    xml_property_read(node, "frame_count", &anim.frame_count);
+    xml_property_read(node, "frame_delay", &anim.default_frame_time);
+    xml_property_read(node, "autoplay", &anim.autoplay);
+    xml_property_read(node, "autoloop", &anim.autoloop);
+    xml_property_read(node, "default_on_finish", &anim.default_on_finish);
+
+    if(anim.default_frame_time == 0) {
+        anim.default_frame_time = 16;
+    }
+
+    for(xmlNodePtr child = xml_match_name(node->children, "frame"); child; child = xml_match_name(child->next, "frame")) {
+        uint16 id = UINT16_MAX;
+        uint16 time = 0;
+        xml_property_read(child, "id", &id);
+        xml_property_read(child, "delay", &time);
+
+        if(id < anim.frame_count && time != 0) {
+            anim.frame_times[id] = time;
         }
     }
 

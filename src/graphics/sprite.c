@@ -125,7 +125,11 @@ int16 sprite_get_anim_id(sprite spr) {
 void sprite_draw(sprite spr, shader s, mat4 model, mat4 view) {
     aabb_2d box = sprite_get_box(spr);
     glUseProgram(s.id);
-    shader_bind_uniform_name(s, "u_transform", mat4_mul(view, mat4_mul(model, mat4_scale(mat4_ident, box.dimensions))));
+    vec2 origin = {
+        .x = spr->current_animation->origin.x,
+        .y = spr->current_animation->origin.y
+    };
+    shader_bind_uniform_name(s, "u_transform", mat4_mul(view, mat4_mul(model, mat4_translate(mat4_scale(mat4_ident, box.dimensions), origin))));
     shader_bind_uniform_texture_name(s, "u_texture", sprite_get_texture(spr), GL_TEXTURE0);
     box.vec = vec4_mul(box.vec, 1.0f / sprite_get_texture(spr).width);
     shader_bind_uniform_name(s, "uv_offset", box.position);
