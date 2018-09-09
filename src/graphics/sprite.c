@@ -33,7 +33,7 @@ sprite sprite_new(spriteset set) {
 }
 
 void sprite_set_animation_common(sprite spr, animation* anim, bool force_reset) {
-    if(!anim || (anim->texture_id == spr->current_animation->texture_id && !force_reset)) {
+    if(!spr || !anim || (anim->texture_id == spr->current_animation->texture_id && !force_reset)) {
         return;
     }
 
@@ -45,33 +45,47 @@ void sprite_set_animation_common(sprite spr, animation* anim, bool force_reset) 
 }
 
 void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset) {
+    check_return(spr, "Sprite is NULL", );
     sprite_set_animation_common(spr, spriteset_get_animation(spr->src, handle), force_reset);
 }
 
 void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset) {
+    check_return(spr, "Sprite is NULL", );
     sprite_set_animation_common(spr, spriteset_get_animation(spr->src, handle), force_reset);
 }
 
 void sprite_set_orientation(sprite spr, uint8 orient) {
+    check_return(spr, "Sprite is NULL", );
+
     spr->orient = orient;
 }
 
 uint8 sprite_get_orientation(sprite spr) {
+    check_return(spr, "Sprite is NULL", 0);
+
     return spr->orient;
 }
 
 void sprite_set_playing(sprite spr, bool playing) {
+    check_return(spr, "Sprite is NULL", );
+
     spr->is_playing = playing;
 }
 
 bool sprite_get_playing(sprite spr) {
+    check_return(spr, "Sprite is NULL", false);
+
     return spr->is_playing;
 }
 
 uint32 sprite_get_position(const sprite spr) {
+    check_return(spr, "Sprite is NULL", 0);
+
     return spr->position;
 }
 void sprite_set_position(sprite spr, uint32 position) {
+    check_return(spr, "Sprite is NULL", );
+
     spr->position = position;
     if(animation_get_frame(spr->current_animation, spr->position, &spr->frame, &spr->position) && !spr->current_animation->autoloop) {
         spr->position = spr->current_animation->total_time - 1;
@@ -86,13 +100,19 @@ void sprite_set_position(sprite spr, uint32 position) {
 }
 
 uint16 sprite_get_frame(const sprite spr) {
+    check_return(spr, "Sprite is NULL", 0);
+
     return spr->frame;
 }
 void sprite_set_frame(sprite spr, uint16 frame) {
+    check_return(spr, "Sprite is NULL", );
+
     sprite_set_position(spr, animation_get_time(spr->current_animation, frame));
 }
 
 void sprite_update(sprite spr, float dt) {
+    check_return(spr, "Sprite is NULL", );
+
     if(!spr->is_playing)
         return;
 
@@ -100,6 +120,8 @@ void sprite_update(sprite spr, float dt) {
 }
 
 aabb_2d sprite_get_box(sprite spr) {
+    check_return(spr, "Sprite is NULL", (aabb_2d){0});
+
     aabb_2d box = spr->current_animation->texture_box;
     box.width /= spr->current_animation->frame_count;
     box.height /= spr->current_animation->orient_count;
@@ -111,18 +133,25 @@ aabb_2d sprite_get_box(sprite spr) {
 }
 
 gltex sprite_get_texture(sprite spr) {
+    check_return(spr, "Sprite is NULL", (gltex){0});
+
     return spriteset_get_texture(spr->src);
 }
 
 spriteset sprite_get_data(sprite spr) {
+    check_return(spr, "Sprite is NULL", NULL);
     return spr->src;
 }
 
 int16 sprite_get_anim_id(sprite spr) {
+    check_return(spr, "Sprite is NULL", 0);
+
     return spr->current_animation->texture_id;
 }
 
 void sprite_draw(sprite spr, shader s, mat4 model, mat4 view) {
+    check_return(spr, "Sprite is NULL", );
+
     aabb_2d box = sprite_get_box(spr);
     glUseProgram(s.id);
     vec2 origin = {
