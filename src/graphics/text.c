@@ -223,7 +223,7 @@ void text_set_str_va(text t, const char* s, va_list args) {
 
 // Create a new text object with the provided string format
 text text_new(font f, const char* s, ...) {
-    text t = msalloc(struct text);
+    text t = mscalloc(1, struct text);
     t->fnt = f;
     t->msh = NULL;
     t->str = NULL;
@@ -265,8 +265,15 @@ void text_set_str(text t, const char* s, ...) {
 	va_end(args);
 }
 
+// Get the current text set to the text object
+char* text_get_str(const text t) {
+    check_return(t, "Text is NULL", NULL);
+
+    return nstrdup(t->str);
+}
+
 // Get the text object's generated mesh
-mesh text_get_mesh(text t) {
+mesh text_get_mesh(const text t) {
     check_return(t, "Text is NULL", NULL);
 
     return t->msh;
@@ -280,7 +287,7 @@ void text_set_align(text t, text_alignment align) {
     t->align = align;
     text_update_mesh(t);
 }
-text_alignment text_get_align(text t) {
+text_alignment text_get_align(const text t) {
     check_return(t, "Text is NULL", TEXT_ALIGN_DEFAULT);
 
     return t->align;
@@ -294,7 +301,7 @@ void text_set_wrap(text t, text_wrap wrap) {
     t->wrap = wrap;
     text_update_mesh(t);
 }
-text_wrap text_get_wrap(text t) {
+text_wrap text_get_wrap(const text t) {
     check_return(t, "Text is NULL", TEXT_WRAP_DEFAULT);
 
     return t->wrap;
@@ -308,7 +315,7 @@ void text_set_max_width(text t, float width) {
     t->max_width = width;
     text_update_mesh(t);
 }
-float text_get_max_width(text t) {
+float text_get_max_width(const text t) {
     check_return(t, "Text is NULL", 0);
 
     return t->max_width;
@@ -322,24 +329,27 @@ void text_set_font(text t, font f) {
     t->fnt = f;
     text_update_mesh(t);
 }
-font text_get_font(text t) {
+font text_get_font(const text t) {
     check_return(t, "Text is NULL", NULL);
 
     return t->fnt;
 }
 
 // Helper function to render text.
-void text_draw(text t, shader s, mat4 m) {
-    check_return(t, "text is NULL", );
+void text_draw(const text t, shader s, mat4 m) {
+    check_return(t, "Text is NULL", );
+    check_return(t->fnt, "Text has no font", );
 
     if(t->msh) {
         glUseProgram(s.id);
+
         shader_bind_uniform_name(s, "u_transform", m);
         shader_bind_uniform_texture_name(s, "u_texture", font_get_texture(t->fnt), GL_TEXTURE0);
         vec2 v0 = (vec2){.x=0,.y=0};
         vec2 v1 = (vec2){.x=1,.y=1};
         shader_bind_uniform_name(s, "uv_offset", v0);
         shader_bind_uniform_name(s, "uv_scale", v1);
+
         mesh_render(s, t->msh, GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
     }
 }

@@ -12,12 +12,23 @@ typedef struct glyph {
     float advance;
 } glyph;
 
+// Creates a new font
 font font_new(uint16 height, const char* path);
+
+// Adds a bew glyph to the font
 void font_add_glyph(font f, glyph gp);
-glyph* font_get_glyph(font f, int16 id);
-aabb_2d font_get_glyph_bounds(font f, int16 id);
-gltex font_get_texture(font f);
-float font_get_height(font f);
+
+// Returns a glyph from the font
+glyph* font_get_glyph(const font f, int16 id);
+
+// Returns the bounding box for a font's glyph, in texture coordinates
+aabb_2d font_get_glyph_bounds(const font f, int16 id);
+
+// Returns the font's texture atlas
+gltex font_get_texture(const font f);
+
+// Returns the font's line height
+float font_get_height(const font f);
 
 // Frees the given font, and all resources contained within it
 #define font_free(f) { _font_free(f); f = NULL; }

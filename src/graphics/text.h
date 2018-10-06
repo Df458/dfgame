@@ -43,27 +43,30 @@ void _text_free(text t, bool free_src);
 // Update the text object's contents with the provided string format
 void text_set_str(text t, const char* s, ...);
 
+// Get the current text set to the text object
+char* text_get_str(const text t);
+
 // Get the text object's generated mesh
-mesh text_get_mesh(text t);
+mesh text_get_mesh(const text t);
 
 // Gets/sets the text's alignment
 void text_set_align(text t, text_alignment align);
-text_alignment text_get_align(text t);
+text_alignment text_get_align(const text t);
 
 // Gets/sets the text's wrap method
-void text_set_wrap(text t, text_wrap wrap);
+void text_set_wrap(const text t, text_wrap wrap);
 text_wrap text_get_wrap(text t);
 
 // Gets/sets the text's maximum width for wrapping.
 // If the value is 0, the text won't wrap.
 void text_set_max_width(text t, float width);
-float text_get_max_width(text t);
+float text_get_max_width(const text t);
 
 // Gets/sets the text object's font
 void text_set_font(text t, font f);
-font text_get_font(text t);
+font text_get_font(const text t);
 
 // Helper function to render text.
-void text_draw(text t, shader s, mat4 m);
+void text_draw(const text t, shader s, mat4 m);
 
 #endif
