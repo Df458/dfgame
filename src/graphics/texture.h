@@ -28,6 +28,9 @@ gltex gltex_new_from_raw(GLenum type, rawtex raw, bool clone_path);
 // Creates a new rawtex, and initializes the data block based on the arguments
 rawtex rawtex_new(uint16 w, uint16 h, uint8 elements);
 
+// Creates a new rawtex, and initializes the data block based on an existing opengl texture
+rawtex rawtex_new_from_gl(const gltex tex, bool clone_path);
+
 // Creates a new rawtex, and initializes the data block with the provided data
 rawtex rawtex_new_data(uint16 w, uint16 h, uint8 elements, ubyte* data);
 

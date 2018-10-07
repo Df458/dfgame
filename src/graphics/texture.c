@@ -55,7 +55,21 @@ gltex gltex_new_from_raw(GLenum type, rawtex raw, bool clone_path) {
 
 // Creates a new rawtex, and initializes the data block based on the arguments
 rawtex rawtex_new(uint16 w, uint16 h, uint8 elements) {
-    return rawtex_new_data(w, h, elements, scalloc(w * h * elements, sizeof(float)));
+    return rawtex_new_data(w, h, elements, scalloc(w * h * elements, sizeof(uint8)));
+}
+
+// Creates a new rawtex, and initializes the data block based on an existing opengl texture
+rawtex rawtex_new_from_gl(const gltex tex, bool clone_path) {
+    check_return(tex.width > 0 && tex.height > 0, "Trying to read raw data from an invalid OpenGL texture", (rawtex){0});
+
+    rawtex raw = rawtex_new(tex.width, tex.height, 4);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, raw.data);
+
+    // If we have an asset path and we want to clone it, make a copy
+    if(clone_path)
+        raw.asset_path = nstrdup(tex.asset_path);
+
+    return raw;
 }
 
 // Creates a new rawtex, and initializes the data block with the provided data
