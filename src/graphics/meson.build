@@ -28,6 +28,7 @@ install_headers(
     subdir : 'dfgame/graphics')
 
 graphics = declare_dependency(include_directories : include_directories('.'), link_with : graphicslib)
+graphics_vapi = files('vapi/Texture.vapi')
 
 if tidy.found()
     run_target(
