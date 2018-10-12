@@ -105,7 +105,7 @@ void audio_player_set_position(audio_player player, float pos) {
 
 // Gets/sets the position of the listener relative to the player
 vec3 audio_player_get_translation(audio_player player) {
-    vec3 data = {0};
+    vec3 data = vec3_zero;
     check_return(player, "Player is NULL", data);
 
     AL_CALL(alGetSourcefv(player->al_source, AL_POSITION, data.data), data);

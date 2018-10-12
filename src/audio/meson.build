@@ -29,7 +29,6 @@ if tidy.found()
         'tidy-audio',
         command: [
             tidy,
-            '-checks=*-hicpp-signed-bitwise',
             '-p', meson.build_root()
         ] + audiosrc)
 endif

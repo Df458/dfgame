@@ -3,6 +3,9 @@
 
 #include "aabb.h"
 
+const aabb_2d aabb_2d_zero = { .vec = vec4_zero };
+const aabb_3d aabb_3d_zero = { .position = vec3_zero, .dimensions = vec3_zero };
+
 // Gets the area of the aabb
 float aabb_area_2d(aabb_2d box) {
     return box.dimensions.x * box.dimensions.y;
@@ -38,8 +41,9 @@ bool aabb_intersects_point_3d(aabb_3d box, vec3 point) {
 
 // Returns a new aabb based on the overlap of the two given aabbs
 aabb_2d aabb_get_intersection_2d(aabb_2d box1, aabb_2d box2) {
-    if(!aabb_intersects_2d(box1, box2))
-        return (aabb_2d){0};
+    if(!aabb_intersects_2d(box1, box2)) {
+        return aabb_2d_zero;
+    }
 
     float xmin, xmax, ymin, ymax;
     xmin = box1.position.x < box2.position.x ? box1.position.x : box2.position.x;
@@ -60,8 +64,9 @@ aabb_2d aabb_get_intersection_2d(aabb_2d box1, aabb_2d box2) {
     };
 }
 aabb_3d aabb_get_intersection_3d(aabb_3d box1, aabb_3d box2) {
-    if(!aabb_intersects_3d(box1, box2))
-        return (aabb_3d){0};
+    if(!aabb_intersects_3d(box1, box2)) {
+        return aabb_3d_zero;
+    }
 
     float xmin, xmax, ymin, ymax, zmin, zmax;
     xmin = box1.position.x < box2.position.x ? box1.position.x : box2.position.x;

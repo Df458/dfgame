@@ -78,7 +78,7 @@ rawtex load_texture_raw(const char* path) {
 
     error("Failed to load texture: File extension %s not recognized", ext);
 
-    return (rawtex){0};
+    return rawtex_empty;
 }
 
 #ifdef enable_gif
@@ -110,7 +110,7 @@ bool gif_read_gcb(GifFileType* file_type, int index, GraphicsControlBlock* block
 }
 
 rawtex load_gif_raw(const char* path) {
-    rawtex tex = {0};
+    rawtex tex = rawtex_empty;
 
     // Open the file
     int error;
@@ -170,7 +170,7 @@ void rawtex_fill_png_rgba(rawtex* tex, png_structp pstruct, int rowbytes) {
 }
 
 rawtex load_png_raw(const char* path) {
-    rawtex tex = (rawtex){0};
+    rawtex tex = rawtex_empty;
     FILE* infile = fopen(path, "rb");
     check_return(infile, "Could not open file: %s", tex, path)
     
@@ -241,7 +241,7 @@ rawtex load_png_raw(const char* path) {
 #ifdef enable_jpeg
 rawtex load_jpeg_raw(const char* path) {
     struct jpeg_decompress_struct decompresser;
-    rawtex tex = (rawtex){0};
+    rawtex tex = rawtex_empty;
 
     jpeg_error err;
     
@@ -297,7 +297,7 @@ rawtex load_tga_raw(const char* path) {
     TGAData data;
     sfree(temp_path);
 
-    rawtex tex = (rawtex){0};
+    rawtex tex = rawtex_empty;
 
     check_return(image, "Could not open file: %s", tex, path);
 
@@ -365,8 +365,7 @@ rawtex load_tga_raw(const char* path) {
 
 #ifdef enable_tiff
 rawtex load_tiff_raw(const char* path) {
-    rawtex tex;
-    tex.data = NULL;
+    rawtex tex = rawtex_empty;
     TIFF* infile = TIFFOpen(path, "r");
     check_return(infile, "Could not open file: %s", tex, path)
 

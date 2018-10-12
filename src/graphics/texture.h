@@ -20,6 +20,7 @@ typedef struct rawtex {
 
     char* asset_path;
 } rawtex;
+const extern rawtex rawtex_empty;
 
 gltex gltex_new(GLenum type, uint16 w, uint16 h);
 gltex gltex_new_depth(GLenum type, uint16 w, uint16 h);

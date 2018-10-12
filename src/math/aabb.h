@@ -19,10 +19,17 @@ typedef struct aabb_2d {
         vec4 vec;
     };
 } aabb_2d;
+
+// A bounding box at [0,0] with dimensions of [0,0]
+const extern aabb_2d aabb_2d_zero;
+
 typedef struct aabb_3d {
     vec3 position;
     vec3 dimensions;
 } aabb_3d;
+
+// A bounding box at [0,0,0] with dimensions of [0,0,0]
+const extern aabb_3d aabb_3d_zero;
 
 // Gets the area of the aabb
 #define aabb_area(box) _Generic(box,\

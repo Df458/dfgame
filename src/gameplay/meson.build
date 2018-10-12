@@ -27,7 +27,6 @@ if tidy.found()
         'tidy-gameplay',
         command: [
             tidy,
-            '-checks=*-hicpp-signed-bitwise',
             '-p', meson.build_root()
         ] + gameplaysrc)
 endif

@@ -31,7 +31,7 @@ static void recalculate_matrix(transform t) {
 transform transform_new() {
     transform t = salloc(sizeof(struct transform));
 
-    t->position = (vec3){0};
+    t->position = vec3_zero;
     t->orientation = quat_ident;
     t->scale = (vec3){ .x=1, .y=1, .z=1 };
     t->matrix = mat4_ident;

@@ -201,7 +201,7 @@ camera window_create_2d_camera(window win) {
 // Returns the mouse position in pixels.
 vec2 window_get_mouse_position_raw(window win) {
     if(check_warn(win, "Window is NULL") || check_warn(win->platform_data, "Window is invalid")) {
-        return (vec2){0};
+        return vec2_zero;
     }
 
     double x, y;
@@ -215,7 +215,7 @@ vec2 window_get_mouse_position(window win) {
     vec2 v2 = window_get_dims(win);
 
     if(check_warn(eq0(v2.x) || eq0(v2.y), "Failed to calculate mouse position")) {
-        return (vec2){0};
+        return vec2_zero;
     }
 
     return (vec2){ .x = v.x / v2.x * 2 - 1, .y = v.y / v2.y * -2 + 1 };
@@ -224,7 +224,7 @@ vec2 window_get_mouse_position(window win) {
 // Returns the dimensions of the window.
 vec2 window_get_dims(window win) {
     if(check_warn(win, "Window is NULL") || check_warn(win->platform_data, "Window is invalid")) {
-        return (vec2){0};
+        return vec2_zero;
     }
 
     int x, y;

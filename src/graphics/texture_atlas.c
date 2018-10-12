@@ -50,9 +50,9 @@ texture_atlas texture_atlas_new() {
     atlas->textures = array_mnew(aabb_2d, 8);
     atlas->free_space = array_mnew(atlas_box, 8);
 
-    atlas_box initial = {0};
+    atlas_box initial = { .box=aabb_2d_zero, .free_marker=vec3_zero };
     initial.box = (aabb_2d) {
-        .position = (vec2){0},
+        .position = vec2_zero,
         .dimensions = (vec2){ .x = 256, .y = 256 }
     };
     array_add(atlas->free_space, initial);
@@ -79,19 +79,22 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
                     if(box->free_marker.y == 0) {
                         box->box.dimensions.x += new_size - prev_size;
                     } else {
-                        atlas_box new_box = {0};
-                        new_box.box = (aabb_2d) {
-                            .position = (vec2){ .x = prev_size, .y = box->box.position.y },
-                            .dimensions = (vec2){ .x = new_size - prev_size, .y = box->box.dimensions.y }
+                        atlas_box new_box = {
+                            .box = (aabb_2d) {
+                                .position = (vec2){ .x = prev_size, .y = box->box.position.y },
+                                .dimensions = (vec2){ .x = new_size - prev_size, .y = box->box.dimensions.y }
+                            }, .free_marker=vec3_zero
                         };
                         array_add(atlas->free_space, new_box);
                     }
                 }
             }
-            atlas_box new_box = {0};
-            new_box.box = (aabb_2d) {
-                .position = (vec2){ .x = 0, .y = prev_size },
+            atlas_box new_box = {
+                .box = (aabb_2d) {
+                    .position = (vec2){ .x = 0, .y = prev_size },
                     .dimensions = (vec2){ .x = new_size, .y = new_size - prev_size }
+                },
+                .free_marker=vec3_zero
             };
             array_add(atlas->free_space, new_box);
         } else {
@@ -99,7 +102,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
         }
     } while(!found_box && new_size <= 4096);
 
-    check_return(found_box, "Can't pack a texture of "vec2_printstr" in atlas (Current size [%d, %d]).", (aabb_2d){0}, vec2_decomp(box.dimensions), atlas->texture_data.width, atlas->texture_data.height);
+    check_return(found_box, "Can't pack a texture of "vec2_printstr" in atlas (Current size [%d, %d]).", aabb_2d_zero, vec2_decomp(box.dimensions), atlas->texture_data.width, atlas->texture_data.height);
 
     if(new_size != atlas->texture_data.width)
     {
@@ -156,7 +159,7 @@ int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
 }
 
 aabb_2d texture_atlas_get(texture_atlas atlas, int16 index) {
-    check_return(array_get_length(atlas->textures) > index, "Can't get texture bounds in atlas: Index %d is out of bounds", (aabb_2d){0}, index);
+    check_return(array_get_length(atlas->textures) > index, "Can't get texture bounds in atlas: Index %d is out of bounds", aabb_2d_zero, index);
 
     return *(aabb_2d*)array_get(atlas->textures, index);
 }

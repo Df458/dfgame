@@ -35,7 +35,6 @@ if tidy.found()
         'tidy-graphics',
         command: [
             tidy,
-            '-checks=*-hicpp-signed-bitwise',
             '-p', meson.build_root()
         ] + graphicssrc)
 endif

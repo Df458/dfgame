@@ -10,10 +10,10 @@
 // Bitmask enum for defining the contents of vertex buffer
 typedef enum vertex_types
 {
-    VT_POSITION = 0b10000000,
-    VT_NORMAL = 0b01000000,
-    VT_TEXTURE = 0b00100000,
-    VT_COLOR = 0b00010000,
+    VT_POSITION = 1 << 0,
+    VT_NORMAL = 1 << 1,
+    VT_TEXTURE = 1 << 2,
+    VT_COLOR = 1 << 3,
 } vertex_types;
 
 // Vertex with just positional information

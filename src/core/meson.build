@@ -34,7 +34,6 @@ if tidy.found()
         'tidy-core',
         command: [
             tidy,
-            '-checks=*-hicpp-signed-bitwise',
             '-p', meson.build_root()
         ] + coresrc)
 endif

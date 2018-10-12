@@ -70,7 +70,7 @@ glyph* glyph_to_verts(text t, vt_pt* buffer, int index, vec2 offset, float line_
 void iter_arrange_lines(text_line_data* line, text t) {
     vt_pt* verts = mesh_get_data(t->msh);
 
-    vec3 offset_value = {0};
+    vec3 offset_value = vec3_zero;
 
     if(t->align == TEXT_ALIGN_LEFT || t->align == TEXT_ALIGN_CENTER || t->align == TEXT_ALIGN_RIGHT) {
         offset_value.y = t->bounding_size.y * -0.5f;
@@ -99,10 +99,11 @@ text_line_data update_add_line(text t, array lines, text_line_data old, uint16 c
 
     old.end = cursor;
     array_add(lines, old);
-    if(old.box.dimensions.x > t->bounding_size.x)
+    if(old.box.dimensions.x > t->bounding_size.x) {
         t->bounding_size.x = old.box.dimensions.x;
+    }
 
-    text_line_data new_line = {0};
+    text_line_data new_line = (text_line_data){ .box=aabb_2d_zero, .start=0, .end=0 };
     new_line.box.position.y = offset->y;
     new_line.start = cursor + 1;
 
@@ -123,9 +124,9 @@ void text_update_mesh(text t) {
     t->bounding_size.x = 0;
     t->bounding_size.y = height;
 
-    vec2 offset = (vec2){0};
+    vec2 offset = vec2_zero;
 
-    text_line_data current_data = {0};
+    text_line_data current_data = (text_line_data){ .box=aabb_2d_zero, .start=0, .end=0 };
 
     bool line_has_space = false;
 
@@ -230,7 +231,7 @@ text text_new(font f, const char* s, ...) {
     t->align = TEXT_ALIGN_DEFAULT;
     t->wrap = TEXT_WRAP_DEFAULT;
     t->max_width = 0;
-    t->bounding_size = (vec2){0};
+    t->bounding_size = vec2_zero;
 
     va_list args;
     va_start(args, s);

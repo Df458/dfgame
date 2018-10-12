@@ -120,7 +120,7 @@ void sprite_update(sprite spr, float dt) {
 }
 
 aabb_2d sprite_get_box(sprite spr) {
-    check_return(spr, "Sprite is NULL", (aabb_2d){0});
+    check_return(spr, "Sprite is NULL", aabb_2d_zero);
 
     aabb_2d box = spr->current_animation->texture_box;
     box.width /= spr->current_animation->frame_count;
@@ -166,7 +166,7 @@ void sprite_draw(sprite spr, shader s, mat4 model, mat4 view) {
     mesh_render(s, mesh_quad(), GL_TRIANGLES, "i_pos", VT_POSITION, "i_uv", VT_TEXTURE);
 
     aabb_2d clear = (aabb_2d) {
-        .position = (vec2){0},
+        .position = vec2_zero,
         .dimensions = (vec2){.x = 1, .y = 1}
     };
     shader_bind_uniform_name(s, "uv_offset", clear.position);

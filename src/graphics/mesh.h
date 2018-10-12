@@ -11,14 +11,14 @@
 mesh mesh_new_type(uint32 size, uint8 vertex_type, void* data, const char* path);
 
 #define mesh_new(size, data, path) _Generic(data,\
-    vt_p*: mesh_new_type(size, VT_POSITION, data, path),\
-    vt_pn*: mesh_new_type(size, VT_POSITION | VT_NORMAL, data, path),\
-    vt_pt*: mesh_new_type(size, VT_POSITION | VT_TEXTURE, data, path),\
-    vt_pnt*: mesh_new_type(size, VT_POSITION | VT_NORMAL | VT_TEXTURE, data, path),\
-    vt_pc*: mesh_new_type(size, VT_POSITION | VT_COLOR, data, path),\
-    vt_pnc*: mesh_new_type(size, VT_POSITION | VT_NORMAL | VT_COLOR, data, path),\
-    vt_ptc*: mesh_new_type(size, VT_POSITION | VT_TEXTURE | VT_COLOR, data, path),\
-    vt_pntc*: mesh_new_type(size, VT_POSITION | VT_NORMAL | VT_TEXTURE | VT_COLOR, data, path)\
+    vt_p*: mesh_new_type(size, (uint8)VT_POSITION, data, path),\
+    vt_pn*: mesh_new_type(size, (uint8)VT_POSITION | (uint8)VT_NORMAL, data, path),\
+    vt_pt*: mesh_new_type(size, (uint8)VT_POSITION | (uint8)VT_TEXTURE, data, path),\
+    vt_pnt*: mesh_new_type(size, (uint8)VT_POSITION | (uint8)VT_NORMAL | (uint8)VT_TEXTURE, data, path),\
+    vt_pc*: mesh_new_type(size, (uint8)VT_POSITION | (uint8)VT_COLOR, data, path),\
+    vt_pnc*: mesh_new_type(size, (uint8)VT_POSITION | (uint8)VT_NORMAL | (uint8)VT_COLOR, data, path),\
+    vt_ptc*: mesh_new_type(size, (uint8)VT_POSITION | (uint8)VT_TEXTURE | (uint8)VT_COLOR, data, path),\
+    vt_pntc*: mesh_new_type(size, (uint8)VT_POSITION | (uint8)VT_NORMAL | (uint8)VT_TEXTURE | (uint8)VT_COLOR, data, path)\
 )
 
 #define mesh_render(s, m, o, ...) _mesh_render(s, m, o, __VA_ARGS__, 0)
@@ -50,14 +50,14 @@ void* mesh_get_data(mesh m);
 void mesh_set_data_type(mesh m, uint32 size, uint8 vertex_type, void* data);
 
 #define mesh_set_data(m, size, data) _Generic(data,\
-    vt_p*: mesh_set_data_type(m, size, VT_POSITION, data),\
-    vt_pn*: mesh_set_data_type(m, size, VT_POSITION | VT_NORMAL, data),\
-    vt_pt*: mesh_set_data_type(m, size, VT_POSITION | VT_TEXTURE, data),\
-    vt_pnt*: mesh_set_data_type(m, size, VT_POSITION | VT_NORMAL | VT_TEXTURE, data),\
-    vt_pc*: mesh_set_data_type(m, size, VT_POSITION | VT_COLOR, data),\
-    vt_pnc*: mesh_set_data_type(m, size, VT_POSITION | VT_NORMAL | VT_COLOR, data),\
-    vt_ptc*: mesh_set_data_type(m, size, VT_POSITION | VT_TEXTURE | VT_COLOR, data),\
-    vt_pntc*: mesh_set_data_type(m, size, VT_POSITION | VT_NORMAL | VT_TEXTURE | VT_COLOR, data)\
+    vt_p*: mesh_set_data_type(m, size, (uint8)VT_POSITION, data),\
+    vt_pn*: mesh_set_data_type(m, size, (uint8)VT_POSITION | (uint8)VT_NORMAL, data),\
+    vt_pt*: mesh_set_data_type(m, size, (uint8)VT_POSITION | (uint8)VT_TEXTURE, data),\
+    vt_pnt*: mesh_set_data_type(m, size, (uint8)VT_POSITION | (uint8)VT_NORMAL | (uint8)VT_TEXTURE, data),\
+    vt_pc*: mesh_set_data_type(m, size, (uint8)VT_POSITION | (uint8)VT_COLOR, data),\
+    vt_pnc*: mesh_set_data_type(m, size, (uint8)VT_POSITION | (uint8)VT_NORMAL | (uint8)VT_COLOR, data),\
+    vt_ptc*: mesh_set_data_type(m, size, (uint8)VT_POSITION | (uint8)VT_TEXTURE | (uint8)VT_COLOR, data),\
+    vt_pntc*: mesh_set_data_type(m, size, (uint8)VT_POSITION | (uint8)VT_NORMAL | (uint8)VT_TEXTURE | (uint8)VT_COLOR, data)\
 )
 
 // Updates the mesh for rendering

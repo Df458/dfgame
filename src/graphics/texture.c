@@ -7,6 +7,8 @@
 #include "memory/alloc.h"
 #include "stringutil.h"
 
+const rawtex rawtex_empty = { .data = NULL, .width = 0, .height = 0, .elements = 0, .asset_path = NULL };
+
 gltex gltex_new(GLenum type, uint16 w, uint16 h) {
     gltex tex;
     tex.width = w;

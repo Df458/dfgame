@@ -60,7 +60,6 @@ if tidy.found()
         'tidy-resource',
         command: [
             tidy,
-            '-checks=*-hicpp-signed-bitwise',
             '-p', meson.build_root()
         ] + resourcesrc)
 endif

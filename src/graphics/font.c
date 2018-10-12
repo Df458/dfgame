@@ -64,7 +64,7 @@ glyph* font_get_glyph(const font f, int16 id) {
 
 // Returns the bounding box for a font's glyph, in texture coordinates
 aabb_2d font_get_glyph_bounds(const font f, int16 id) {
-    check_return(f, "Font is NULL", (aabb_2d){0});
+    check_return(f, "Font is NULL", aabb_2d_zero);
 
     return texture_atlas_get(f->atlas, id);
 }
