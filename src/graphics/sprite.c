@@ -20,7 +20,9 @@ typedef struct sprite {
 }* sprite;
 
 sprite sprite_new(spriteset set) {
-    sprite spr = salloc(sizeof(struct sprite));
+    check_return(set != NULL, "Can't create a sprite without a spriteset", NULL);
+
+    sprite spr = mscalloc(1, struct sprite);
 
     spr->src = set;
     spr->current_animation = spriteset_get_animation(set, NULL);
