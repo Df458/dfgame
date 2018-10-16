@@ -3,11 +3,12 @@
 
 #include "sprite.h"
 
-#include "check.h"
-#include "mesh.h"
-#include "memory/alloc.h"
-#include "shader.h"
-#include "spriteset.h"
+#include "core/check.h"
+#include "core/container/array.h"
+#include "core/memory/alloc.h"
+#include "graphics/mesh.h"
+#include "graphics/shader.h"
+#include "graphics/spriteset.h"
 
 typedef struct sprite {
     spriteset src;
@@ -29,13 +30,17 @@ sprite sprite_new(spriteset set) {
     spr->position = 0;
     spr->frame = 0;
     spr->orient = 0;
-    spr->is_playing = spr->current_animation->autoplay;
+
+    if(!check_error(spr->current_animation != NULL, "Spriteset has no animations"))
+    {
+        spr->is_playing = spr->current_animation->autoplay;
+    }
 
     return spr;
 }
 
 void sprite_set_animation_common(sprite spr, animation* anim, bool force_reset) {
-    if(!spr || !anim || (anim->texture_id == spr->current_animation->texture_id && !force_reset)) {
+    if(!spr || !anim || (spr->current_animation != NULL && anim->texture_id == spr->current_animation->texture_id && !force_reset)) {
         return;
     }
 
@@ -43,17 +48,29 @@ void sprite_set_animation_common(sprite spr, animation* anim, bool force_reset) 
 
     spr->position = 0;
     spr->frame = 0;
-    sprite_set_playing(spr, spr->current_animation->autoplay);
+
+    if(!check_error(spr->current_animation != NULL, "Spriteset has no animations"))
+    {
+        sprite_set_playing(spr, spr->current_animation->autoplay);
+    }
 }
 
 void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset) {
     check_return(spr, "Sprite is NULL", );
+
     sprite_set_animation_common(spr, spriteset_get_animation(spr->src, handle), force_reset);
 }
 
 void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset) {
     check_return(spr, "Sprite is NULL", );
+
     sprite_set_animation_common(spr, spriteset_get_animation(spr->src, handle), force_reset);
+}
+
+animation* sprite_get_animation(sprite spr) {
+    check_return(spr, "Sprite is NULL", NULL);
+
+    return spr->current_animation;
 }
 
 void sprite_set_orientation(sprite spr, uint8 orient) {
@@ -123,6 +140,14 @@ void sprite_update(sprite spr, float dt) {
 
 aabb_2d sprite_get_box(sprite spr) {
     check_return(spr, "Sprite is NULL", aabb_2d_zero);
+    check_return(spr->current_animation, "Sprite has no animation", aabb_2d_zero);
+
+    if(check_warn(spr->current_animation->frame_count != 0, "Animation has no frames")) {
+        spr->current_animation->frame_count = 1;
+    }
+    if(check_warn(spr->current_animation->orient_count != 0, "Animation has no orientations")) {
+        spr->current_animation->orient_count = 1;
+    }
 
     aabb_2d box = spr->current_animation->texture_box;
     box.width /= spr->current_animation->frame_count;
@@ -146,13 +171,15 @@ spriteset sprite_get_data(sprite spr) {
 }
 
 int16 sprite_get_anim_id(sprite spr) {
-    check_return(spr, "Sprite is NULL", 0);
+    check_return(spr, "Sprite is NULL", ARRAY_INDEX_INVALID);
+    check_return(spr->current_animation, "Sprite has no animation", ARRAY_INDEX_INVALID);
 
     return spr->current_animation->texture_id;
 }
 
 void sprite_draw(sprite spr, shader s, mat4 model, mat4 view) {
     check_return(spr, "Sprite is NULL", );
+    check_return(spr->current_animation, "Sprite has no animation", );
 
     aabb_2d box = sprite_get_box(spr);
     glUseProgram(s.id);

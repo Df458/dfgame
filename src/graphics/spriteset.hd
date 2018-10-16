@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+declare(struct, animation)
 declarep(struct, spriteset)
 
 #endif

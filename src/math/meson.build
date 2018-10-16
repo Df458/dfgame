@@ -22,7 +22,10 @@ install_headers(
     subdir : 'dfgame/math')
 
 math = declare_dependency(include_directories : include_directories('.'), link_with : mathlib)
-math_vapi = files('vapi/Vector.vapi')
+math_vapi = files(
+    'vapi/Aabb.vapi',
+    'vapi/Vector.vapi'
+    )
 
 if tidy.found()
     run_target(

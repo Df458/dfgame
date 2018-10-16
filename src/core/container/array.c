@@ -179,7 +179,7 @@ void array_insert(array a, void* data, uint16 position) {
 bool array_contains(array a, void* data) {
     check_return(a, "Array is NULL", false);
 
-    return array_find(a, data) != -1;
+    return array_find(a, data) != ARRAY_INDEX_INVALID;
 }
 
 // Returns true if data is a member of this array, or false if it isn't. Uses
@@ -187,33 +187,33 @@ bool array_contains(array a, void* data) {
 bool array_containsp(array a, void* data, equality_predicate p, void* user) {
     check_return(a, "Array is NULL", false);
 
-    return array_findp(a, data, p, user) != -1;
+    return array_findp(a, data, p, user) != ARRAY_INDEX_INVALID;
 }
 
-// Returns the position of data in this array, or INVALID_INDEX if array does
+// Returns the position of data in this array, or ARRAY_INDEX_INVALID if array does
 // not contain data.
 int32 array_find(array a, void* data) {
-    check_return(a, "Array is NULL", INVALID_INDEX);
+    check_return(a, "Array is NULL", ARRAY_INDEX_INVALID);
 
     for(int32 i = 0; i < a->length; ++i) {
         if(!memcmp(a->data + (a->member_size * i), data, a->member_size)) {
             return i;
         }
     }
-    return INVALID_INDEX;
+    return ARRAY_INDEX_INVALID;
 }
 
 // Returns the position of data using predicate p to check the array, or
-// INVALID_INDEX if array does not contain data.
+// ARRAY_INDEX_INVALID if array does not contain data.
 int32 array_findp(array a, void* data, equality_predicate p, void* user) {
-    check_return(a, "Array is NULL", INVALID_INDEX);
+    check_return(a, "Array is NULL", ARRAY_INDEX_INVALID);
 
     for(int32 i = 0; i < a->length; ++i) {
         if(p(a->data + (a->member_size * i), data, user)) {
             return i;
         }
     }
-    return INVALID_INDEX;
+    return ARRAY_INDEX_INVALID;
 }
 
 // Tries to remove data from this array, returning true if it succeeeds. This
@@ -222,7 +222,7 @@ bool array_remove(array a, void* data) {
     check_return(a, "Array is NULL", false);
 
     int32 index = array_find(a, data);
-    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
+    check_return(index != ARRAY_INDEX_INVALID, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
     array_remove_at(a, index);
 
     return true;
@@ -235,7 +235,7 @@ bool array_removep(array a, void* data, equality_predicate p, void* user) {
     check_return(a, "Array is NULL", false);
 
     int32 index = array_findp(a, data, p, user);
-    check_return(index != INVALID_INDEX, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
+    check_return(index != ARRAY_INDEX_INVALID, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
     array_remove_at(a, index);
 
     return true;
@@ -284,6 +284,18 @@ void* array_get(array a, uint16 position) {
     check_return(position < a->length, "Array index %u is out of bounds in array of size %u", NULL, position, a->length);
 
     return a->data + (a->member_size * position);
+}
+
+// Returns the element matching predicate p in this array
+void* array_getp(array a, void* data, equality_predicate p, void* user) {
+    check_return(a, "Array is NULL", NULL);
+
+    uint16 index = array_findp(a, data, p, user);
+    if(index == ARRAY_INDEX_INVALID) {
+        return NULL;
+    }
+
+    return array_get(a, index);
 }
 
 // Replaces the element at position in this array with data.

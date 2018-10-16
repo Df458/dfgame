@@ -27,7 +27,7 @@ typedef struct animation {
     char* filepath;
     char* name;
 } animation;
-
+#define ANIMATION_DEFAULT "default"
 
 // Creates a new empty spriteset
 spriteset spriteset_new(const char* path);
@@ -36,15 +36,30 @@ spriteset spriteset_new(const char* path);
     gltex: spriteset_add_animation_gl,\
     rawtex: spriteset_add_animation_raw\
 )(s, a, t)
+// Adds a new *empty* animation to the spriteset, for editing purposes
+animation* spriteset_add_animation_empty(spriteset set);
 // Adds a new animation to the spriteset, using raw pixel data
-void spriteset_add_animation_raw(spriteset set, animation anim, rawtex texture);
+animation* spriteset_add_animation_raw(spriteset set, animation anim, rawtex texture);
 // Adds a new animation to the spriteset, copying from an OpenGL texture
-void spriteset_add_animation_gl(spriteset set, animation anim, gltex texture);
-// Removes an animation form the spriteset, deletes it, and rearranges the atlas
+animation* spriteset_add_animation_gl(spriteset set, animation anim, gltex texture);
+// Removes an animation from the spriteset, deletes it, and rearranges the atlas
 void spriteset_remove_animation(spriteset set, animation* a);
+
+#define spriteset_set_animation_texture(s, a, t) _Generic(t,\
+    gltex: spriteset_set_animation_texture_gl,\
+    rawtex: spriteset_set_animation_texture_raw\
+)(s, a, t)
+// Updates an animation's texture, using raw pixel data
+void spriteset_set_animation_texture_raw(spriteset set, animation* anim, rawtex texture);
+// Updates an animation's texture, copying from an OpenGL texture
+void spriteset_set_animation_texture_gl(spriteset set, animation* anim, gltex texture);
+
+// Updates an animation's name, but only if it's unique
+bool spriteset_set_animation_name(spriteset set, animation* anim, char* name);
 
 // Gets the numer of animations stored in the spriteset
 uint16 spriteset_get_animation_count(spriteset set);
+
 #define spriteset_get_animation(s, h) _Generic(h,\
     void*: spriteset_get_animation_by_name,\
     char*: spriteset_get_animation_by_name,\

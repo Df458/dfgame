@@ -9,6 +9,7 @@
 #include "core/stringutil.h"
 #include "graphics/texture.h"
 #include "graphics/texture_atlas.h"
+#include "graphics/spriteset.priv.h"
 #include "resource/paths.h"
 #include "resource/texture_loader.h"
 #include "resource/xmlutil.h"
@@ -19,13 +20,6 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <string.h>
-
-typedef struct spriteset {
-    texture_atlas atlas;
-    hashmap animations;
-
-    char* asset_path;
-}* spriteset;
 
 typedef struct writer_data {
     const char* path;
@@ -132,7 +126,7 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
         .frame_count = 1,
         .frame_times = mscalloc(1, uint16),
         .total_time = 0,
-        .texture_id = -1,
+        .texture_id = ARRAY_INDEX_INVALID,
         .autoplay = true,
         .autoloop = false,
         .default_on_finish = true,
@@ -194,7 +188,7 @@ void read_animation(spriteset set, xmlNodePtr node, const char* path) {
 
     if(!check_warn(should_keep, "Failed to load animation as it lacks a texture")) {
         if(!xml_property_read(node, "name", &anim.name)) {
-            anim.name = nstrdup("default");
+            anim.name = nstrdup(ANIMATION_DEFAULT);
         }
 
         spriteset_add_animation(set, anim, tex);
@@ -216,19 +210,22 @@ iter_result write_animation(void* a, void* user) {
     xml_property_write(writer, "autoloop", anim->autoloop);
     xml_property_write(writer, "default_on_finish", anim->default_on_finish);
 
-    char* t_path = get_relative_base(((writer_data*)user)->path, anim->filepath);
-    xml_property_write(writer, "file", anim->filepath + strlen(t_path));
-    sfree(t_path);
+    if(anim->filepath) {
+        char* t_path = get_relative_base(((writer_data*)user)->path, anim->filepath);
+        xml_property_write(writer, "file", anim->filepath + strlen(t_path));
+        sfree(t_path);
 
-    if(strcmp(anim->name, "default"))
-        xml_property_write(writer, "name", anim->name);
+        if(nstrcmp(anim->name, ANIMATION_DEFAULT)) {
+            xml_property_write(writer, "name", anim->name);
+        }
 
-    for(int i = 0; i < anim->frame_count; ++i) {
-        if(anim->frame_times[i] != 0) {
-            xmlTextWriterStartElement(writer, (xmlChar*)"frame");
-            xml_property_write(writer, "id", i);
-            xml_property_write(writer, "delay", anim->frame_times[i]);
-            xmlTextWriterEndElement(writer);
+        for(int i = 0; i < anim->frame_count; ++i) {
+            if(anim->frame_times[i] != 0) {
+                xmlTextWriterStartElement(writer, (xmlChar*)"frame");
+                xml_property_write(writer, "id", i);
+                xml_property_write(writer, "delay", anim->frame_times[i]);
+                xmlTextWriterEndElement(writer);
+            }
         }
     }
 
@@ -271,14 +268,15 @@ spriteset load_spriteset_from_xml(const char* path) {
     check_return(root != NULL, "Spriteset file %s is invalid", NULL, path);
 
     spriteset spr = spriteset_new(NULL);
-
-    for(xmlNodePtr node = root->children; node; node = node->next)
-        if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"animation"))
-            read_animation(spr, node, path);
-
-    check_warn(spriteset_get_animation_count(spr), "Spriteset file %s has no animations");
-
     spr->asset_path = nstrdup(path);
+
+    for(xmlNodePtr node = root->children; node; node = node->next) {
+        if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"animation")) {
+            read_animation(spr, node, path);
+        }
+    }
+
+    check_warn(spriteset_get_animation_count(spr), "Spriteset file %s has no animations", path);
 
     xmlFreeDoc(doc);
     return spr;
@@ -309,13 +307,13 @@ bool load_animation_from_image(const char* path, animation* anim, rawtex* tex) {
         .frame_times = mscalloc(1, uint16),
         .total_time = 0,
         .default_frame_time = 16,
-        .texture_id = -1,
+        .texture_id = ARRAY_INDEX_INVALID,
         .autoplay = true,
         .autoloop = false,
         .default_on_finish = false,
 
         .filepath = nstrdup(path),
-        .name = nstrdup("default"),
+        .name = nstrdup(ANIMATION_DEFAULT),
     };
 
     bool loaded = false;
@@ -357,7 +355,7 @@ void save_spriteset(const char* path, spriteset set) {
         .path = path,
         .writer = writer,
     };
-    hashmap_foreach(set->animations, write_animation, &data);
+    array_foreachd(set->animations, write_animation, &data);
 
     xmlTextWriterEndElement(writer);
     xmlTextWriterEndDocument(writer);

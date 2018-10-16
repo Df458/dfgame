@@ -19,6 +19,8 @@ typedef struct array_iter {
     bool is_valid;
 } array_iter;
 
+#define ARRAY_INDEX_INVALID UINT16_MAX
+
 // Creates a new array with enough space allocated to hold up to reserve members of size size.
 // 0 is a valid size, since it will grow to fit new members.
 #define array_mnew(type, reserve) array_new(sizeof(type), reserve)
@@ -77,6 +79,9 @@ void array_remove_iter(array a, array_iter* it);
 
 // Returns the element at position in this array.
 void* array_get(array a, uint16 position);
+
+// Returns the element matching predicate p in this array
+void* array_getp(array a, void* data, equality_predicate p, void* user);
 
 // Replaces the element at position in this array with data.
 void array_set(array a, uint16 position, void* data);

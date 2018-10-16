@@ -61,13 +61,15 @@ texture_atlas texture_atlas_new() {
 }
 
 aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
+    check_return(atlas != NULL, "Atlas is NULL", aabb_2d_zero);
+
     uint16 new_size = atlas->texture_data.width;
     atlas_box* found_box = NULL;
 
     do {
         int32 res = array_findp(atlas->free_space, &box, find_fitting_atlas_box, NULL);
 
-        if(res == -1) {
+        if(res == ARRAY_INDEX_INVALID) {
             uint16 prev_size = new_size;
             new_size = next_power_of_two(new_size);
             uint16 len = array_get_length(atlas->free_space);
@@ -123,6 +125,8 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
 }
 
 int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
+    check_return(atlas != NULL, "Atlas is NULL", ARRAY_INDEX_INVALID);
+
     aabb_2d box = (aabb_2d){
         .dimensions = {
             .x=tex.width,
@@ -132,7 +136,7 @@ int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
     aabb_2d container = texture_atlas_insert_box(atlas, box);
 
     if(!container.dimensions.x)
-        return -1;
+        return ARRAY_INDEX_INVALID;
 
     glCopyImageSubData(tex.handle, tex.type, 0, 0, 0, 0, atlas->texture_data.handle, atlas->texture_data.type, 0, container.position.x, container.position.y, 0, container.dimensions.x, container.dimensions.y, 1);
 
@@ -140,6 +144,8 @@ int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
 }
 
 int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
+    check_return(atlas != NULL, "Atlas is NULL", ARRAY_INDEX_INVALID);
+
     aabb_2d box = (aabb_2d){
         .dimensions = {
             .x=tex.width,
@@ -149,22 +155,42 @@ int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
     aabb_2d container = texture_atlas_insert_box(atlas, box);
 
     if(container.dimensions.x == 0)
-        return -1;
+        return ARRAY_INDEX_INVALID;
 
     glBindTexture(GL_TEXTURE_2D, atlas->texture_data.handle);
-    for(int i = 0; i < tex.height; ++i)
+    for(int i = 0; i < tex.height; ++i) {
         glTexSubImage2D(GL_TEXTURE_2D, 0, container.position.x, container.position.y + i, container.dimensions.x, 1, mode, GL_UNSIGNED_BYTE, tex.data + ((tex.height - i - 1) * tex.width * tex.elements));
+    }
 
     return array_get_length(atlas->textures) - 1;
 }
 
 aabb_2d texture_atlas_get(texture_atlas atlas, int16 index) {
+    check_return(atlas != NULL, "Atlas is NULL", aabb_2d_zero);
     check_return(array_get_length(atlas->textures) > index, "Can't get texture bounds in atlas: Index %d is out of bounds", aabb_2d_zero, index);
 
     return *(aabb_2d*)array_get(atlas->textures, index);
 }
 
+uint16 texture_atlas_get_texture_count(texture_atlas atlas) {
+    check_return(atlas != NULL, "Atlas is NULL", 0);
+
+    return array_get_length(atlas->textures);
+}
+
 void texture_atlas_remove(texture_atlas atlas, int16 index) {
+    check_return(atlas != NULL, "Atlas is NULL", );
+
+    aabb_2d* box = array_get(atlas->textures, index);
+    check_return(box != NULL, "Failed to locate texture", )
+
+    // Make the old space available
+    atlas_box new_box = {
+        .box = *box,
+        .free_marker=vec3_zero
+    };
+    array_add(atlas->free_space, new_box);
+
     array_remove_at(atlas->textures, index);
 }
 
@@ -172,7 +198,7 @@ void texture_atlas_remove(texture_atlas atlas, int16 index) {
 // NOTE: Don't call this function. Use the macro without
 // the leading _ instead, as it also NULLs your pointer.
 void _texture_atlas_free(texture_atlas atlas) {
-    check_return(atlas, "Can't destroy atlas: Atlas is null", );
+    check_return(atlas != NULL, "Atlas is NULL", );
 
     array_free(atlas->textures);
     array_free(atlas->free_space);
@@ -181,5 +207,7 @@ void _texture_atlas_free(texture_atlas atlas) {
 }
 
 gltex texture_atlas_get_texture(texture_atlas atlas) {
+    check_return(atlas != NULL, "Atlas is NULL", (gltex){0});
+
     return atlas->texture_data;
 }

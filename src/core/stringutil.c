@@ -34,6 +34,32 @@ char* vsaprintf(const char* format, va_list args) {
 
     return final;
 }
+int nstrcmp(const char* str_a, const char* str_b) {
+    if(str_a == NULL) {
+        if(str_b == NULL) {
+            return COMPARE_EQUAL_TO;
+        }
+
+        return COMPARE_LESS_THAN;
+    } else if(str_b == NULL) {
+        return COMPARE_GREATER_THAN;
+    }
+
+    return strcmp(str_a, str_b);
+}
+int nstrncmp(const char* str_a, const char* str_b, size_t len) {
+    if(str_a == NULL) {
+        if(str_b == NULL) {
+            return COMPARE_EQUAL_TO;
+        }
+
+        return COMPARE_LESS_THAN;
+    } else if(str_b == NULL) {
+        return COMPARE_GREATER_THAN;
+    }
+
+    return strncmp(str_a, str_b, len);
+}
 bool aisi(const char* str) {
     check_return(str, "str is NULL", false);
     for(int i = 0; str[i] != '\0'; ++i) {

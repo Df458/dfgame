@@ -17,15 +17,22 @@ sprite sprite_new(spriteset set);
 )(s, h, f)
 void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset);
 void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset);
+animation* sprite_get_animation(sprite spr);
+
 void sprite_set_orientation(sprite spr, uint8 orient);
 uint8 sprite_get_orientation(sprite spr);
+
 void sprite_set_playing(sprite spr, bool playing);
 bool sprite_get_playing(sprite spr);
+
 uint32 sprite_get_position(const sprite spr);
 void sprite_set_position(sprite spr, uint32 position);
+
 uint16 sprite_get_frame(const sprite spr);
 void sprite_set_frame(sprite spr, uint16 frame);
+
 void sprite_update(sprite spr, float dt);
+
 int16 sprite_get_anim_id(sprite spr);
 aabb_2d sprite_get_box(sprite spr);
 gltex sprite_get_texture(sprite spr);
