@@ -65,6 +65,7 @@ rawtex rawtex_new_from_gl(const gltex tex, bool clone_path) {
     check_return(tex.width > 0 && tex.height > 0, "Trying to read raw data from an invalid OpenGL texture", (rawtex){0});
 
     rawtex raw = rawtex_new(tex.width, tex.height, 4);
+    glBindTexture(GL_TEXTURE_2D, tex.handle);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, raw.data);
 
     // If we have an asset path and we want to clone it, make a copy
