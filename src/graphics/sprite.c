@@ -171,8 +171,8 @@ spriteset sprite_get_data(sprite spr) {
 }
 
 int16 sprite_get_anim_id(sprite spr) {
-    check_return(spr, "Sprite is NULL", ARRAY_INDEX_INVALID);
-    check_return(spr->current_animation, "Sprite has no animation", ARRAY_INDEX_INVALID);
+    check_return(spr, "Sprite is NULL", CONTAINER_INDEX_INVALID);
+    check_return(spr->current_animation, "Sprite has no animation", CONTAINER_INDEX_INVALID);
 
     return spr->current_animation->texture_id;
 }

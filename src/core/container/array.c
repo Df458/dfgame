@@ -17,14 +17,14 @@
 //
 // NOTE: The points are NOT bounds-checked. Inputs are assumed to be correct,
 //       and must be validated by the calling function.
-static void shift(void* data, uint16 start, uint16 end, uint16 member_size) {
+static void shift(void* data, container_index start, container_index end, uint16 member_size) {
     // Determine the direction that we'll be shifting.
     int8 shiftval = 1;
     if(end > start) {
         shiftval = -1;
     }
 
-    for(uint16 i = end; i != start; i += shiftval) {
+    for(container_index i = end; i != start; i += shiftval) {
         memcpy(data + (member_size * i), data + (member_size * (i + shiftval)), member_size);
     }
 }
@@ -45,8 +45,8 @@ static void array_resize_if_full(array a) {
 }
 
 // Heap-sorts an array, using predicate p to determine ordering.
-static void heap_sort(void* data, uint16 length, uint16 member_size, comparison_predicate p, void* user) {
-    uint16 i, index, back_index;
+static void heap_sort(void* data, container_index length, uint16 member_size, comparison_predicate p, void* user) {
+    container_index i, index, back_index;
     void* temp = salloc(member_size);
     // Build the heap
 
@@ -94,7 +94,7 @@ static void heap_sort(void* data, uint16 length, uint16 member_size, comparison_
 
 // Creates a new array with enough space allocated to hold up to size members.
 // 0 is a valid size, since it will grow to fit new members.
-array array_new_common(uint16 size, uint16 reserve) {
+array array_new_common(uint16 size, container_index reserve) {
     check_return(reserve > 0, "Array elements must have a size", NULL);
 
     array new_array = salloc(sizeof(struct array));
@@ -111,7 +111,7 @@ array array_new_common(uint16 size, uint16 reserve) {
 
     return new_array;
 }
-array array_new(uint16 size, uint16 reserve) {
+array array_new(uint16 size, container_index reserve) {
     array new_array = array_new_common(size, reserve);
 
     if(new_array) {
@@ -120,7 +120,7 @@ array array_new(uint16 size, uint16 reserve) {
 
     return new_array;
 }
-array array_new_ordered(uint16 size, uint16 reserve) {
+array array_new_ordered(uint16 size, container_index reserve) {
     array new_array = array_new_common(size, reserve);
 
     if(new_array) {
@@ -142,7 +142,7 @@ void _array_free(array a) {
 }
 
 // Returns the number of actual members stored in this array.
-uint16 array_get_length(array a) {
+container_index array_get_length(array a) {
     check_return(a, "Array is NULL", 0);
 
     return a->length;
@@ -157,7 +157,7 @@ void _array_add(array a, void* data, uint16 size) {
 }
 
 // Adds a new member to a specified position in this array, resizing it if necessary.
-void array_insert(array a, void* data, uint16 position) {
+void array_insert(array a, void* data, container_index position) {
     check_return(a, "Array is NULL", );
 
     assert(position <= a->length);
@@ -179,7 +179,7 @@ void array_insert(array a, void* data, uint16 position) {
 bool array_contains(array a, void* data) {
     check_return(a, "Array is NULL", false);
 
-    return array_find(a, data) != ARRAY_INDEX_INVALID;
+    return array_find(a, data) != CONTAINER_INDEX_INVALID;
 }
 
 // Returns true if data is a member of this array, or false if it isn't. Uses
@@ -187,33 +187,33 @@ bool array_contains(array a, void* data) {
 bool array_containsp(array a, void* data, equality_predicate p, void* user) {
     check_return(a, "Array is NULL", false);
 
-    return array_findp(a, data, p, user) != ARRAY_INDEX_INVALID;
+    return array_findp(a, data, p, user) != CONTAINER_INDEX_INVALID;
 }
 
-// Returns the position of data in this array, or ARRAY_INDEX_INVALID if array does
+// Returns the position of data in this array, or CONTAINER_INDEX_INVALID if array does
 // not contain data.
 int32 array_find(array a, void* data) {
-    check_return(a, "Array is NULL", ARRAY_INDEX_INVALID);
+    check_return(a, "Array is NULL", CONTAINER_INDEX_INVALID);
 
     for(int32 i = 0; i < a->length; ++i) {
         if(!memcmp(a->data + (a->member_size * i), data, a->member_size)) {
             return i;
         }
     }
-    return ARRAY_INDEX_INVALID;
+    return CONTAINER_INDEX_INVALID;
 }
 
 // Returns the position of data using predicate p to check the array, or
-// ARRAY_INDEX_INVALID if array does not contain data.
+// CONTAINER_INDEX_INVALID if array does not contain data.
 int32 array_findp(array a, void* data, equality_predicate p, void* user) {
-    check_return(a, "Array is NULL", ARRAY_INDEX_INVALID);
+    check_return(a, "Array is NULL", CONTAINER_INDEX_INVALID);
 
     for(int32 i = 0; i < a->length; ++i) {
         if(p(a->data + (a->member_size * i), data, user)) {
             return i;
         }
     }
-    return ARRAY_INDEX_INVALID;
+    return CONTAINER_INDEX_INVALID;
 }
 
 // Tries to remove data from this array, returning true if it succeeeds. This
@@ -222,7 +222,7 @@ bool array_remove(array a, void* data) {
     check_return(a, "Array is NULL", false);
 
     int32 index = array_find(a, data);
-    check_return(index != ARRAY_INDEX_INVALID, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
+    check_return(index != CONTAINER_INDEX_INVALID, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
     array_remove_at(a, index);
 
     return true;
@@ -235,7 +235,7 @@ bool array_removep(array a, void* data, equality_predicate p, void* user) {
     check_return(a, "Array is NULL", false);
 
     int32 index = array_findp(a, data, p, user);
-    check_return(index != ARRAY_INDEX_INVALID, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
+    check_return(index != CONTAINER_INDEX_INVALID, "Tried to remove object 0x%x from an array, but it couldn't be found", false, data);
     array_remove_at(a, index);
 
     return true;
@@ -253,7 +253,7 @@ void* array_pop(array a) {
 }
 
 // Removes the element at position in this array.
-void array_remove_at(array a, uint16 position) {
+void array_remove_at(array a, container_index position) {
     check_return(a, "Array is NULL", );
     check_return(position < a->length, "Trying to remove out-of-bounds element %d from an array of length %d", , position, a->length);
     --a->length;
@@ -279,7 +279,7 @@ void array_remove_iter(array a, array_iter* it) {
 }
 
 // Returns the element at position in this array.
-void* array_get(array a, uint16 position) {
+void* array_get(array a, container_index position) {
     check_return(a, "Array is NULL", NULL);
     check_return(position < a->length, "Array index %u is out of bounds in array of size %u", NULL, position, a->length);
 
@@ -290,8 +290,8 @@ void* array_get(array a, uint16 position) {
 void* array_getp(array a, void* data, equality_predicate p, void* user) {
     check_return(a, "Array is NULL", NULL);
 
-    uint16 index = array_findp(a, data, p, user);
-    if(index == ARRAY_INDEX_INVALID) {
+    container_index index = array_findp(a, data, p, user);
+    if(index == CONTAINER_INDEX_INVALID) {
         return NULL;
     }
 
@@ -299,7 +299,7 @@ void* array_getp(array a, void* data, equality_predicate p, void* user) {
 }
 
 // Replaces the element at position in this array with data.
-void array_set(array a, uint16 position, void* data) {
+void array_set(array a, container_index position, void* data) {
     check_return(a, "Array is NULL", );
     check_return(position < a->length, "Array index %u is out of bounds in array of size %u", , position, a->length);
 
@@ -318,7 +318,7 @@ void array_sort(array a, comparison_predicate p, void* user) {
 // users must still free memory as usual.
 void array_foreachd(array a, foreach_delegate d, void* user) {
     // Call d on each item
-    for(uint16 i = 0; i < a->length; ++i) {
+    for(container_index i = 0; i < a->length; ++i) {
         iter_result res = d(a->data + (a->member_size * i), user);
 
         // Respond to delete/replace decisions

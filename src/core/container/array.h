@@ -1,32 +1,32 @@
 #ifndef DF_CORE_ARRAY
 #define DF_CORE_ARRAY
 
-#include "types.h"
-#include "delegate.h"
+#include "core/container/container_common.h"
+#include "core/types.h"
+#include "core/container/delegate.h"
 
 typedef struct array {
     uint16 member_size;
-    uint16 length;
+    container_index length;
     uint16 alloc_length;
     bool preserve_order;
 
     byte* data;
 }* array;
 typedef struct array_iter {
-    uint16 index;
+    container_index index;
     int8 increment;
     void* data;
     bool is_valid;
 } array_iter;
-
-#define ARRAY_INDEX_INVALID UINT16_MAX
+#define array_iter_data(iter, type) *(type*)iter.data
 
 // Creates a new array with enough space allocated to hold up to reserve members of size size.
 // 0 is a valid size, since it will grow to fit new members.
 #define array_mnew(type, reserve) array_new(sizeof(type), reserve)
 #define array_mnew_ordered(type, reserve) array_new_ordered(sizeof(type), reserve)
-array array_new(uint16 size, uint16 reserve);
-array array_new_ordered(uint16 size, uint16 reserve);
+array array_new(uint16 size, container_index reserve);
+array array_new_ordered(uint16 size, container_index reserve);
 
 // Frees the array, and sets array to NULL to make it harder to double-free.
 #define array_free(a) { _array_free(a); a = NULL; }
@@ -36,7 +36,7 @@ array array_new_ordered(uint16 size, uint16 reserve);
 void _array_free(array a);
 
 // Returns the number of actual members stored in this array.
-uint16 array_get_length(array a);
+container_index array_get_length(array a);
 
 // Adds a new member to the end of this array, resizing it if necessary.
 #define array_add(a, d) { _array_add(a, &d, sizeof(d)); }
@@ -45,7 +45,7 @@ void _array_add(array a, void* data, uint16 size);
 
 // Adds a new member to a specified position in this array, resizing it if
 // necessary.
-void array_insert(array a, void* data, uint16 position);
+void array_insert(array a, void* data, container_index position);
 
 // Returns true if data is a member of this array, or false if it isn't.
 bool array_contains(array a, void* data);
@@ -62,7 +62,7 @@ int32 array_find(array a, void* data);
 // INVALID_INDEX if array does not contain data.
 int32 array_findp(array a, void* data, equality_predicate p, void* user);
 
-// Tries to remove data from this array, returning true if it succeeeds. This
+// Tries to remove data from this array, returning true if it succeeds. This
 // will remove the first copy of data it finds.
 bool array_remove(array a, void* data);
 
@@ -72,19 +72,19 @@ bool array_remove(array a, void* data);
 bool array_removep(array a, void* data, equality_predicate p, void* user);
 
 // Removes the element at position in this array.
-void array_remove_at(array a, uint16 position);
+void array_remove_at(array a, container_index position);
 
 // Removes the element pointed to by it from this array
 void array_remove_iter(array a, array_iter* it);
 
 // Returns the element at position in this array.
-void* array_get(array a, uint16 position);
+void* array_get(array a, container_index position);
 
 // Returns the element matching predicate p in this array
 void* array_getp(array a, void* data, equality_predicate p, void* user);
 
 // Replaces the element at position in this array with data.
-void array_set(array a, uint16 position, void* data);
+void array_set(array a, container_index position, void* data);
 
 // Removes the element at the end of this array and returns it
 void* array_pop(array a);

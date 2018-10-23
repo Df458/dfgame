@@ -69,7 +69,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
     do {
         int32 res = array_findp(atlas->free_space, &box, find_fitting_atlas_box, NULL);
 
-        if(res == ARRAY_INDEX_INVALID) {
+        if(res == CONTAINER_INDEX_INVALID) {
             uint16 prev_size = new_size;
             new_size = next_power_of_two(new_size);
             uint16 len = array_get_length(atlas->free_space);
@@ -125,7 +125,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
 }
 
 int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
-    check_return(atlas != NULL, "Atlas is NULL", ARRAY_INDEX_INVALID);
+    check_return(atlas != NULL, "Atlas is NULL", CONTAINER_INDEX_INVALID);
 
     aabb_2d box = (aabb_2d){
         .dimensions = {
@@ -136,7 +136,7 @@ int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
     aabb_2d container = texture_atlas_insert_box(atlas, box);
 
     if(!container.dimensions.x)
-        return ARRAY_INDEX_INVALID;
+        return CONTAINER_INDEX_INVALID;
 
     glCopyImageSubData(tex.handle, tex.type, 0, 0, 0, 0, atlas->texture_data.handle, atlas->texture_data.type, 0, container.position.x, container.position.y, 0, container.dimensions.x, container.dimensions.y, 1);
 
@@ -144,7 +144,7 @@ int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
 }
 
 int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
-    check_return(atlas != NULL, "Atlas is NULL", ARRAY_INDEX_INVALID);
+    check_return(atlas != NULL, "Atlas is NULL", CONTAINER_INDEX_INVALID);
 
     aabb_2d box = (aabb_2d){
         .dimensions = {
@@ -155,7 +155,7 @@ int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
     aabb_2d container = texture_atlas_insert_box(atlas, box);
 
     if(container.dimensions.x == 0)
-        return ARRAY_INDEX_INVALID;
+        return CONTAINER_INDEX_INVALID;
 
     glBindTexture(GL_TEXTURE_2D, atlas->texture_data.handle);
     for(int i = 0; i < tex.height; ++i) {

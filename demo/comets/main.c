@@ -262,7 +262,7 @@ bool loop(mainloop l, float dt) {
     update_rocks(dt);
 
     array_foreach(audio, i) {
-        audio_player pl = *(audio_player*)i.data;
+        audio_player pl = array_iter_data(i, audio_player);
         if(!audio_player_get_playing(pl)) {
             audio_player_free(pl, false);
             array_remove_iter(audio, &i);

@@ -72,7 +72,7 @@ animation* spriteset_add_animation_empty(spriteset set) {
         .default_frame_time = 16,
         .frame_times = mscalloc(1, uint16),
         .total_time = 16,
-        .texture_id = ARRAY_INDEX_INVALID,
+        .texture_id = CONTAINER_INDEX_INVALID,
         .autoplay = false,
         .autoloop = false,
         .default_on_finish = false,
@@ -96,7 +96,7 @@ animation* spriteset_add_animation_raw(spriteset set, animation anim, rawtex tex
 
     if(!array_containsp(set->animations, anim.name, animation_equals, NULL)) {
         uint16 index = texture_atlas_add_raw(set->atlas, texture, GL_RGBA);
-        check_return(index != ARRAY_INDEX_INVALID, "Can't add animation %s: texture atlas is full", NULL, anim.name);
+        check_return(index != CONTAINER_INDEX_INVALID, "Can't add animation %s: texture atlas is full", NULL, anim.name);
 
         anim.texture_id = index;
         anim.texture_box = texture_atlas_get(set->atlas, index);
@@ -119,7 +119,7 @@ animation* spriteset_add_animation_gl(spriteset set, animation anim, gltex textu
 
     if(!array_containsp(set->animations, anim.name, animation_equals, NULL)) {
         uint16 index = texture_atlas_add_gl(set->atlas, texture, GL_RGBA);
-        check_return(index != ARRAY_INDEX_INVALID, "Can't add animation %s: texture atlas is full", NULL, anim.name);
+        check_return(index != CONTAINER_INDEX_INVALID, "Can't add animation %s: texture atlas is full", NULL, anim.name);
 
         anim.texture_id = index;
         anim.texture_box = texture_atlas_get(set->atlas, index);
@@ -139,7 +139,7 @@ animation* spriteset_add_animation_gl(spriteset set, animation anim, gltex textu
 // Removes an animation from the spriteset and deletes it
 void spriteset_remove_animation(spriteset set, animation* a) {
     uint16 id = a->texture_id;
-    if(id != ARRAY_INDEX_INVALID) {
+    if(id != CONTAINER_INDEX_INVALID) {
         texture_atlas_remove(set->atlas, id);
     }
 
@@ -161,7 +161,7 @@ void spriteset_remove_animation(spriteset set, animation* a) {
         animation* anim = (animation*)iter.data;
 
         // If the animation was pointing to the last slot in the atlas, it has been swapped with the old animation
-        if(id != ARRAY_INDEX_INVALID && anim->texture_id == size) {
+        if(id != CONTAINER_INDEX_INVALID && anim->texture_id == size) {
             anim->texture_id = id;
         }
 
@@ -181,7 +181,7 @@ void spriteset_set_animation_texture_raw(spriteset set, animation* anim, rawtex 
 
     check_return(anim != NULL, "Animation is NULL, and no default exists", );
 
-    if(anim->texture_id != ARRAY_INDEX_INVALID) {
+    if(anim->texture_id != CONTAINER_INDEX_INVALID) {
         texture_atlas_remove(set->atlas, anim->texture_id);
     }
 
@@ -199,7 +199,7 @@ void spriteset_set_animation_texture_gl(spriteset set, animation* anim, gltex te
 
     check_return(anim != NULL, "Animation is NULL, and no default exists", );
 
-    if(anim->texture_id != ARRAY_INDEX_INVALID) {
+    if(anim->texture_id != CONTAINER_INDEX_INVALID) {
         texture_atlas_remove(set->atlas, anim->texture_id);
     }
 
