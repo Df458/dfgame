@@ -19,7 +19,7 @@ typedef struct array_iter {
     void* data;
     bool is_valid;
 } array_iter;
-#define array_iter_data(iter, type) *(type*)iter.data
+#define array_iter_data(iter, type) (*(type*)iter.data)
 
 // Creates a new array with enough space allocated to hold up to reserve members of size size.
 // 0 is a valid size, since it will grow to fit new members.
@@ -67,7 +67,7 @@ int32 array_findp(array a, void* data, equality_predicate p, void* user);
 bool array_remove(array a, void* data);
 
 // Tries to remove data from this array, using predicate p to check the data
-// and returning true if it succeeeds. This will remove the first copy of data
+// and returning true if it succeeds. This will remove the first copy of data
 // it finds.
 bool array_removep(array a, void* data, equality_predicate p, void* user);
 

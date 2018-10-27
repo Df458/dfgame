@@ -30,8 +30,8 @@ typedef struct iter_result {
 #define iter_break (iter_result) { .decision = DECISION_BREAK }
 #define iter_delete (iter_result) { .decision = DECISION_DELETE }
 #define iter_break_delete (iter_result) { .decision = DECISION_BREAK_DELETE }
-#define iter_replace(data) (iter_result) { .decision = DECISION_REPLACE, replacement_value = data }
-#define iter_break_replace(data) (iter_result) { .decision = DECISION_BREAK_REPLACE, replacement_value = data }
+#define iter_replace(data) (iter_result) { .decision = DECISION_REPLACE, .replacement_value = data }
+#define iter_break_replace(data) (iter_result) { .decision = DECISION_BREAK_REPLACE, .replacement_value = data }
 
 // Used to iterate a container, performing actions on each.
 delegate(iter_result, foreach_delegate, void* iter_data, void* user);

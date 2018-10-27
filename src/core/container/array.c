@@ -3,10 +3,9 @@
 
 #include "array.h"
 
-#include "alloc.h"
-#include "check.h"
-#include "power.h"
-#include <assert.h>
+#include "core/check.h"
+#include "core/memory/alloc.h"
+#include "core/power.h"
 
 // Private Functions
 
@@ -95,9 +94,9 @@ static void heap_sort(void* data, container_index length, uint16 member_size, co
 // Creates a new array with enough space allocated to hold up to size members.
 // 0 is a valid size, since it will grow to fit new members.
 array array_new_common(uint16 size, container_index reserve) {
-    check_return(reserve > 0, "Array elements must have a size", NULL);
+    check_return(size > 0, "Array elements must have a size", NULL);
 
-    array new_array = salloc(sizeof(struct array));
+    array new_array = msalloc(struct array);
 
     new_array->member_size  = size;
     new_array->length       = 0;
@@ -159,8 +158,8 @@ void _array_add(array a, void* data, uint16 size) {
 // Adds a new member to a specified position in this array, resizing it if necessary.
 void array_insert(array a, void* data, container_index position) {
     check_return(a, "Array is NULL", );
+    check_return(position <= a->length, "Trying to insert at out-of-bounds position %d from an array of length %d", , position, a->length);
 
-    assert(position <= a->length);
     a->length++;
     array_resize_if_full(a);
 
@@ -208,7 +207,7 @@ int32 array_find(array a, void* data) {
 int32 array_findp(array a, void* data, equality_predicate p, void* user) {
     check_return(a, "Array is NULL", CONTAINER_INDEX_INVALID);
 
-    for(int32 i = 0; i < a->length; ++i) {
+    for(container_index i = 0; i < a->length; ++i) {
         if(p(a->data + (a->member_size * i), data, user)) {
             return i;
         }
@@ -273,9 +272,9 @@ void array_remove_iter(array a, array_iter* it) {
     check_return(it && it->is_valid, "Attempting to access an array with an invalid iterator", );
 
     array_remove_at(a, it->index);
-    if(it->increment > 0) {
-        it->index -= it->increment;
-    }
+
+    it->index -= it->increment;
+    it->data = NULL;
 }
 
 // Returns the element at position in this array.
@@ -308,6 +307,8 @@ void array_set(array a, container_index position, void* data) {
 
 // Performs a heapsort on array using predicate p for comparison.
 void array_sort(array a, comparison_predicate p, void* user) {
+    check_return(a, "Array is NULL", );
+
     heap_sort(a->data, a->length, a->member_size, p, user);
 }
 
@@ -317,6 +318,8 @@ void array_sort(array a, comparison_predicate p, void* user) {
 // Values can be safely deleted without worrying about skipping entries, but
 // users must still free memory as usual.
 void array_foreachd(array a, foreach_delegate d, void* user) {
+    check_return(a, "Array is NULL", );
+
     // Call d on each item
     for(container_index i = 0; i < a->length; ++i) {
         iter_result res = d(a->data + (a->member_size * i), user);
@@ -338,6 +341,8 @@ void array_foreachd(array a, foreach_delegate d, void* user) {
 
 // Gets an iterator to the start of the array
 array_iter array_get_start(array a) {
+    check_return(a, "Array is NULL", (array_iter) {0});
+
     if(a->length == 0) {
         return (array_iter) {0};
     }

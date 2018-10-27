@@ -4,8 +4,10 @@
 #include "types.h"
 #include <string.h>
 
+typedef uint32 hash_value;
+
 // Add this macro to a function to add a hash key as an argument
-#define hash_key const byte* hash_data, uint16 hash_data_size
+#define hash_key byte* hash_data, uint16 hash_data_size
 
 // This macro is used to pass the contents of hash_key to another function
 #define hash_key_data hash_data, hash_data_size
@@ -23,6 +25,6 @@
 #define make_crc() df_crc32(hash_data, hash_data_size)
 
 // Converts data into its respective CRC32 hash.
-uint32 df_crc32(hash_key);
+hash_value df_crc32(hash_key);
 
 #endif // DF_CORE_CRC
