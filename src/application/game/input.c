@@ -176,9 +176,7 @@ void update_input() {
         }
         if(mouse_button_axis_bindings[i].axes != NULL && mouse_button_axis_bindings[i].set)
             array_foreach(mouse_button_axis_bindings[i].axes, it) {
-                array_foreach(mouse_button_axis_bindings[i].axes, it) {
-                    axis_value_foreach(it.data, 1.0f);
-                }
+                axis_value_foreach(it.data, 1.0f);
             }
     }
 
@@ -188,9 +186,7 @@ void update_input() {
 
     if(mouse_position_axis_bindings[0].axes != NULL)
         array_foreach(mouse_position_axis_bindings[0].axes, it) {
-            array_foreach(mouse_position_axis_bindings[0].axes, it) {
-                axis_value_foreach(it.data, mouse_position_axis_bindings[0].offset);
-            }
+            axis_value_foreach(it.data, mouse_position_axis_bindings[0].offset);
         }
     if(mouse_position_axis_bindings[1].axes != NULL) {
         array_foreach(mouse_position_axis_bindings[1].axes, it) {
