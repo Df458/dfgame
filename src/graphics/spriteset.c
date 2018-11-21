@@ -57,7 +57,10 @@ animation* spriteset_add_animation_empty(spriteset set) {
             }
 
             // Sanity check
-            check_return(i != UINT16_MAX, "Out of default names, please rename or delete some existing animations", NULL);
+            if(check_error(i != CONTAINER_INDEX_INVALID, "Out of default names, please rename or delete some existing animations")) {
+                sfree(name);
+                return NULL;
+            }
         }
     }
 

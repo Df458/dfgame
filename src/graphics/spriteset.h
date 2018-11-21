@@ -1,9 +1,10 @@
 #ifndef DF_GRAPHICS_SPRITESET
 #define DF_GRAPHICS_SPRITESET
 
+#include "core/container/container_common.h"
 #include "graphics/spriteset.hd"
-#include "math/aabb.h"
 #include "graphics/texture.h"
+#include "math/aabb.h"
 
 typedef struct animation {
     uint8 orient_count;
@@ -18,7 +19,7 @@ typedef struct animation {
     uint16* frame_times;
     uint16 total_time;
 
-    int16 texture_id;
+    container_index texture_id;
 
     bool autoplay;
     bool autoloop;

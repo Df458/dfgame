@@ -1,12 +1,13 @@
 #ifndef DF_GRAPHICS_SPRITE
 #define DF_GRAPHICS_SPRITE
 
-#include "aabb.h"
-#include "matrix.h"
-#include "shader.hd"
-#include "sprite.hd"
-#include "spriteset.hd"
-#include "texture.h"
+#include "core/container/container_common.h"
+#include "graphics/shader.hd"
+#include "graphics/sprite.hd"
+#include "graphics/spriteset.hd"
+#include "graphics/texture.h"
+#include "math/aabb.h"
+#include "math/matrix.h"
 
 sprite sprite_new(spriteset set);
 #define sprite_set_animation(s, h, f) _Generic(h,\
@@ -33,7 +34,7 @@ void sprite_set_frame(sprite spr, uint16 frame);
 
 void sprite_update(sprite spr, float dt);
 
-int16 sprite_get_anim_id(sprite spr);
+container_index sprite_get_anim_id(sprite spr);
 aabb_2d sprite_get_box(sprite spr);
 gltex sprite_get_texture(sprite spr);
 spriteset sprite_get_data(sprite spr);

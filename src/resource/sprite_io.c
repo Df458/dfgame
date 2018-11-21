@@ -284,7 +284,7 @@ spriteset load_spriteset_from_xml(const char* path) {
 
 spriteset load_spriteset_from_image(const char* path) {
     animation anim;
-    rawtex tex;
+    rawtex tex = { 0 };
     check_return(load_animation_from_image(path, &anim, &tex), "", NULL);
 
 
