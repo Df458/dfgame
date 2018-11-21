@@ -2,7 +2,6 @@
 #define DF_GRAPHICS_TEXT
 
 #include "graphics/text.hd"
-
 #include "graphics/font.hd"
 #include "graphics/mesh.hd"
 #include "graphics/shader.hd"

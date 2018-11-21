@@ -124,7 +124,7 @@ aabb_2d texture_atlas_insert_box(texture_atlas atlas, aabb_2d box) {
     return box;
 }
 
-int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
+container_index texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
     check_return(atlas != NULL, "Atlas is NULL", CONTAINER_INDEX_INVALID);
 
     aabb_2d box = (aabb_2d){
@@ -143,7 +143,7 @@ int16 texture_atlas_add_gl(texture_atlas atlas, gltex tex, GLenum mode) {
     return array_get_length(atlas->textures) - 1;
 }
 
-int16 texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
+container_index texture_atlas_add_raw(texture_atlas atlas, rawtex tex, GLenum mode) {
     check_return(atlas != NULL, "Atlas is NULL", CONTAINER_INDEX_INVALID);
 
     aabb_2d box = (aabb_2d){
