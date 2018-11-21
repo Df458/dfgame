@@ -3,7 +3,7 @@
 #include "log/log.h"
 #include <libxml/parser.h>
 
-static const char test_file_1[] = "<root small_int=\"1\" big_int=\"1234567\" negative_int=\"-40\" vec_x=\"1.25\" vec_y=\"-35.7\" vec_z=\"0\" vec_w=\"45.01\" string=\"lorem ipsum\" bool=\"true\" Bool=\"False\"/>";
+static const char test_file_1[] = "<root small_int=\"1\" big_int=\"1234567\" negative_int=\"-40\" vec_x=\"1.25\" vec_y=\"-35.7\" vec_z=\"0\" vec_w=\"45.01\" string=\"lorem ipsum\" bool=\"true\" Bool=\"False\" color3=\"#ff00ff\" Color3=\"#00FFFF\" color4=\"#ffffffff\" Color4=\"#FFFF0000\"/>";
 static const char test_file_2[] = "<root><child v=\"1\"/><match v=\"2\"/><child v=\"3\"/><child v=\"4\"/><match v=\"5\"/></root>";
 
 static xmlDocPtr test_doc = NULL;
@@ -129,6 +129,31 @@ void test_xml_read() {
     CU_ASSERT_EQUAL(test_vec4.z, 0.0f);
     CU_ASSERT_EQUAL(test_vec4.w, 45.01f);
     CU_ASSERT_FALSE(xml_property_read(root, "string", &test_vec4));
+
+    // Color tests
+    CU_ASSERT_TRUE(xml_property_read_color(root, "color3", &test_vec3));
+    CU_ASSERT_EQUAL(test_vec3.r, 1.0f);
+    CU_ASSERT_EQUAL(test_vec3.g, 0.0f);
+    CU_ASSERT_EQUAL(test_vec3.b, 1.0f);
+    CU_ASSERT_TRUE(xml_property_read_color(root, "Color3", &test_vec3));
+    CU_ASSERT_EQUAL(test_vec3.r, 0.0f);
+    CU_ASSERT_EQUAL(test_vec3.g, 1.0f);
+    CU_ASSERT_EQUAL(test_vec3.b, 1.0f);
+    CU_ASSERT_FALSE(xml_property_read_color(root, "color4", &test_vec3));
+    CU_ASSERT_FALSE(xml_property_read_color(root, "Color4", &test_vec3));
+
+    CU_ASSERT_TRUE(xml_property_read_color(root, "color4", &test_vec4));
+    CU_ASSERT_EQUAL(test_vec4.r, 1.0f);
+    CU_ASSERT_EQUAL(test_vec4.g, 1.0f);
+    CU_ASSERT_EQUAL(test_vec4.b, 1.0f);
+    CU_ASSERT_EQUAL(test_vec4.a, 1.0f);
+    CU_ASSERT_TRUE(xml_property_read_color(root, "Color4", &test_vec4));
+    CU_ASSERT_EQUAL(test_vec4.r, 1.0f);
+    CU_ASSERT_EQUAL(test_vec4.g, 1.0f);
+    CU_ASSERT_EQUAL(test_vec4.b, 0.0f);
+    CU_ASSERT_EQUAL(test_vec4.a, 0.0f);
+    CU_ASSERT_FALSE(xml_property_read_color(root, "color3", &test_vec4));
+    CU_ASSERT_FALSE(xml_property_read_color(root, "Color3", &test_vec4));
 
 
     // String tests

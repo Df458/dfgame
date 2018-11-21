@@ -36,6 +36,7 @@ if get_option('enable_tga') == true
 endif
 vorbis = dependency('vorbisfile')
 xml = dependency('libxml-2.0')
+gee = dependency('gee-0.8')
 gtk = dependency('gtk+-3.0')
 
 add_project_arguments('-I/usr/include/freetype2', language: 'c')

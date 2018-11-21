@@ -7,8 +7,12 @@ applicationeditorclib  = static_library('dfgame_application_editor_backend', app
                          install : true)
 
 
-applicationeditordeps = [ gtk ]
-applicationeditorsrc  = [ 'Viewport.vala' ]
+applicationeditordeps = [ gee, gtk, xml ]
+applicationeditorsrc  = [
+  'Init.vala',
+  'PropertyGrid.vala',
+  'Viewport.vala'
+]
 applicationeditorvapi  = [ 'editorc.vapi' ]
 applicationeditorinc  = [ include_directories('.') ] + applicationinc
 applicationeditorlib  = shared_library('dfgame_application_editor', applicationeditorsrc + applicationeditorvapi,
@@ -19,7 +23,15 @@ applicationeditorlib  = shared_library('dfgame_application_editor', applicatione
                         link_with : [ gameplaylib, graphicslib, applicationeditorclib ],
                         vala_args : ['--target-glib=2.38'],
                         install : true,
-                       install_dir : [ true, true, true ])
+                        install_dir : [ true, true, true ])
+
+applicationeditorlib_shared = shared_library('dfgame_application_editor_shared', applicationeditorsrc + applicationeditorvapi,
+                        include_directories : applicationeditorinc,
+                        dependencies : applicationeditordeps,
+                        link_with : [ gameplaylib, graphicslib, applicationeditorclib ],
+                        vala_args : ['--target-glib=2.38'],
+                        install : true,
+                        install_dir : [ true, true, true ])
 
 pkgconfig.generate(libraries : applicationeditorclib,
                     version : '1.0.0',

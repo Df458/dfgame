@@ -1,0 +1,8 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:complexType name="triangle">
+        <xs:attribute name="size" type="xs:float"/>
+        <xs:attribute name="angle" type="xs:float"/>
+        <xs:attribute name="color" type="df:color4"/>
+        <xs:attribute name="is_filled" type="xs:Boolean"/>
+    </xs:complexType>
+</xs:schema>

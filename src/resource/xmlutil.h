@@ -21,6 +21,13 @@ bool xml_property_read_vec2(const xmlNodePtr node, const char* name, vec2* val);
 bool xml_property_read_vec3(const xmlNodePtr node, const char* name, vec3* val);
 bool xml_property_read_vec4(const xmlNodePtr node, const char* name, vec4* val);
 bool xml_property_read_string(const xmlNodePtr node, const char* name, char** val);
+
+bool xml_property_read_color3(const xmlNodePtr node, const char* name, vec3* val);
+bool xml_property_read_color4(const xmlNodePtr node, const char* name, vec4* val);
+#define xml_property_read_color(node, name, val) _Generic(val,\
+    vec3*: xml_property_read_color3,\
+    vec4*: xml_property_read_color4\
+)(node, name, val)
                                                 
 #define xml_property_read(node, name, val) _Generic(val,\
     bool*: xml_property_read_bool,\
@@ -51,6 +58,13 @@ bool xml_property_write_vec2(xmlTextWriterPtr writer, const char* name, vec2 val
 bool xml_property_write_vec3(xmlTextWriterPtr writer, const char* name, vec3 val);
 bool xml_property_write_vec4(xmlTextWriterPtr writer, const char* name, vec4 val);
 bool xml_property_write_string(xmlTextWriterPtr writer, const char* name, char* val);
+
+bool xml_property_write_color3(xmlTextWriterPtr node, const char* name, vec3 val);
+bool xml_property_write_color4(xmlTextWriterPtr node, const char* name, vec4 val);
+#define xml_property_write_color(writer, name, val) _Generic(val,\
+    vec3: xml_property_write_color3,\
+    vec4: xml_property_write_color4\
+)(writer, name, val)
                                                 
 #define xml_property_write(writer, name, val) _Generic(val,\
     bool: xml_property_write_bool,\

@@ -1,12 +1,13 @@
 deditor_cinc = [include_directories('../../src'), include_directories('../../src/math'), include_directories('../../src/core'), include_directories('../../src/graphics'), include_directories('../../src/gameplay'), include_directories('../../src/application'), include_directories('../../src/application/editor')]
-deditor_cdeps = [ glew ]
+deditor_cdeps = [ glew, xml ]
 deditor_ctarget = static_library('demo_editor', 'triangle.c',
                         dependencies : deditor_cdeps,
+                        link_with : [ resourcelib ],
                         include_directories : deditor_cinc,
                         install : false)
 
 deditorsrc = [ 'main.vala', 'DemoApp.vala', 'MainWindow.vala', 'Demo.vapi' ]
-deditordeps = [ gtk, application_editor_vala ]
+deditordeps = [ gtk, application_editor_vala, xml ]
 deditorinc = deditor_cinc
 deditorresources = gnome.compile_resources('resources', 'assets/demo.gresource.xml', source_dir : 'assets')
 deditortarget = executable('demo_editor', deditorsrc + deditorresources,

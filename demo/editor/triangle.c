@@ -7,8 +7,13 @@
 #include "shader_init.h"
 #include "triangle.h"
 #include "vertex.hd"
+#include "resource/xmlutil.h"
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+
+#include <locale.h>
 
 shader s_main;
 
@@ -65,4 +70,34 @@ void triangle_draw(triangle* t) {
     shader_bind_uniform_name(s_main, "u_color", t->color);
     glPolygonMode(GL_FRONT_AND_BACK, t->filled ? GL_FILL : GL_LINE);
     mesh_render(s_main, t->tri_data, GL_TRIANGLES, "i_pos", VT_POSITION);
+}
+void triangle_load(triangle* t, char* data) {
+    xmlDocPtr doc = xmlReadMemory(data, strlen(data), "", NULL, 0);
+    xmlNodePtr root = xml_match_name(xmlDocGetRootElement(doc), "triangle");
+    check_return(root != NULL, "Triangle data is invalid", );
+
+    setlocale(LC_NUMERIC, "C");
+    xml_property_read(root, "size", &t->size);
+    xml_property_read(root, "angle", &t->angle);
+    xml_property_read(root, "is_filled", &t->filled);
+    xml_property_read_color(root, "color", &t->color);
+
+    xmlFreeDoc(doc);
+}
+char* triangle_save(triangle* t) {
+    xmlBuffer buf = {0};
+    xmlTextWriter* writer = xmlNewTextWriterMemory(&buf, 0);
+
+    setlocale(LC_NUMERIC, "C");
+    xmlTextWriterStartDocument(writer, NULL, "ISO-8859-1", NULL);
+    xmlTextWriterStartElement(writer, (xmlChar*)"triangle");
+    xml_property_write(writer, "size", t->size);
+    xml_property_write(writer, "angle", t->angle);
+    xml_property_write(writer, "is_filled", t->filled);
+    xml_property_write_color(writer, "color", t->color);
+    xmlTextWriterEndElement(writer);
+    xmlTextWriterEndDocument(writer);
+
+    xmlFreeTextWriter(writer);
+    return (char*)buf.content;
 }

@@ -18,5 +18,7 @@ void cleanup();
 triangle* triangle_init();
 void triangle_free(triangle* t);
 void triangle_draw(triangle* t);
+void triangle_load(triangle* t, char* data);
+char* triangle_save(triangle* t);
 
 #endif

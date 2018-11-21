@@ -2,6 +2,7 @@ tags
 obj
 lib/*.a
 
+*.ui~
 *.un~
 *.taghl
 

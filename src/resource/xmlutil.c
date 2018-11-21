@@ -185,7 +185,6 @@ bool xml_property_read_float(const xmlNodePtr node, const char* name, float* val
     }
 
     *val = atof((char*)prop);
-
     sfree(prop);
 
     return true;
@@ -251,6 +250,52 @@ bool xml_property_read_string(const xmlNodePtr node, const char* name, char** va
     sfree(prop);
 
     return true;
+}
+
+bool xml_property_read_color3(const xmlNodePtr node, const char* name, vec3* val) {
+    uint8 r, g, b;
+    bool props_read = false;
+
+    xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
+    if(!prop || strlen((char*)prop) != 7) {
+        return false;
+    }
+
+    uint8 count = sscanf((char*)prop, "#%02hhx%02hhx%02hhx", &r, &g, &b);
+    if(count == 3) {
+        val->r = r / 255.0f;
+        val->g = g / 255.0f;
+        val->b = b / 255.0f;
+
+        props_read = true;
+    }
+
+    sfree(prop);
+
+    return props_read;
+}
+bool xml_property_read_color4(const xmlNodePtr node, const char* name, vec4* val) {
+    uint8 r, g, b, a;
+    bool props_read = false;
+
+    xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
+    if(!prop || strlen((char*)prop) != 9) {
+        return false;
+    }
+
+    uint8 count = sscanf((char*)prop, "#%02hhx%02hhx%02hhx%02hhx", &r, &g, &b, &a);
+    if(count == 4) {
+        val->r = r / 255.0f;
+        val->g = g / 255.0f;
+        val->b = b / 255.0f;
+        val->a = a / 255.0f;
+
+        props_read = true;
+    }
+
+    sfree(prop);
+
+    return props_read;
 }
 
 bool xml_property_write_bool(xmlTextWriterPtr writer, const char* name, bool val) {
@@ -354,4 +399,19 @@ bool xml_property_write_string(xmlTextWriterPtr writer, const char* name, char* 
         return false;
     }
     return xmlTextWriterWriteAttribute(writer, (xmlChar*)name, (xmlChar*)val) != -1;
+}
+
+bool xml_property_write_color3(xmlTextWriterPtr writer, const char* name, vec3 val) {
+    char* data = saprintf("#%02hhx%02hhx%02hhx", (int)(val.r * 255), (int)(val.g * 255), (int)(val.b * 255));
+    int ret = xmlTextWriterWriteAttribute(writer, (xmlChar*)name, (xmlChar*)data);
+    sfree(data);
+
+    return ret != -1;
+}
+bool xml_property_write_color4(xmlTextWriterPtr writer, const char* name, vec4 val) {
+    char* data = saprintf("#%02hhx%02hhx%02hhx%02hhx", (int)(val.r * 255), (int)(val.g * 255), (int)(val.b * 255), (int)(val.a * 255));
+    int ret = xmlTextWriterWriteAttribute(writer, (xmlChar*)name, (xmlChar*)data);
+    sfree(data);
+
+    return ret != -1;
 }
