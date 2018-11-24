@@ -1,7 +1,7 @@
 applicationeditorcsrc  = [ 'input.c', 'window.c' ]
 applicationeditorclib  = static_library('dfgame_application_editor_backend', applicationeditorcsrc,
                          include_directories : applicationinc,
-                         dependencies : applicationdeps + [ gtk ],
+                         dependencies : [ gtk ],
                          link_with : applicationlink,
                          link_args : args,
                          install : true)
@@ -13,7 +13,7 @@ applicationeditorsrc  = [
   'PropertyGrid.vala',
   'Viewport.vala'
 ]
-applicationeditorvapi  = [ 'editorc.vapi' ]
+applicationeditorvapi  = [ 'editorc.vapi' ] + core_vapi
 applicationeditorinc  = [ include_directories('.') ] + applicationinc
 applicationeditorlib  = shared_library('dfgame_application_editor', applicationeditorsrc + applicationeditorvapi,
                         include_directories : applicationeditorinc,

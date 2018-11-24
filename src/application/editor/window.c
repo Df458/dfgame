@@ -3,11 +3,11 @@
 
 #include "application/editor/window.h"
 
-#include "camera.h"
-#include "check.h"
-#include "input.h"
-#include "log/log.h"
-#include "graphics_log.h"
+#include "application/input.h"
+#include "core/check.h"
+#include "core/log/log.h"
+#include "graphics/camera.h"
+#include "graphics/graphics_log.h"
 
 #include <gtk/gtk.h>
 

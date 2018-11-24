@@ -1,9 +1,7 @@
 using Gtk;
-using DFGame.Input;
-using DFGame.Window;
+using DFGame.Application;
 
-namespace DFGame
-{
+namespace DFGame {
     public class Viewport : GLArea
     {
         private uint _update_interval = 0;
@@ -18,16 +16,16 @@ namespace DFGame
             ((WindowProxy.ProxyContent*)_proxy.platform_data)->dims_x = (float)width_request;
             ((WindowProxy.ProxyContent*)_proxy.platform_data)->dims_y = (float)height_request;
 
-            button_press_event.connect(on_button_press);
-            button_release_event.connect(on_button_release);
-            key_press_event.connect(on_key_press);
-            key_release_event.connect(on_key_release);
+            button_press_event.connect(Input.on_button_press);
+            button_release_event.connect(Input.on_button_release);
+            key_press_event.connect(Input.on_key_press);
+            key_release_event.connect(Input.on_key_release);
             motion_notify_event.connect((ev) => {
                 ((WindowProxy.ProxyContent*)_proxy.platform_data)->mouse_x = (float)ev.x;
                 ((WindowProxy.ProxyContent*)_proxy.platform_data)->mouse_y = (float)ev.y;
                 return false;
             });
-            scroll_event.connect(on_scroll);
+            scroll_event.connect(Input.on_scroll);
             enter_notify_event.connect((ev) => {
                 is_focus = true;
                 return false;
@@ -36,8 +34,9 @@ namespace DFGame
                 ((WindowProxy.ProxyContent*)_proxy.platform_data)->dims_x = (float)ev.width;
                 ((WindowProxy.ProxyContent*)_proxy.platform_data)->dims_y = (float)ev.height;
 
-                if(_proxy.resize_event != null)
+                if(_proxy.resize_event != null) {
                     _proxy.resize_event->cb((uint16)ev.width, (uint16)ev.height, _proxy.resize_event.user);
+                }
             });
 
             can_focus = true;
@@ -55,7 +54,7 @@ namespace DFGame
 
             needs_draw = true;
 
-            update_input();
+            Input.update();
 
             queue_render();
 
@@ -79,7 +78,7 @@ namespace DFGame
                 update_timer.set_callback(update);
                 update_timer.attach(MainContext.default());
             } else {
-                // TODO
+                error("Can't set an FPS value of 0");
             }
         }
 

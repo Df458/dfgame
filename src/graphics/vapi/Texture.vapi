@@ -1,5 +1,5 @@
-namespace DFGame.Graphics
-{
+[CCode(cheader_filename="graphics/texture.h")]
+namespace DFGame.Graphics {
     [CCode(cname = "rawtex", destroy_function = "rawtex_cleanup", has_type_id = false)]
     [Compact]
     public struct RawTex

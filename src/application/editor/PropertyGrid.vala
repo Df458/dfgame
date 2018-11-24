@@ -1,3 +1,4 @@
+using DFGame.Core;
 using Gtk;
 using Xml;
 
@@ -192,7 +193,7 @@ namespace DFGame {
         // Loads type information from an XSD file
         public bool load_schema(Xml.Doc* doc) {
             if(doc == null || doc->children == null) {
-                // TODO Error
+                Logger.error("Failed to read schema");
                 return false;
             }
 
@@ -221,7 +222,7 @@ namespace DFGame {
                 var doc = parser.read_memory((char[])schema.get_data(), schema.length, "");
                 return load_schema(doc);
             } catch(GLib.Error e) {
-                // TODO: Error
+                Logger.error("Failed to read schema from path %s", path);
             }
 
             return false;
@@ -232,7 +233,7 @@ namespace DFGame {
             var doc = parser.read_memory(data.to_utf8(), data.length, "");
 
             if(doc == null) {
-                // TODO Error
+                Logger.error("Failed to read xml data");
                 return false;
             }
 
@@ -252,7 +253,7 @@ namespace DFGame {
             var doc = parser.read_memory(data.to_utf8(), data.length, "");
 
             if(doc == null) {
-                // TODO Error
+                Logger.error("Failed to read xml data");
                 return false;
             }
 

@@ -1,9 +1,10 @@
 #ifndef APPLICATION_KEYMAP_H
 #define APPLICATION_KEYMAP_H
+#include "application/input_id.h"
+#include "core/types.h"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "input_id.h"
-#include "types.h"
 
 const uint32 native_to_dfgame_key[] = {
     [0 ... GLFW_KEY_LAST]    = K_INVALID,

@@ -1,6 +1,5 @@
 [CCode(cheader_filename="graphics/spriteset.h")]
-namespace DFGame.Graphics
-{
+namespace DFGame.Graphics {
     [CCode(cname = "animation", destroy_function = "", has_type_id = false)]
     [Compact]
     public struct Animation
