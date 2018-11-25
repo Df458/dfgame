@@ -53,3 +53,21 @@ install_data(sources : '../../../data/catalog/dfgame-editor.xml', install_dir : 
 
 application_editor_c = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorclib)
 application_editor_vala = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorlib, sources : applicationeditorvapi)
+
+if lint.found()
+    run_target(
+        'lint-editor',
+        command: [
+            lint,
+        ] + applicationeditorsrc)
+endif
+
+if tidy.found()
+    run_target(
+        'tidy-editor',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + applicationeditorcsrc)
+endif

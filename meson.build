@@ -11,6 +11,7 @@ pkgconfig = import('pkgconfig')
 m = compiler.find_library('m', required : false)
 
 tidy = find_program('clang-tidy', required: false)
+lint = find_program('io.elementary.vala-lint', required: false)
 
 cunit = dependency('cunit')
 freetype = dependency('freetype2')
