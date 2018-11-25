@@ -21,7 +21,6 @@ namespace DFGame {
         public string default_value { get; private set; }
 
         public signal void value_changed (string data);
-        /* private signal void set_value (string data); */
 
         construct {
             orientation = Orientation.HORIZONTAL;
@@ -35,6 +34,9 @@ namespace DFGame {
 
             name_label = new Label (display_name);
             name_label.halign = Align.END;
+            if(prop.documentation != null) {
+                name_label.set_tooltip_markup(prop.documentation);
+            }
             pack_start (name_label);
 
             reset_button = new Button.from_icon_name ("edit-clear-symbolic");

@@ -6,15 +6,31 @@ namespace DFGame {
     // Represents a property on an object
     public class PropertyType {
         public string name { get; private set; }
+        public string documentation { get; private set; }
 
-        public PropertyType (string type_name) {
-            name = type_name;
+        public PropertyType.complex (Xml.Node* node_dat) {
+            name = "complexType";
+            prepare (node_dat->children);
         }
 
-        public void prepare (void* node_dat) {
+        public PropertyType.attribute (Xml.Node* node_dat) {
+            name = node_dat->get_prop ("type");
+            prepare (node_dat->children);
+        }
+
+        public void prepare (Xml.Node* node_dat) {
             for (Xml.Node* node = node_dat; node != null; node = node->next) {
-                if (node->type == ElementType.ELEMENT_NODE && node->name == "attribute") {
-                    props.set (node->get_prop ("name"), new PropertyType (node->get_prop ("type")));
+                if (node->type == ElementType.ELEMENT_NODE) {
+                    if (node->name == "attribute") {
+                        PropertyType new_prop = new PropertyType.attribute (node);
+                        props.set (node->get_prop ("name"), new_prop);
+                    } else if (node->name == "annotation") {
+                        for (Xml.Node* child = node->children; child != null; child = child->next) {
+                            if (child->type == ElementType.ELEMENT_NODE && child->name == "documentation") {
+                                documentation = child->get_content();
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -53,18 +69,8 @@ namespace DFGame {
             }
 
             for (var node = doc->children->children; node != null; node = node->next) {
-                if (node->type == ElementType.ELEMENT_NODE) {
-                    switch (node->name) {
-                        case "complexType":
-                            string name = node->get_prop ("name");
-                            var prop = new PropertyType ("complexType");
-                            prop.prepare (node->children);
-                            types.set (name, prop);
-                            break;
-                        case "attribute":
-                            // TODO: Parse and prepare an attribute property
-                            break;
-                    }
+                if (node->type == ElementType.ELEMENT_NODE && node->name == "complexType") {
+                    types.set (node->get_prop ("name"), new PropertyType.complex (node));
                 }
             }
 
