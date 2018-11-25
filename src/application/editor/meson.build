@@ -10,7 +10,12 @@ applicationeditorclib  = static_library('dfgame_application_editor_backend', app
 applicationeditordeps = [ gee, gtk, xml ]
 applicationeditorsrc  = [
   'Init.vala',
-  'PropertyGrid.vala',
+  'propertygrid/editors/BoolPropertyEditor.vala',
+  'propertygrid/editors/ColorPropertyEditor.vala',
+  'propertygrid/editors/FloatPropertyEditor.vala',
+  'propertygrid/editors/PropertyEditor.vala',
+  'propertygrid/PropertyEditorBuilder.vala',
+  'propertygrid/PropertyGrid.vala',
   'Viewport.vala'
 ]
 applicationeditorvapi  = [ 'editorc.vapi' ] + core_vapi

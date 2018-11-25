@@ -21,6 +21,7 @@ public class MainWindow : ApplicationWindow
         Demo.init();
         triangle = new Demo.Triangle();
 
+        properties.builder = new BasicPropertyBuilder();
         properties.load_schema_from_resource("/org/df458/EditorDemo/schemas/triangle.xsd");
 
         properties.load_data(triangle.save());
