@@ -16,6 +16,14 @@ namespace DFGame.Math
 
         [CCode(cname = "aabb_2d_zero")]
         public const Aabb2D zero;
+
+        [CCode (cname="aabb_2d_printstr")]
+        public const string printstr;
+
+        [CCode (cname="vala_to_string")]
+        public string to_string() {
+            return printstr.printf(x, y, width, height);
+        }
     }
 
     [CCode (cname = "aabb_3d", destroy_function = "", has_type_id = false)]
@@ -27,5 +35,13 @@ namespace DFGame.Math
 
         [CCode(cname = "aabb_3d_zero")]
         public const Aabb3D zero;
+
+        [CCode (cname="aabb_3d_printstr")]
+        public const string printstr;
+
+        [CCode (cname="vala_to_string")]
+        public string to_string() {
+            return printstr.printf(x, y, width, height);
+        }
     }
 }

@@ -123,7 +123,7 @@ void init_resources() {
 
     path = assets_path("OpenSans-Regular.ttf", NULL);
     info_text = text_new(load_font(path, 16), info_str);
-    text_set_align(info_text, TEXT_ALIGN_BOTTOM_LEFT);
+    text_set_align(info_text, ALIGN_BOTTOM_LEFT);
     sfree(path);
 
 }

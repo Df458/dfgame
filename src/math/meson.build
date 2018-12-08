@@ -1,5 +1,13 @@
 mathdeps = [ m ]
-mathsrc  = [ 'aabb.c', 'interpolate.c', 'matrix.c', 'quat.c', 'transform.c', 'vector.c' ]
+mathsrc  = files(
+  'aabb.c',
+  'alignment.c',
+  'interpolate.c',
+  'matrix.c',
+  'quat.c',
+  'transform.c',
+  'vector.c'
+)
 mathinc  = [ include_directories('..'), include_directories('../core') ]
 mathlib  = static_library('dfgame_math', mathsrc,
                          include_directories : mathinc,
@@ -17,9 +25,20 @@ pkgconfig.generate(mathlib,
                     requires : ['dfgame-core'],
                     description : 'dfgame math module, provides various math utilities')
 
-install_headers(
-    [ 'aabb.h', 'interpolate.h', 'mathutil.h', 'matrix.h', 'quat.h', 'transform.h', 'vector.h', 'matrix.hd', 'quat.hd', 'transform.hd', 'vector.hd' ],
-    subdir : 'dfgame/math')
+install_headers([
+  'aabb.h',
+  'alignment.h',
+  'interpolate.h',
+  'mathutil.h',
+  'matrix.h',
+  'quat.h',
+  'transform.h',
+  'vector.h',
+  'matrix.hd',
+  'quat.hd',
+  'transform.hd',
+  'vector.hd'
+  ], subdir : 'dfgame/math')
 
 math = declare_dependency(include_directories : include_directories('.'), link_with : mathlib)
 math_vapi = files(

@@ -292,7 +292,7 @@ int main() {
     init_base_resource_path(NULL);
     char* path = assets_path("OpenSans-Regular.ttf", NULL);
     info_text = text_new(load_font(path, 16), info_str);
-    text_set_align(info_text, TEXT_ALIGN_BOTTOM_LEFT);
+    text_set_align(info_text, ALIGN_BOTTOM_LEFT);
     sfree(path);
 
     bullets = array_mnew(bullet, 40);

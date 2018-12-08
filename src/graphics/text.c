@@ -18,7 +18,7 @@ typedef struct text {
     font fnt;
     char* str;
     mesh msh;
-    text_alignment align;
+    alignment_2d align;
     text_wrap wrap;
     float max_width;
     vec2 bounding_size;
@@ -71,18 +71,11 @@ void iter_arrange_lines(text_line_data* line, text t) {
     vt_pt* verts = mesh_get_data(t->msh);
 
     vec3 offset_value = vec3_zero;
-
-    if(t->align == TEXT_ALIGN_LEFT || t->align == TEXT_ALIGN_CENTER || t->align == TEXT_ALIGN_RIGHT) {
-        offset_value.y = t->bounding_size.y * -0.5f;
-    } else if(t->align == TEXT_ALIGN_BOTTOM_LEFT || t->align == TEXT_ALIGN_BOTTOM || t->align == TEXT_ALIGN_BOTTOM_RIGHT) {
-        offset_value.y = t->bounding_size.y * -1.0f;
-    }
-
-    if(t->align == TEXT_ALIGN_TOP || t->align == TEXT_ALIGN_CENTER || t->align == TEXT_ALIGN_BOTTOM) {
-        offset_value.x = line->box.dimensions.x * -0.5f;
-    } else if(t->align == TEXT_ALIGN_TOP_RIGHT || t->align == TEXT_ALIGN_RIGHT || t->align == TEXT_ALIGN_BOTTOM_RIGHT) {
-        offset_value.x = line->box.dimensions.x * -1.0f;
-    }
+    aabb_2d box = {
+        .position = vec2_zero,
+        .dimensions = { .x = line->box.dimensions.x, .y = t->bounding_size.y }
+    };
+    offset_value.xy = vec2_mul(aabb_get_origin_2d(box, t->align), -1);
 
     for(int i = line->start * 6; i < line->end * 6; ++i) {
         verts[i].position = vec_add(verts[i].position, offset_value);
@@ -228,7 +221,7 @@ text text_new(font f, const char* s, ...) {
     t->fnt = f;
     t->msh = NULL;
     t->str = NULL;
-    t->align = TEXT_ALIGN_DEFAULT;
+    t->align = ALIGN_DEFAULT;
     t->wrap = TEXT_WRAP_DEFAULT;
     t->max_width = 0;
     t->bounding_size = vec2_zero;
@@ -281,15 +274,15 @@ mesh text_get_mesh(const text t) {
 }
 
 // Gets/sets the text's alignment
-void text_set_align(text t, text_alignment align) {
+void text_set_align(text t, alignment_2d align) {
     check_return(t, "Text is NULL", );
-    check_return(align <= TEXT_ALIGN_LAST, "Invalid text alignment 0x%x", , align);
+    check_return(align <= ALIGN_LAST, "Invalid text alignment 0x%x", , align);
 
     t->align = align;
     text_update_mesh(t);
 }
-text_alignment text_get_align(const text t) {
-    check_return(t, "Text is NULL", TEXT_ALIGN_DEFAULT);
+alignment_2d text_get_align(const text t) {
+    check_return(t, "Text is NULL", ALIGN_DEFAULT);
 
     return t->align;
 }

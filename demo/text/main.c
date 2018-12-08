@@ -35,29 +35,29 @@ const char* info_str = "Q W E\nA S  D - Change text alignment\nZ X  C";
 
 typedef struct align_key {
     key_id key;
-    text_alignment alignment;
+    alignment_2d alignment;
 } align_key;
 
 #define ALIGN_KEYS_COUNT 9
 align_key keys[ALIGN_KEYS_COUNT] = {
-    { .key = K_Q, .alignment = TEXT_ALIGN_TOP_LEFT     },
-    { .key = K_W, .alignment = TEXT_ALIGN_TOP          },
-    { .key = K_E, .alignment = TEXT_ALIGN_TOP_RIGHT    },
-    { .key = K_A, .alignment = TEXT_ALIGN_LEFT         },
-    { .key = K_S, .alignment = TEXT_ALIGN_CENTER       },
-    { .key = K_D, .alignment = TEXT_ALIGN_RIGHT        },
-    { .key = K_Z, .alignment = TEXT_ALIGN_BOTTOM_LEFT  },
-    { .key = K_X, .alignment = TEXT_ALIGN_BOTTOM       },
-    { .key = K_C, .alignment = TEXT_ALIGN_BOTTOM_RIGHT },
+    { .key = K_Q, .alignment = ALIGN_TOP_LEFT     },
+    { .key = K_W, .alignment = ALIGN_TOP          },
+    { .key = K_E, .alignment = ALIGN_TOP_RIGHT    },
+    { .key = K_A, .alignment = ALIGN_LEFT         },
+    { .key = K_S, .alignment = ALIGN_CENTER       },
+    { .key = K_D, .alignment = ALIGN_RIGHT        },
+    { .key = K_Z, .alignment = ALIGN_BOTTOM_LEFT  },
+    { .key = K_X, .alignment = ALIGN_BOTTOM       },
+    { .key = K_C, .alignment = ALIGN_BOTTOM_RIGHT },
 };
 
 void wrap(action_id id, void* user) {
-    text_set_align(t_wrap_c, (text_alignment)user);
-    text_set_align(t_wrap_w, (text_alignment)user);
-    text_set_align(t_wrap_n, (text_alignment)user);
+    text_set_align(t_wrap_c, (alignment_2d)user);
+    text_set_align(t_wrap_w, (alignment_2d)user);
+    text_set_align(t_wrap_n, (alignment_2d)user);
 }
 
-void draw_lines(text_alignment align, vec2 pos, float level) {
+void draw_lines(alignment_2d align, vec2 pos, float level) {
     vt_pc a = {0};
     vt_pc b = {0};
     a.position.xy = (vec2){ .x = 0, .y = pos.y - 100 };
@@ -66,16 +66,16 @@ void draw_lines(text_alignment align, vec2 pos, float level) {
     b.color = color_red;
 
     switch(align) {
-        case TEXT_ALIGN_TOP_RIGHT:
-        case TEXT_ALIGN_RIGHT:
-        case TEXT_ALIGN_BOTTOM_RIGHT:
+        case ALIGN_TOP_RIGHT:
+        case ALIGN_RIGHT:
+        case ALIGN_BOTTOM_RIGHT:
             a.position.x = pos.x - level;
             b.position.x = pos.x - level;
             debug_draw_line(camera_get_vp(c_main), a, b, 2);
             break;
-        case TEXT_ALIGN_TOP:
-        case TEXT_ALIGN_CENTER:
-        case TEXT_ALIGN_BOTTOM:
+        case ALIGN_TOP:
+        case ALIGN_CENTER:
+        case ALIGN_BOTTOM:
             a.position.x = pos.x - level * 0.5f;
             b.position.x = pos.x - level * 0.5f;
             debug_draw_line(camera_get_vp(c_main), a, b, 2);
@@ -83,9 +83,9 @@ void draw_lines(text_alignment align, vec2 pos, float level) {
             b.position.x = pos.x + level * 0.5f;
             debug_draw_line(camera_get_vp(c_main), a, b, 2);
             break;
-        case TEXT_ALIGN_TOP_LEFT:
-        case TEXT_ALIGN_LEFT:
-        case TEXT_ALIGN_BOTTOM_LEFT:
+        case ALIGN_TOP_LEFT:
+        case ALIGN_LEFT:
+        case ALIGN_BOTTOM_LEFT:
             a.position.x = pos.x + level;
             b.position.x = pos.x + level;
             debug_draw_line(camera_get_vp(c_main), a, b, 2);
@@ -135,17 +135,17 @@ int main(int argc, char** argv) {
     f_text = load_font(path, 16);
     t_wrap_c = text_new(f_text, demo_str);
     text_set_wrap(t_wrap_c, TEXT_WRAP_CHARACTER);
-    text_set_align(t_wrap_c, TEXT_ALIGN_TOP);
+    text_set_align(t_wrap_c, ALIGN_TOP);
 
     t_wrap_w = text_new(f_text, demo_str);
-    text_set_align(t_wrap_w, TEXT_ALIGN_TOP);
+    text_set_align(t_wrap_w, ALIGN_TOP);
     text_set_wrap(t_wrap_w, TEXT_WRAP_WORD);
 
     t_wrap_n = text_new(f_text, demo_str);
-    text_set_align(t_wrap_n, TEXT_ALIGN_TOP);
+    text_set_align(t_wrap_n, ALIGN_TOP);
 
     t_info = text_new(f_text, info_str);
-    text_set_align(t_info, TEXT_ALIGN_BOTTOM_LEFT);
+    text_set_align(t_info, ALIGN_BOTTOM_LEFT);
     sfree(path);
 
     glEnable(GL_DEPTH_TEST);
@@ -156,14 +156,14 @@ int main(int argc, char** argv) {
         input_add_key_action(keys[i].key, as_event(action_event, wrap, (void*)keys[i].alignment));
     }
 
-    input_add_key_action(K_W, as_event(action_event, wrap, (void*)TEXT_ALIGN_TOP));
-    input_add_key_action(K_E, as_event(action_event, wrap, (void*)TEXT_ALIGN_TOP_RIGHT));
-    input_add_key_action(K_A, as_event(action_event, wrap, (void*)TEXT_ALIGN_LEFT));
-    input_add_key_action(K_S, as_event(action_event, wrap, (void*)TEXT_ALIGN_CENTER));
-    input_add_key_action(K_D, as_event(action_event, wrap, (void*)TEXT_ALIGN_RIGHT));
-    input_add_key_action(K_Z, as_event(action_event, wrap, (void*)TEXT_ALIGN_BOTTOM_LEFT));
-    input_add_key_action(K_X, as_event(action_event, wrap, (void*)TEXT_ALIGN_BOTTOM));
-    input_add_key_action(K_C, as_event(action_event, wrap, (void*)TEXT_ALIGN_BOTTOM_RIGHT));
+    input_add_key_action(K_W, as_event(action_event, wrap, (void*)ALIGN_TOP));
+    input_add_key_action(K_E, as_event(action_event, wrap, (void*)ALIGN_TOP_RIGHT));
+    input_add_key_action(K_A, as_event(action_event, wrap, (void*)ALIGN_LEFT));
+    input_add_key_action(K_S, as_event(action_event, wrap, (void*)ALIGN_CENTER));
+    input_add_key_action(K_D, as_event(action_event, wrap, (void*)ALIGN_RIGHT));
+    input_add_key_action(K_Z, as_event(action_event, wrap, (void*)ALIGN_BOTTOM_LEFT));
+    input_add_key_action(K_X, as_event(action_event, wrap, (void*)ALIGN_BOTTOM));
+    input_add_key_action(K_C, as_event(action_event, wrap, (void*)ALIGN_BOTTOM_RIGHT));
 
     mainloop_create_run(loop);
 
