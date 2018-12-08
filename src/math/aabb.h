@@ -68,4 +68,10 @@ aabb_3d aabb_get_intersection_3d(aabb_3d box1, aabb_3d box2);
 comparison aabb_comparison_2d(aabb_2d box1, aabb_2d box2);
 comparison aabb_comparison_3d(aabb_3d box1, aabb_3d box2);
 
+// printf helper macros
+#define aabb_2d_printstr "[(%f, %f), %fx%f]"
+#define aabb_3d_printstr "[(%f, %f, %f), %fx%fx%f]"
+#define aabb_2d_decomp(b) vec2_decomp(b.position), vec2_decomp(b.dimensions)
+#define aabb_3d_decomp(b) vec3_decomp(b.position), vec3_decomp(b.dimensions)
+
 #endif

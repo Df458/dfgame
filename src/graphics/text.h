@@ -5,24 +5,8 @@
 #include "graphics/font.hd"
 #include "graphics/mesh.hd"
 #include "graphics/shader.hd"
+#include "math/alignment.h"
 #include "math/matrix.hd"
-
-typedef enum text_alignment {
-    TEXT_ALIGN_TOP = 0,
-    TEXT_ALIGN_BOTTOM,
-    TEXT_ALIGN_LEFT,
-    TEXT_ALIGN_RIGHT,
-
-    TEXT_ALIGN_TOP_LEFT,
-    TEXT_ALIGN_TOP_RIGHT,
-    TEXT_ALIGN_BOTTOM_LEFT,
-    TEXT_ALIGN_BOTTOM_RIGHT,
-
-    TEXT_ALIGN_CENTER,
-
-    TEXT_ALIGN_LAST    = TEXT_ALIGN_CENTER,
-    TEXT_ALIGN_DEFAULT = TEXT_ALIGN_TOP_LEFT
-} text_alignment;
 
 typedef enum text_wrap {
     TEXT_WRAP_CHARACTER = 0,
@@ -49,8 +33,8 @@ char* text_get_str(const text t);
 mesh text_get_mesh(const text t);
 
 // Gets/sets the text's alignment
-void text_set_align(text t, text_alignment align);
-text_alignment text_get_align(const text t);
+void text_set_align(text t, alignment_2d align);
+alignment_2d text_get_align(const text t);
 
 // Gets/sets the text's wrap method
 void text_set_wrap(const text t, text_wrap wrap);
