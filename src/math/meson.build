@@ -17,13 +17,13 @@ mathlib  = static_library('dfgame_math', mathsrc,
                          install : true)
 
 pkgconfig.generate(mathlib,
-                    version : '1.0.0',
-                    name : 'dfgame-math',
-                    filebase : 'dfgame-math',
-                    extra_cflags : [ '-I${prefix}/include/dfgame/math' ],
-                    libraries : ['-lm', '-ldfgame_math' ],
-                    requires : ['dfgame-core'],
-                    description : 'dfgame math module, provides various math utilities')
+                   version : '1.0.0',
+                   name : 'dfgame-math',
+                   filebase : 'dfgame-math',
+                   extra_cflags : [ '-I${prefix}/include/dfgame/math' ],
+                   libraries : ['-lm', '-ldfgame_math' ],
+                   requires : ['dfgame-core'],
+                   description : 'dfgame math module, provides various math utilities')
 
 install_headers([
   'aabb.h',

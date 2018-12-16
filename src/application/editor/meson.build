@@ -21,21 +21,21 @@ applicationeditorlib  = shared_library('dfgame_application_editor', applicatione
                         install : true,
                        install_dir : [ true, true, true ])
 
-pkgconfig.generate(libraries : applicationeditorclib,
-                    version : '1.0.0',
-                    name : 'dfgame-application-editor-backend',
-                    filebase : 'dfgame-application-editor-backend',
-                    extra_cflags : [ '-I${prefix}/include/dfgame/application', '-I${prefix}/include/dfgame/application/editor' ],
-                    requires : [ 'dfgame-gameplay', 'dfgame-graphics' ],
-                    description : 'dfgame application module (editor backend code), provides classes and UI widgets for use in tools')
+pkgconfig.generate(applicationeditorclib,
+                   version : '1.0.0',
+                   name : 'dfgame-application-editor-backend',
+                   filebase : 'dfgame-application-editor-backend',
+                   extra_cflags : [ '-I${prefix}/include/dfgame/application', '-I${prefix}/include/dfgame/application/editor' ],
+                   requires : [ 'dfgame-gameplay', 'dfgame-graphics' ],
+                   description : 'dfgame application module (editor backend code), provides classes and UI widgets for use in tools')
 
-pkgconfig.generate(libraries : applicationeditorlib,
-                    version : '1.0.0',
-                    name : 'dfgame-application-editor',
-                    filebase : 'dfgame-application-editor',
-                    extra_cflags : [ '-I${prefix}/include/dfgame/application', '-I${prefix}/include/dfgame/application/editor' ],
-                    requires : [ 'dfgame-application-editor-backend' ],
-                    description : 'dfgame application module (editor), provides classes and UI widgets for use in tools')
+pkgconfig.generate(applicationeditorlib,
+                   version : '1.0.0',
+                   name : 'dfgame-application-editor',
+                   filebase : 'dfgame-application-editor',
+                   extra_cflags : [ '-I${prefix}/include/dfgame/application', '-I${prefix}/include/dfgame/application/editor' ],
+                   requires : [ 'dfgame-application-editor-backend' ],
+                   description : 'dfgame application module (editor), provides classes and UI widgets for use in tools')
 
 install_data(sources : '../../../data/catalog/dfgame-editor.xml', install_dir : '/usr/share/glade/catalogs')
 

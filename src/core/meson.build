@@ -16,12 +16,12 @@ corelib  = static_library('dfgame_core', coresrc,
                          link_args : args,
                          install : true)
 
-pkgconfig.generate(libraries : corelib,
-                    version : '1.0.0',
-                    name : 'dfgame-core',
-                    filebase : 'dfgame-core',
-                    extra_cflags : [ '-I${prefix}/include/dfgame/core' ],
-                    description : 'dfgame core module, provides core functionality')
+pkgconfig.generate(corelib,
+                   version : '1.0.0',
+                   name : 'dfgame-core',
+                   filebase : 'dfgame-core',
+                   extra_cflags : [ '-I${prefix}/include/dfgame/core' ],
+                   description : 'dfgame core module, provides core functionality')
 
 install_headers([
   'check.h',
