@@ -41,13 +41,13 @@ resourcelib  = static_library('dfgame_resource', resourcesrc,
 run_command('ctags', '-R', '.')
 
 pkgconfig.generate(resourcelib,
-                    version : '1.0.0',
-                    name : 'dfgame-resource',
-                    filebase : 'dfgame-resource',
-                    extra_cflags : [ '-I${prefix}/include/dfgame/resource' ],
-                    requires : resourcerequires,
-                    libraries : ['-ltga', '-ldfgame_resource' ],
-                    description : 'dfgame resource module, loads assets for other modules')
+                   version : '1.0.0',
+                   name : 'dfgame-resource',
+                   filebase : 'dfgame-resource',
+                   extra_cflags : [ '-I${prefix}/include/dfgame/resource' ],
+                   requires : resourcerequires,
+                   libraries : ['-ltga', '-ldfgame_resource' ],
+                   description : 'dfgame resource module, loads assets for other modules')
 
 install_headers(
     [ 'audio_loader.h', 'data_loader.h', 'font_loader.h', 'mesh_loader.h', 'paths.h', 'sprite_io.h', 'texture_loader.h', 'xmlutil.h' ],
