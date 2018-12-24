@@ -1,0 +1,54 @@
+<xs:schema
+    xmlns:df="/org/df458/dfgame"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+    <!-- Types -->
+    <xs:simpleType name="fill_type">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="true" df:displayName="Filled"/>
+            <xs:enumeration value="false" df:displayName="Wireframe"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="size_type">
+        <xs:restriction base="xs:float">
+            <xs:minInclusive value="0"/>
+            <xs:totalDigits value="6"/>
+        </xs:restriction>
+        <xs:annotation>
+            <xs:documentation>A decimal value above 0</xs:documentation>
+        </xs:annotation>
+    </xs:simpleType>
+    <xs:simpleType name="degree_type">
+        <xs:restriction base="xs:float">
+            <xs:minInclusive value="0"/>
+            <xs:maxExclusive value="360"/>
+        </xs:restriction>
+        <xs:annotation>
+            <xs:documentation>An angle in degrees</xs:documentation>
+        </xs:annotation>
+    </xs:simpleType>
+
+    <!-- Triangle struct -->
+    <xs:complexType name="triangle">
+        <xs:attribute name="size" type="size_type">
+            <xs:annotation>
+                <xs:documentation>The size of the triangle</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="angle" type="degree_type">
+            <xs:annotation>
+                <xs:documentation>The angle of rotation</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="color" type="df:color4">
+            <xs:annotation>
+                <xs:documentation>The color of the triangle</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="is_filled" type="fill_type" df:displayName="Style">
+            <xs:annotation>
+                <xs:documentation>Toggles filled/wireframe rendering</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+</xs:schema>

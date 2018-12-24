@@ -1,4 +1,4 @@
-using DFGame;
+using DFGame.PropertyGrid;
 using Gtk;
 
 [GtkTemplate (ui="/org/df458/EditorDemo/MainWindow.ui")]
@@ -7,20 +7,9 @@ public class MainWindow : ApplicationWindow
     private Demo.Triangle triangle;
 
     [GtkChild]
-    private Scale angle_scale;
-    [GtkChild]
-    private Scale size_scale;
-    [GtkChild]
-    private ColorButton color_selector;
-    [GtkChild]
-    private Switch fill_switch;
+    private PropertyGrid properties;
     [GtkChild]
     private DFGame.Viewport viewport;
-
-    public MainWindow()
-    {
-        color_selector.notify["rgba"].connect(color_changed);
-    }
 
     public void prepare()
     {
@@ -31,6 +20,12 @@ public class MainWindow : ApplicationWindow
 
         Demo.init();
         triangle = new Demo.Triangle();
+
+        properties.builder = new BasicPropertyBuilder();
+        properties.load_schema_from_resource("/org/df458/EditorDemo/schemas/triangle.xsd");
+
+        properties.load_data(triangle.save());
+        properties.show_all();
     }
 
     private bool on_loop(float dt)
@@ -42,42 +37,20 @@ public class MainWindow : ApplicationWindow
     }
 
     [GtkCallback]
-    public void angle_changed()
-    {
-        triangle.angle = (float)angle_scale.adjustment.value;
-        viewport.queue_render();
-    }
-
-    [GtkCallback]
-    public void size_changed()
-    {
-        triangle.size = (float)size_scale.adjustment.value;
-        viewport.queue_render();
-    }
-
-    public void color_changed(ParamSpec p)
-    {
-        triangle.color.r = (float)color_selector.rgba.red;
-        triangle.color.g = (float)color_selector.rgba.green;
-        triangle.color.b = (float)color_selector.rgba.blue;
-        viewport.queue_render();
-    }
-
-    [GtkCallback]
-    public bool toggle_filled(bool fill)
-    {
-        triangle.filled = fill;
-        viewport.queue_render();
-
-        return false;
-    }
-
-    [GtkCallback]
     public void on_reset()
     {
-        angle_scale.adjustment.value = 0;
-        size_scale.adjustment.value = 0.5;
-        color_selector.rgba = Gdk.RGBA(){ red=1, green=1, blue=1, alpha=1 };
-        fill_switch.active = true;
+        triangle.angle = 0;
+        triangle.size = 0.5f;
+        triangle.filled = true;
+        triangle.color.r = 1.0f;
+        triangle.color.g = 1.0f;
+        triangle.color.b = 1.0f;
+
+        properties.update_data(triangle.save());
+    }
+
+    [GtkCallback]
+    private void triangle_property_changed(string data) {
+        triangle.load(data);
     }
 }

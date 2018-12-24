@@ -24,6 +24,12 @@ namespace Demo
 
         [CCode (cname = "triangle_draw")]
         public void draw();
+
+        [CCode (cname = "triangle_load")]
+        public void load(string data);
+
+        [CCode (cname = "triangle_save")]
+        public string save();
     }
 
     [CCode (cname = "vec4")]

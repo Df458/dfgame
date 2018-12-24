@@ -29,6 +29,7 @@ install_headers(
 
 graphics = declare_dependency(include_directories : include_directories('.'), link_with : graphicslib)
 graphics_vapi = files(
+    'vapi/Framebuffer.vapi',
     'vapi/Spriteset.vapi',
     'vapi/Texture.vapi'
     )

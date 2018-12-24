@@ -1,15 +1,31 @@
 applicationeditorcsrc  = [ 'input.c', 'window.c' ]
 applicationeditorclib  = static_library('dfgame_application_editor_backend', applicationeditorcsrc,
                          include_directories : applicationinc,
-                         dependencies : applicationdeps + [ gtk ],
+                         dependencies : [ gtk ],
                          link_with : applicationlink,
                          link_args : args,
                          install : true)
 
 
-applicationeditordeps = [ gtk ]
-applicationeditorsrc  = [ 'Viewport.vala' ]
-applicationeditorvapi  = [ 'editorc.vapi' ]
+applicationeditordeps = [ gee, gtk, xml ]
+applicationeditorsrc  = [
+  'Init.vala',
+  'propertygrid/Annotation.vala',
+  'propertygrid/Attribute.vala',
+  'propertygrid/editors/BoolPropertyEditor.vala',
+  'propertygrid/editors/ColorPropertyEditor.vala',
+  'propertygrid/editors/EnumPropertyEditor.vala',
+  'propertygrid/editors/FloatPropertyEditor.vala',
+  'propertygrid/editors/PropertyEditor.vala',
+  'propertygrid/PropertyEditorBuilder.vala',
+  'propertygrid/PropertyGrid.vala',
+  'propertygrid/PropertyType.vala',
+  'propertygrid/Restriction.vala',
+  'propertygrid/SimpleType.vala',
+  'propertygrid/xsd_def.vala',
+  'Viewport.vala',
+]
+applicationeditorvapi  = [ 'editorc.vapi' ] + core_vapi
 applicationeditorinc  = [ include_directories('.') ] + applicationinc
 applicationeditorlib  = shared_library('dfgame_application_editor', applicationeditorsrc + applicationeditorvapi,
                         include_directories : applicationeditorinc,
@@ -19,7 +35,15 @@ applicationeditorlib  = shared_library('dfgame_application_editor', applicatione
                         link_with : [ gameplaylib, graphicslib, applicationeditorclib ],
                         vala_args : ['--target-glib=2.38'],
                         install : true,
-                       install_dir : [ true, true, true ])
+                        install_dir : [ true, true, true ])
+
+applicationeditorlib_shared = shared_library('dfgame_application_editor_shared', applicationeditorsrc + applicationeditorvapi,
+                        include_directories : applicationeditorinc,
+                        dependencies : applicationeditordeps,
+                        link_with : [ gameplaylib, graphicslib, applicationeditorclib ],
+                        vala_args : ['--target-glib=2.38'],
+                        install : true,
+                        install_dir : [ true, true, true ])
 
 pkgconfig.generate(applicationeditorclib,
                    version : '1.0.0',
@@ -41,3 +65,21 @@ install_data(sources : '../../../data/catalog/dfgame-editor.xml', install_dir : 
 
 application_editor_c = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorclib)
 application_editor_vala = declare_dependency(include_directories : [include_directories('.'), include_directories('..')], link_with : applicationeditorlib, sources : applicationeditorvapi)
+
+if lint.found()
+    run_target(
+        'lint-editor',
+        command: [
+            lint,
+        ] + applicationeditorsrc)
+endif
+
+if tidy.found()
+    run_target(
+        'tidy-editor',
+        command: [
+            tidy,
+            '-checks=*-hicpp-signed-bitwise',
+            '-p', meson.build_root()
+        ] + applicationeditorcsrc)
+endif

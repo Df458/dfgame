@@ -1,8 +1,9 @@
-using DFGame;
+using DFGame.Application;
 
 public static int main (string[] args)
 {
+    init();
+
     DemoApp app = new DemoApp();
-    typeof(Viewport).ensure();
     return app.run(args);
 }

@@ -46,6 +46,10 @@ install_headers([
   'memory/alloc.h'
 ], subdir : 'dfgame/core/memory')
 
+core_vapi = files(
+    'log/vapi/Log.vapi'
+    )
+
 core = declare_dependency(include_directories : coreinc, link_with : corelib)
 
 if tidy.found()

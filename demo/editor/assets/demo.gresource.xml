@@ -1,5 +1,6 @@
 <gresources>
     <gresource prefix="/org/df458/EditorDemo">
         <file preprocess="xml-stripblanks">MainWindow.ui</file>
+        <file preprocess="xml-stripblanks">schemas/triangle.xsd</file>
     </gresource>
 </gresources>

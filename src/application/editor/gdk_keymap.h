@@ -1,7 +1,8 @@
 #ifndef APPLICATION_KEYMAP_H
 #define APPLICATION_KEYMAP_H
+#include "application/input_id.h"
+
 #include <gdk/gdkkeysyms.h>
-#include "input_id.h"
 
 const uint32 dfgame_to_native_key[] = {
     [0 ... K_LAST]           = GDK_KEY_VoidSymbol,

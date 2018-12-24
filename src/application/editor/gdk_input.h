@@ -1,8 +1,8 @@
 #ifndef APPLICATION_GDK_INPUT_H
 #define APPLICATION_GDK_INPUT_H
-#include <gdk/gdk.h>
+#include "application/input.h"
 
-#include "input.h"
+#include <gdk/gdk.h>
 
 bool on_button_press(GdkEventButton* event);
 bool on_button_release(GdkEventButton* event);

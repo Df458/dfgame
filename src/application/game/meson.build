@@ -1,7 +1,7 @@
 applicationgamesrc  = [ 'input.c', 'mainloop.c', 'window.c' ]
 applicationgamelib  = static_library('dfgame_application_game', applicationgamesrc,
                          include_directories : applicationinc,
-                         dependencies : applicationdeps,
+                         dependencies : [ glfw, glew ],
                          link_with : applicationlink,
                          link_args : args,
                          install : true)

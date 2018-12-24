@@ -11,6 +11,7 @@ pkgconfig = import('pkgconfig')
 m = compiler.find_library('m', required : false)
 
 tidy = find_program('clang-tidy', required: false)
+lint = find_program('io.elementary.vala-lint', required: false)
 
 cunit = dependency('cunit')
 freetype = dependency('freetype2')
@@ -36,6 +37,7 @@ if get_option('enable_tga') == true
 endif
 vorbis = dependency('vorbisfile')
 xml = dependency('libxml-2.0')
+gee = dependency('gee-0.8')
 gtk = dependency('gtk+-3.0')
 
 add_project_arguments('-I/usr/include/freetype2', language: 'c')

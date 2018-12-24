@@ -2,13 +2,12 @@
 #define LOG_CATEGORY "Application"
 
 #include "gdk_input.h"
-
 #include "gdk_keymap.h"
 
-#include "check.h"
-#include "container/array.h"
-#include "log/log.h"
-#include "memory/alloc.h"
+#include "core/check.h"
+#include "core/container/array.h"
+#include "core/log/log.h"
+#include "core/memory/alloc.h"
 
 typedef struct input_binding {
     array actions;

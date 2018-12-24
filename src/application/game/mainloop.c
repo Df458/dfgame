@@ -3,8 +3,9 @@
 
 #include "mainloop.h"
 
-#include "input.h"
-#include "memory/alloc.h"
+#include "application/input.h"
+#include "core/memory/alloc.h"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 

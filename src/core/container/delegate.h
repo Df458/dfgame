@@ -1,6 +1,6 @@
 #ifndef DF_CORE_DELEGATE
 #define DF_CORE_DELEGATE
-#include "types.h"
+#include "core/types.h"
 
 // Used to compare elements in a container, returning if the elements are the
 // same.
