@@ -10,6 +10,9 @@
             </signals>
         </glade-widget-class>
         <glade-widget-class name="DFGamePropertyGridPropertyGrid" generic-name="propertygrid" title="Property Grid" get-type-function="df_game_property_grid_property_grid_get_type">
+            <properties>
+                <property id="builder" visible="false"/>
+            </properties>
             <signals>
                 <signal id="value_changed"/>
             </signals>
