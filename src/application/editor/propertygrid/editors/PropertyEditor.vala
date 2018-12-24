@@ -1,11 +1,13 @@
 using Gtk;
 
-namespace DFGame {
+namespace DFGame.PropertyGrid.Editors {
     // Widget for editing properties
     public abstract class PropertyEditor : Box {
-        public string display_name { get; private set; }
-        public string property_name { get; private set; }
+        // The attribute being edited
+        public Attribute attribute { get; private set; }
         public string owner_name { get; private set; }
+        public string property_name { get { return attribute.name; } }
+        public PropertyType prop_type { get { return attribute.prop_type; } }
 
         private string _current_value = null;
         public string current_value {
@@ -26,17 +28,22 @@ namespace DFGame {
             orientation = Orientation.HORIZONTAL;
             spacing = 6;
         }
-        public PropertyEditor (string owner, string name, PropertyType prop, string value) {
+        public PropertyEditor (string owner, Attribute attr, string value) {
             owner_name = owner;
-            property_name = name;
-            display_name = property_name.replace ("_", " ").strip ();
-            display_name.data[0] = display_name.get (0).toupper ();
+            attribute = attr;
 
-            name_label = new Label (display_name);
-            name_label.halign = Align.END;
-            if(prop.documentation != null) {
-                name_label.set_tooltip_markup(prop.documentation);
+            // Get the tooltip from the attribute's documentation
+            if (attr.annotation != null) {
+                string tooltip = attr.annotation.documentation;
+
+                if (attr.prop_type.annotation != null) {
+                    tooltip = "%s\n\n(Type: %s)".printf (tooltip, attr.prop_type.annotation.documentation);
+                }
+                set_tooltip_markup (tooltip);
             }
+
+            name_label = new Label (attr.display_name);
+            name_label.halign = Align.END;
             pack_start (name_label);
 
             reset_button = new Button.from_icon_name ("edit-clear-symbolic");
@@ -94,11 +101,28 @@ namespace DFGame {
     }
 
     public class GenericPropertyEditor : PropertyEditor {
-        public GenericPropertyEditor (string owner, string name, PropertyType prop, string value) {
-            base (owner, name, prop, value);
+        public GenericPropertyEditor (string owner, Attribute attr, string value) {
+            base (owner, attr, value);
         }
         protected override Widget? create_editor_widget () {
             entry = new Entry ();
+
+            // Check for restrictions
+            if (prop_type is SimpleType) {
+                SimpleType simple = (SimpleType)prop_type;
+                if (simple.restriction != null) {
+                    // Minimum length
+                    if (simple.restriction.min_length != null) {
+                        // TODO:
+                    }
+
+                    // Maximum length
+                    if (simple.restriction.max_length != null) {
+                        entry.max_length = simple.restriction.max_length;
+                    }
+                }
+            }
+
             entry.activate.connect (() => { handle_value_changed (entry.text); });
             entry.focus_out_event.connect (() => { handle_value_changed (entry.text); return true; });
             return entry;

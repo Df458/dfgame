@@ -1,4 +1,4 @@
-using DFGame;
+using DFGame.PropertyGrid;
 using Gtk;
 
 [GtkTemplate (ui="/org/df458/EditorDemo/MainWindow.ui")]
@@ -7,7 +7,7 @@ public class MainWindow : ApplicationWindow
     private Demo.Triangle triangle;
 
     [GtkChild]
-    private DFGame.PropertyGrid properties;
+    private PropertyGrid properties;
     [GtkChild]
     private DFGame.Viewport viewport;
 

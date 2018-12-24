@@ -1,6 +1,6 @@
 namespace DFGame.Application {
     public static void init () {
-        typeof (PropertyGrid).ensure ();
+        typeof (DFGame.PropertyGrid.PropertyGrid).ensure ();
         typeof (Viewport).ensure ();
     }
 }

@@ -9,7 +9,7 @@
                 <signal id="update_step"/>
             </signals>
         </glade-widget-class>
-        <glade-widget-class name="DFGamePropertyGrid" generic-name="propertygrid" title="Property Grid" get-type-function="df_game_property_grid_get_type">
+        <glade-widget-class name="DFGamePropertyGridPropertyGrid" generic-name="propertygrid" title="Property Grid" get-type-function="df_game_property_grid_property_grid_get_type">
             <signals>
                 <signal id="value_changed"/>
             </signals>
@@ -18,6 +18,6 @@
 
     <glade-widget-group name="DFGame" title="DFGame Editor Widgets">
         <glade-widget-class-ref name="DFGameViewport"/>
-        <glade-widget-class-ref name="DFGamePropertyGrid"/>
+        <glade-widget-class-ref name="DFGamePropertyGridPropertyGrid"/>
     </glade-widget-group>
 </glade-catalog>

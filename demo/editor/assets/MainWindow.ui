@@ -11,15 +11,17 @@
       <object class="GtkPaned">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="position">250</property>
+        <property name="position">320</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <property name="spacing">6</property>
+            <property name="margin_top">6</property>
+            <property name="margin_bottom">6</property>
             <child>
-              <object class="DFGamePropertyGrid" id="properties">
+              <object class="DFGamePropertyGridPropertyGrid" id="properties">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <signal name="value_changed" handler="triangle_property_changed" swapped="no"/>
@@ -38,7 +40,6 @@
                 <property name="receives_default">True</property>
                 <property name="margin_start">6</property>
                 <property name="margin_end">6</property>
-                <property name="margin_bottom">6</property>
                 <signal name="clicked" handler="on_reset" swapped="no"/>
                 <style>
                   <class name="destructive-action"/>

@@ -1,8 +1,8 @@
 using Gtk;
-namespace DFGame {
+namespace DFGame.PropertyGrid.Editors {
     public class BoolPropertyEditor : PropertyEditor {
-        public BoolPropertyEditor (string owner, string name, PropertyType prop, string value) {
-            base (owner, name, prop, value);
+        public BoolPropertyEditor (string owner, Attribute attr, string value) {
+            base (owner, attr, value);
         }
         protected override Widget? create_editor_widget () {
             check = new CheckButton ();

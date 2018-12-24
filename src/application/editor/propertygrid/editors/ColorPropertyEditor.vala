@@ -1,9 +1,9 @@
 using Gtk;
 
-namespace DFGame {
+namespace DFGame.PropertyGrid.Editors {
     public class ColorPropertyEditor : PropertyEditor {
-        public ColorPropertyEditor (string owner, string name, PropertyType prop, string value) {
-            base (owner, name, prop, value);
+        public ColorPropertyEditor (string owner, Attribute attr, string value) {
+            base (owner, attr, value);
         }
         protected override Widget? create_editor_widget () {
             color = new ColorButton ();

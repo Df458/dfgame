@@ -1,53 +1,9 @@
 using DFGame.Core;
+using DFGame.PropertyGrid.Editors;
 using Gtk;
 using Xml;
 
-namespace DFGame {
-    // Represents a property on an object
-    public class PropertyType {
-        public string name { get; private set; }
-        public string documentation { get; private set; }
-
-        public PropertyType.complex (Xml.Node* node_dat) {
-            name = "complexType";
-            prepare (node_dat->children);
-        }
-
-        public PropertyType.attribute (Xml.Node* node_dat) {
-            name = node_dat->get_prop ("type");
-            prepare (node_dat->children);
-        }
-
-        public void prepare (Xml.Node* node_dat) {
-            for (Xml.Node* node = node_dat; node != null; node = node->next) {
-                if (node->type == ElementType.ELEMENT_NODE) {
-                    if (node->name == "attribute") {
-                        PropertyType new_prop = new PropertyType.attribute (node);
-                        props.set (node->get_prop ("name"), new_prop);
-                    } else if (node->name == "annotation") {
-                        for (Xml.Node* child = node->children; child != null; child = child->next) {
-                            if (child->type == ElementType.ELEMENT_NODE && child->name == "documentation") {
-                                documentation = child->get_content();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        public bool try_get_prop (out PropertyType prop, string name) {
-            if (!props.has_key (name)) {
-                prop = null;
-                return false;
-            }
-
-            prop = props.get (name);
-
-            return true;
-        }
-
-        private Gee.HashMap<string, PropertyType> props = new Gee.HashMap<string, PropertyType> ();
-    }
-
+namespace DFGame.PropertyGrid {
     // Widget for viewing/editing objects with properties
     public class PropertyGrid : Bin {
         public signal void value_changed (string data);
@@ -68,10 +24,26 @@ namespace DFGame {
                 return false;
             }
 
-            for (var node = doc->children->children; node != null; node = node->next) {
-                if (node->type == ElementType.ELEMENT_NODE && node->name == "complexType") {
-                    types.set (node->get_prop ("name"), new PropertyType.complex (node));
+            for (var node = doc->children->first_element_child (); node != null; node = node->next_element_sibling ()) {
+                PropertyType prop = null;
+
+                switch (node->name) {
+                    case XSD_COMPLEX_TYPE:
+                        prop = new PropertyType.complex (node);
+                    break;
+                    case XSD_SIMPLE_TYPE:
+                        prop = new SimpleType (node);
+                    break;
                 }
+
+                if (prop != null) {
+                    types.set (prop.type_name, prop);
+                }
+            }
+
+            // Update property type references
+            foreach (var prop in types.values) {
+                prop.update_types (this);
             }
 
             return false;
@@ -135,10 +107,10 @@ namespace DFGame {
         // Adds a property editing widget for an object with the given property data
         public bool add_property (string owner, string name, string value) {
             PropertyType owner_type = types.get (owner);
-            PropertyType prop_type;
+            Attribute attr;
 
-            if (owner_type.try_get_prop (out prop_type, name)) {
-                PropertyEditor editor = builder.create_editor (owner, name, prop_type, value);
+            if (owner_type.try_get_attr (out attr, name)) {
+                PropertyEditor editor = builder.create_editor (owner, attr, value);
                 editor.value_changed.connect (on_update_value);
                 editor.set_groups (label_group, control_group);
                 properties_list.add (editor);
@@ -155,6 +127,12 @@ namespace DFGame {
             }
 
             return false;
+        }
+
+        // Get a PropertyType from the type name
+        public bool try_get_prop_type (string name, out PropertyType prop_type) {
+            prop_type = types.get (name);
+            return prop_type != null;
         }
 
         private void on_update_value (PropertyEditor editor, string value) {
