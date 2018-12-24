@@ -1,6 +1,6 @@
 #ifndef DF_RESOURCE_TEXTURE_LOADER
 #define DF_RESOURCE_TEXTURE_LOADER
-#include "texture.h"
+#include "graphics/texture.h"
 #ifdef enable_gif
 #include <gif_lib.h>
 #endif

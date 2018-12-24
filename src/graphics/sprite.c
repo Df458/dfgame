@@ -61,7 +61,7 @@ void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset)
     sprite_set_animation_common(spr, spriteset_get_animation(spr->src, handle), force_reset);
 }
 
-void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset) {
+void sprite_set_animation_id(sprite spr, container_index handle, bool force_reset) {
     check_return(spr, "Sprite is NULL", );
 
     sprite_set_animation_common(spr, spriteset_get_animation(spr->src, handle), force_reset);

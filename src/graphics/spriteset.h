@@ -65,12 +65,12 @@ uint16 spriteset_get_animation_count(spriteset set);
     void*: spriteset_get_animation_by_name,\
     char*: spriteset_get_animation_by_name,\
     const char*: spriteset_get_animation_by_name,\
-    int16: spriteset_get_animation_by_id\
+    container_index: spriteset_get_animation_by_id\
 )(s, h)
 // Gets an animation from the spriteset, based on the hash key
 animation* spriteset_get_animation_by_name(spriteset set, const char* handle);
 // Gets an animation from the spriteset, based on the numeric id
-animation* spriteset_get_animation_by_id(spriteset set, int16 handle);
+animation* spriteset_get_animation_by_id(spriteset set, container_index handle);
 
 // Gets the underlying texture of the spriteset
 gltex spriteset_get_texture(spriteset set);

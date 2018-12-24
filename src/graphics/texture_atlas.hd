@@ -1,7 +1,7 @@
 #ifndef DF_GRAPHICS_TEXTURE_ATLAS_D
 #define DF_GRAPHICS_TEXTURE_ATLAS_D
 
-#include "types.h"
+#include "core/types.h"
 
 // Represents a texture atlas
 declarep(struct, texture_atlas);

@@ -1,6 +1,6 @@
 #ifndef DF_AUDIO_SOURCE_D
 #define DF_AUDIO_SOURCE_D
-#include "types.h"
+#include "core/types.h"
 
 declarep(struct, audio_source);
 

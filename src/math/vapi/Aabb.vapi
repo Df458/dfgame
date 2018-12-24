@@ -41,7 +41,7 @@ namespace DFGame.Math
 
         [CCode (cname="vala_to_string")]
         public string to_string() {
-            return printstr.printf(x, y, width, height);
+            return printstr.printf(position.x, position.y, position.z, dimensions.x, dimensions.y, dimensions.z);
         }
     }
 }

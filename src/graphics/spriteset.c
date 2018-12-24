@@ -256,7 +256,7 @@ animation* spriteset_get_animation_by_name(spriteset set, const char* handle) {
 }
 
 // Gets an animation from the spriteset, based on the numeric id
-animation* spriteset_get_animation_by_id(spriteset set, int16 handle) {
+animation* spriteset_get_animation_by_id(spriteset set, container_index handle) {
     check_return(set, "Spriteset is NULL", NULL);
 
     array_foreach(set->animations, iter) {

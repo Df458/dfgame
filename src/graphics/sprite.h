@@ -17,7 +17,7 @@ sprite sprite_new(spriteset set);
     int16: sprite_set_animation_id\
 )(s, h, f)
 void sprite_set_animation_name(sprite spr, const char* handle, bool force_reset);
-void sprite_set_animation_id(sprite spr, int16 handle, bool force_reset);
+void sprite_set_animation_id(sprite spr, container_index handle, bool force_reset);
 animation* sprite_get_animation(sprite spr);
 
 void sprite_set_orientation(sprite spr, uint8 orient);

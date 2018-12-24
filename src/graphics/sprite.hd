@@ -1,7 +1,7 @@
 #ifndef DF_GRAPHICS_SPRITE_D
 #define DF_GRAPHICS_SPRITE_D
 
-#include "types.h"
+#include "core/types.h"
 
 declarep(struct, sprite)
 
