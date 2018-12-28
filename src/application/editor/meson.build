@@ -37,14 +37,6 @@ applicationeditorlib  = shared_library('dfgame_application_editor', applicatione
                         install : true,
                         install_dir : [ true, true, true ])
 
-applicationeditorlib_shared = shared_library('dfgame_application_editor_shared', applicationeditorsrc + applicationeditorvapi,
-                        include_directories : applicationeditorinc,
-                        dependencies : applicationeditordeps,
-                        link_with : [ gameplaylib, graphicslib, applicationeditorclib ],
-                        vala_args : ['--target-glib=2.38'],
-                        install : true,
-                        install_dir : [ true, true, true ])
-
 pkgconfig.generate(applicationeditorclib,
                    version : '1.0.0',
                    name : 'dfgame-application-editor-backend',

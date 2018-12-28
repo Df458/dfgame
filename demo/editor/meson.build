@@ -18,3 +18,11 @@ deditortarget = executable('demo_editor', deditorsrc + deditorresources,
                         install : false)
 
 run_command('ctags', '-R', '.')
+
+if lint.found()
+    run_target(
+        'lint-demo-editor',
+        command: [
+            lint,
+        ] + deditorsrc)
+endif

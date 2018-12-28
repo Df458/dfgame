@@ -1,23 +1,19 @@
-public class DemoApp : Gtk.Application
-{
-    public DemoApp()
-    {
-        activate.connect(activate_response);
-        shutdown.connect(shutdown_response);
+public class DemoApp : Gtk.Application {
+    public DemoApp () {
+        activate.connect (activate_response);
+        shutdown.connect (shutdown_response);
     }
 
-    private void activate_response()
-    {
-        MainWindow win = new MainWindow();
+    private void activate_response () {
+        MainWindow win = new MainWindow ();
 
-        this.add_window(win);
-        win.present();
+        this.add_window (win);
+        win.present ();
 
-        win.prepare();
+        win.prepare ();
     }
 
-    private void shutdown_response()
-    {
-        Demo.cleanup();
+    private void shutdown_response () {
+        Demo.cleanup ();
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<glade-catalog name="dfgame" library="libdfgame_application_editor_shared" depends="gtk+" init-function="dfgame_init">
+<glade-catalog name="dfgame" library="libdfgame_application_editor" depends="gtk+" init-function="dfgame_application_init">
     <glade-widget-classes>
-        <glade-widget-class name="DFGameViewport" generic-name="viewport" title="DFGame Viewport" get-type-function="df_game_viewport_get_type" parent="GtkGLArea">
+        <glade-widget-class name="DFGameViewport" generic-name="viewport" title="DFGame Viewport" get-type-function="df_game_viewport_get_type">
             <properties>
                 <property id="update_interval" default="0" name="Update Interval"/>
             </properties>
@@ -9,7 +9,7 @@
                 <signal id="update_step"/>
             </signals>
         </glade-widget-class>
-        <glade-widget-class name="DFGamePropertyGridPropertyGrid" generic-name="propertygrid" title="Property Grid" get-type-function="df_game_property_grid_property_grid_get_type">
+        <glade-widget-class name="DFGamePropertyGridPropertyGrid" generic-name="propertygrid" title="DFGame Property Grid" get-type-function="df_game_property_grid_property_grid_get_type">
             <properties>
                 <property id="builder" visible="false"/>
             </properties>

@@ -16,15 +16,15 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
-            <property name="spacing">6</property>
             <property name="margin_top">6</property>
             <property name="margin_bottom">6</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
             <child>
               <object class="DFGamePropertyGridPropertyGrid" id="properties">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="value_changed" handler="triangle_property_changed" swapped="no"/>
+                <signal name="value-changed" handler="triangle_property_changed" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -61,7 +61,10 @@
           <object class="DFGameViewport" id="viewport">
             <property name="visible">True</property>
             <property name="app_paintable">True</property>
-            <property name="can_focus">False</property>
+            <property name="can_focus">True</property>
+            <property name="update_interval">60</property>
+            <property name="is_active">True</property>
+            <signal name="update-step" handler="on_loop" swapped="no"/>
           </object>
           <packing>
             <property name="resize">True</property>

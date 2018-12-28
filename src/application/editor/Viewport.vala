@@ -3,7 +3,7 @@ using DFGame.Application;
 
 namespace DFGame {
     public class Viewport : GLArea {
-        private uint _update_interval = 0;
+        private uint _update_interval = 60;
         public uint update_interval { get { return _update_interval; } set { set_update_timer (value); } }
         public unowned WindowProxy proxy { get { return _proxy; } }
 
@@ -43,6 +43,8 @@ namespace DFGame {
             render.connect (run_update);
 
             add_tick_callback (tick);
+
+            set_update_timer(update_interval);
         }
 
         public bool update () {
