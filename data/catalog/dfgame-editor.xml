@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <glade-catalog name="dfgame" library="libdfgame_application_editor" depends="gtk+" init-function="dfgame_application_init">
     <glade-widget-classes>
+        <glade-widget-class name="DFGameApplicationVec2Entry" generic-name="vec2entry" title="Vec2 Entry" get-type-function="df_game_application_vec2_entry_get_type"/>
+        <glade-widget-class name="DFGameApplicationVec3Entry" generic-name="vec3entry" title="Vec3 Entry" get-type-function="df_game_application_vec3_entry_get_type"/>
+        <glade-widget-class name="DFGameApplicationVec4Entry" generic-name="vec4entry" title="Vec4 Entry" get-type-function="df_game_application_vec4_entry_get_type"/>
         <glade-widget-class name="DFGameViewport" generic-name="viewport" title="DFGame Viewport" get-type-function="df_game_viewport_get_type">
             <properties>
                 <property id="update_interval" default="0" name="Update Interval"/>
@@ -20,6 +23,9 @@
     </glade-widget-classes>
 
     <glade-widget-group name="DFGame" title="DFGame Editor Widgets">
+        <glade-widget-class-ref name="DFGameApplicationVec2Entry"/>
+        <glade-widget-class-ref name="DFGameApplicationVec3Entry"/>
+        <glade-widget-class-ref name="DFGameApplicationVec4Entry"/>
         <glade-widget-class-ref name="DFGameViewport"/>
         <glade-widget-class-ref name="DFGamePropertyGridPropertyGrid"/>
     </glade-widget-group>

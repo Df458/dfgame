@@ -1,0 +1,7 @@
+<gresources>
+    <gresource prefix="/org/df458/DFGame/Application">
+        <file preprocess="xml-stripblanks">Vec2Entry.ui</file>
+        <file preprocess="xml-stripblanks">Vec3Entry.ui</file>
+        <file preprocess="xml-stripblanks">Vec4Entry.ui</file>
+    </gresource>
+</gresources>

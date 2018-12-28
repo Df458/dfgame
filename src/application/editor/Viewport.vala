@@ -44,7 +44,7 @@ namespace DFGame {
 
             add_tick_callback (tick);
 
-            set_update_timer(update_interval);
+            set_update_timer (update_interval);
         }
 
         public bool update () {

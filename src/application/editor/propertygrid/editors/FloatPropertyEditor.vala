@@ -27,7 +27,7 @@ namespace DFGame.PropertyGrid.Editors {
                     } else if (simple.restriction.min_exclusive != null) {
                         // SpinButton range is inclusive, so we calculate
                         // the closest valid number based on the digit count
-                        min = simple.restriction.min_exclusive + (1.0 / Math.pow (10, digits));
+                        min = simple.restriction.min_exclusive + (1.0 / GLib.Math.pow (10, digits));
                     }
 
                     // Maximum value
@@ -36,7 +36,7 @@ namespace DFGame.PropertyGrid.Editors {
                     } else if (simple.restriction.max_exclusive != null) {
                         // SpinButton range is inclusive, so we calculate
                         // the closest valid number based on the digit count
-                        max = simple.restriction.max_exclusive - (1.0 / Math.pow (10, digits));
+                        max = simple.restriction.max_exclusive - (1.0 / GLib.Math.pow (10, digits));
                     }
                 }
             }

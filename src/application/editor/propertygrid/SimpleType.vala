@@ -9,7 +9,7 @@ namespace DFGame.PropertyGrid {
 
         // The name of the underlying primitive type
         public override string primitive_name { get {
-            if(restriction != null) {
+            if (restriction != null) {
                 return restriction.base_name;
             }
 
