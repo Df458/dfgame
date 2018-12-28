@@ -6,6 +6,10 @@ namespace DFGame.PropertyGrid {
     public class PropertyType {
         public string name { get; protected set; }
         public string type_name { get; protected set; }
+
+        // The name of the underlying primitive type
+        public virtual string primitive_name { get { return name; } }
+
         public Annotation annotation { get; protected set; }
 
         public PropertyType.complex (Xml.Node* node_dat) {

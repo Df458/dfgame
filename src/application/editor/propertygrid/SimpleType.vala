@@ -7,6 +7,15 @@ namespace DFGame.PropertyGrid {
         // The restrictions placed on this type
         public Restriction restriction { get; private set; default = null; }
 
+        // The name of the underlying primitive type
+        public override string primitive_name { get {
+            if(restriction != null) {
+                return restriction.base_name;
+            }
+
+            return name;
+        } }
+
         public SimpleType (Xml.Node* node_dat) {
             name = "simpleType";
             type_name = node_dat->get_prop ("name");
