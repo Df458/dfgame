@@ -87,6 +87,14 @@ namespace DFGame.Application {
         public Vec2 get_vector () {
             return _vector;
         }
+        public void set_vector (Vec2 vec) {
+            if (_vector.x != vec.x || _vector.y != vec.y) {
+                _vector = vec;
+
+                update_entry_text ();
+                value_changed (_vector);
+            }
+        }
 
         private Vec2 _vector;
 
@@ -187,6 +195,14 @@ namespace DFGame.Application {
 
         public Vec3 get_vector () {
             return _vector;
+        }
+        public void set_vector (Vec3 vec) {
+            if (_vector.x != vec.x || _vector.y != vec.y || _vector.z != vec.z) {
+                _vector = vec;
+
+                update_entry_text ();
+                value_changed (_vector);
+            }
         }
 
         [GtkChild]
@@ -310,6 +326,14 @@ namespace DFGame.Application {
 
         public Vec4 get_vector () {
             return _vector;
+        }
+        public void set_vector (Vec4 vec) {
+            if (_vector.x != vec.x || _vector.y != vec.y || _vector.z != vec.z || _vector.w != vec.w) {
+                _vector = vec;
+
+                update_entry_text ();
+                value_changed (_vector);
+            }
         }
 
         [GtkChild]

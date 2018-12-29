@@ -60,7 +60,6 @@ namespace DFGame.PropertyGrid.Editors {
 
             set_is_changed (false);
 
-            widget.halign = Align.START;
             pack_start (widget, false, true);
         }
 

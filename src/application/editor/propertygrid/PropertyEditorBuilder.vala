@@ -31,6 +31,15 @@ namespace DFGame.PropertyGrid {
 
                 case "df:color4":
                     return new ColorPropertyEditor (owner, attr, value);
+
+                case "df:vec2":
+                    return new Vec2PropertyEditor (owner, attr, value);
+
+                case "df:vec3":
+                    return new Vec3PropertyEditor (owner, attr, value);
+
+                case "df:vec4":
+                    return new Vec4PropertyEditor (owner, attr, value);
             }
 
             // Fallback to text
