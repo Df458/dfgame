@@ -2,6 +2,7 @@ namespace DFGame.PropertyGrid {
     // Constants for XSD parsing
     const string DF_NS = "/org/df458/dfgame";
     const string DF_DISPLAY_NAME = "displayName";
+    const string DF_HINT = "hint";
 
     const string XSD_ANNOTATION = "annotation";
     const string XSD_ATTRIBUTE = "attribute";

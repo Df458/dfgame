@@ -10,6 +10,15 @@ namespace DFGame.PropertyGrid.Editors {
         }
         protected override Widget? create_editor_widget () {
             entry = new Vec2Entry ();
+
+            string hint;
+            if (attribute.try_get_hint ("x_icon", out hint)) {
+                entry.x_icon = hint;
+            }
+            if (attribute.try_get_hint ("y_icon", out hint)) {
+                entry.y_icon = hint;
+            }
+
             entry.value_changed.connect (() => {
                 handle_value_changed ("%f %f".printf (entry.x, entry.y));
             });
@@ -36,6 +45,18 @@ namespace DFGame.PropertyGrid.Editors {
         }
         protected override Widget? create_editor_widget () {
             entry = new Vec3Entry ();
+
+            string hint;
+            if (attribute.try_get_hint ("x_icon", out hint)) {
+                entry.x_icon = hint;
+            }
+            if (attribute.try_get_hint ("y_icon", out hint)) {
+                entry.y_icon = hint;
+            }
+            if (attribute.try_get_hint ("z_icon", out hint)) {
+                entry.z_icon = hint;
+            }
+
             entry.value_changed.connect (() => {
                 handle_value_changed ("%f %f %f".printf (entry.x, entry.y, entry.z));
             });
@@ -62,6 +83,21 @@ namespace DFGame.PropertyGrid.Editors {
         }
         protected override Widget? create_editor_widget () {
             entry = new Vec4Entry ();
+
+            string hint;
+            if (attribute.try_get_hint ("x_icon", out hint)) {
+                entry.x_icon = hint;
+            }
+            if (attribute.try_get_hint ("y_icon", out hint)) {
+                entry.y_icon = hint;
+            }
+            if (attribute.try_get_hint ("z_icon", out hint)) {
+                entry.z_icon = hint;
+            }
+            if (attribute.try_get_hint ("w_icon", out hint)) {
+                entry.w_icon = hint;
+            }
+
             entry.value_changed.connect (() => {
                 handle_value_changed ("%f %f %f %f".printf (entry.x, entry.y, entry.z, entry.w));
             });

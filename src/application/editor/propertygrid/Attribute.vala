@@ -38,6 +38,16 @@ namespace DFGame.PropertyGrid {
             }
         }
 
+        // Try to get the hint value set at key
+        public bool try_get_hint (string key, out string hint) {
+            hint = null;
+            if (annotation != null && annotation.try_get_hint (key, out hint)) {
+                return true;
+            }
+
+            return prop_type.try_get_hint (key, out hint);
+        }
+
         // Format a name for display
         private string make_display_name (string name) {
             // Split on underscores to form words

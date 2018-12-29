@@ -56,6 +56,16 @@ namespace DFGame.PropertyGrid {
             }
         }
 
+        // Try to get the hint value set at key
+        public bool try_get_hint (string key, out string hint) {
+            if (annotation == null) {
+                hint = null;
+                return false;
+            }
+
+            return annotation.try_get_hint (key, out hint);
+        }
+
         // All attributes on this property
         private Gee.HashMap<string, Attribute> attrs = new Gee.HashMap<string, Attribute> ();
     }
