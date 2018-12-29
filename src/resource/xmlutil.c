@@ -206,37 +206,92 @@ bool xml_property_read_double(const xmlNodePtr node, const char* name, double* v
     return true;
 }
 bool xml_property_read_vec2(const xmlNodePtr node, const char* name, vec2* val) {
-    int props_read = false;
+    xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
+    if(!prop) {
+        return false;
+    }
 
-    char* prop_name = saprintf("%s_x", name);
-    props_read |= xml_property_read(node, prop_name, &val->x);
-    sfree(prop_name);
+    uint16 count;
+    char** tokens = nstrsplit((char*)prop, " \t", &count);
 
-    prop_name = saprintf("%s_y", name);
-    props_read |= xml_property_read(node, prop_name, &val->y);
-    sfree(prop_name);
+    bool props_read = count == 2;
+
+    for(uint16 i = 0; props_read && i < count; ++i) {
+        if(!aisf(tokens[i])) {
+            props_read = false;
+            break;
+        }
+
+        val->data[i] = atof(tokens[i]);
+    }
+
+    if(tokens != NULL) {
+        for(uint16 i = 0; i < count; ++i) {
+            sfree(tokens[i]);
+        }
+        sfree(tokens);
+    }
+    sfree(prop);
 
     return props_read;
 }
 bool xml_property_read_vec3(const xmlNodePtr node, const char* name, vec3* val) {
-    bool props_read = false;
+    xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
+    if(!prop) {
+        return false;
+    }
 
-    props_read |= xml_property_read_vec2(node, name, &val->xy);
+    uint16 count;
+    char** tokens = nstrsplit((char*)prop, " \t", &count);
 
-    char* prop_name = saprintf("%s_z", name);
-    props_read |= xml_property_read(node, prop_name, &val->z);
-    sfree(prop_name);
+    bool props_read = count == 3;
+
+    for(uint16 i = 0; props_read && i < count; ++i) {
+        if(!aisf(tokens[i])) {
+            props_read = false;
+            break;
+        }
+
+        val->data[i] = atof(tokens[i]);
+    }
+
+    if(tokens != NULL) {
+        for(uint16 i = 0; i < count; ++i) {
+            sfree(tokens[i]);
+        }
+        sfree(tokens);
+    }
+    sfree(prop);
 
     return props_read;
 }
 bool xml_property_read_vec4(const xmlNodePtr node, const char* name, vec4* val) {
-    bool props_read = false;
+    xmlChar* prop = xmlGetProp(node, (const xmlChar*)name);
+    if(!prop) {
+        return false;
+    }
 
-    props_read |= xml_property_read_vec3(node, name, &val->xyz);
+    uint16 count;
+    char** tokens = nstrsplit((char*)prop, " \t", &count);
 
-    char* prop_name = saprintf("%s_w", name);
-    props_read |= xml_property_read(node, prop_name, &val->w);
-    sfree(prop_name);
+    bool props_read = count == 4;
+
+    for(uint16 i = 0; props_read && i < count; ++i) {
+        if(!aisf(tokens[i])) {
+            props_read = false;
+            break;
+        }
+
+        val->data[i] = atof(tokens[i]);
+    }
+
+    if(tokens != NULL) {
+        for(uint16 i = 0; i < count; ++i) {
+            sfree(tokens[i]);
+        }
+        sfree(tokens);
+    }
+    sfree(prop);
 
     return props_read;
 }
@@ -358,41 +413,25 @@ bool xml_property_write_double(xmlTextWriterPtr writer, const char* name, double
     return ret != -1;
 }
 bool xml_property_write_vec2(xmlTextWriterPtr writer, const char* name, vec2 val) {
-    char* prop_name = saprintf("%s_x", name);
+    char* data = saprintf("%f %f", vec2_decomp(val));
+    int ret = xmlTextWriterWriteAttribute(writer, (xmlChar*)name, (xmlChar*)data);
+    sfree(data);
 
-    bool ret = xml_property_write_float(writer, prop_name, val.x);
-    sfree(prop_name);
-    if(!ret) {
-        return false;
-    }
-
-    prop_name = saprintf("%s_y", name);
-    ret = xml_property_write_float(writer, prop_name, val.y);
-    sfree(prop_name);
-
-    return ret;
+    return ret != -1;
 }
 bool xml_property_write_vec3(xmlTextWriterPtr writer, const char* name, vec3 val) {
-    if(!xml_property_write_vec2(writer, name, val.xy)) {
-        return false;
-    }
+    char* data = saprintf("%f %f %f", vec3_decomp(val));
+    int ret = xmlTextWriterWriteAttribute(writer, (xmlChar*)name, (xmlChar*)data);
+    sfree(data);
 
-    char* prop_name = saprintf("%s_z", name);
-    bool ret = xml_property_write_float(writer, prop_name, val.z);
-    sfree(prop_name);
-
-    return ret;
+    return ret != -1;
 }
 bool xml_property_write_vec4(xmlTextWriterPtr writer, const char* name, vec4 val) {
-    if(!xml_property_write_vec3(writer, name, val.xyz)) {
-        return false;
-    }
+    char* data = saprintf("%f %f %f %f", vec4_decomp(val));
+    int ret = xmlTextWriterWriteAttribute(writer, (xmlChar*)name, (xmlChar*)data);
+    sfree(data);
 
-    char* prop_name = saprintf("%s_w", name);
-    bool ret = xml_property_write_float(writer, prop_name, val.w);
-    sfree(prop_name);
-
-    return ret;
+    return ret != -1;
 }
 bool xml_property_write_string(xmlTextWriterPtr writer, const char* name, char* val) {
     if(!val) {

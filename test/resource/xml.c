@@ -3,7 +3,7 @@
 #include "log/log.h"
 #include <libxml/parser.h>
 
-static const char test_file_1[] = "<root small_int=\"1\" big_int=\"1234567\" negative_int=\"-40\" vec_x=\"1.25\" vec_y=\"-35.7\" vec_z=\"0\" vec_w=\"45.01\" string=\"lorem ipsum\" bool=\"true\" Bool=\"False\" color3=\"#ff00ff\" Color3=\"#00FFFF\" color4=\"#ffffffff\" Color4=\"#FFFF0000\"/>";
+static const char test_file_1[] = "<root small_int=\"1\" big_int=\"1234567\" negative_int=\"-40\" vec2=\"12.5 0.25\" vec3=\"1.25 -35.7 45.01\" vec4=\"1 -0.15 0 6.250\" vec5=\"1 -0.15 0 6.250 7\" float=\"1.25\" string=\"lorem ipsum\" bool=\"true\" Bool=\"False\" color3=\"#ff00ff\" Color3=\"#00FFFF\" color4=\"#ffffffff\" Color4=\"#FFFF0000\"/>";
 static const char test_file_2[] = "<root><child v=\"1\"/><match v=\"2\"/><child v=\"3\"/><child v=\"4\"/><match v=\"5\"/></root>";
 
 static xmlDocPtr test_doc = NULL;
@@ -43,9 +43,9 @@ void test_xml_read() {
     int32 test_int32 = 0;
     float test_float = 0;
     double test_double = 0;
-    vec2 test_vec2 = {0};
-    vec3 test_vec3 = {0};
-    vec4 test_vec4 = {0};
+    vec2 test_vec2 = vec2_zero;
+    vec3 test_vec3 = vec3_zero;
+    vec4 test_vec4 = vec4_zero;
     char* test_string = NULL;
 
     // Bool tests
@@ -100,34 +100,43 @@ void test_xml_read() {
     // Float tests
     CU_ASSERT_TRUE(xml_property_read(root, "small_int", &test_float));
     CU_ASSERT_EQUAL(test_float, 1);
-    CU_ASSERT_TRUE(xml_property_read(root, "vec_x", &test_float));
+    CU_ASSERT_TRUE(xml_property_read(root, "float", &test_float));
     CU_ASSERT_EQUAL(test_float, 1.25f);
     CU_ASSERT_FALSE(xml_property_read(root, "string", &test_float));
 
     CU_ASSERT_TRUE(xml_property_read(root, "small_int", &test_double));
     CU_ASSERT_EQUAL(test_double, 1);
-    CU_ASSERT_TRUE(xml_property_read(root, "vec_x", &test_double));
+    CU_ASSERT_TRUE(xml_property_read(root, "float", &test_double));
     CU_ASSERT_EQUAL(test_double, 1.25f);
     CU_ASSERT_FALSE(xml_property_read(root, "string", &test_double));
 
 
     // Vector tests
-    CU_ASSERT_TRUE(xml_property_read(root, "vec", &test_vec2));
-    CU_ASSERT_EQUAL(test_vec2.x, 1.25f);
-    CU_ASSERT_EQUAL(test_vec2.y, -35.7f);
+    CU_ASSERT_TRUE(xml_property_read(root, "vec2", &test_vec2));
+    CU_ASSERT_EQUAL(test_vec2.x, 12.5f);
+    CU_ASSERT_EQUAL(test_vec2.y, 0.25f);
+    CU_ASSERT_FALSE(xml_property_read(root, "vec3", &test_vec2));
+    CU_ASSERT_FALSE(xml_property_read(root, "vec4", &test_vec2));
+    CU_ASSERT_FALSE(xml_property_read(root, "vec5", &test_vec2));
     CU_ASSERT_FALSE(xml_property_read(root, "string", &test_vec2));
 
-    CU_ASSERT_TRUE(xml_property_read(root, "vec", &test_vec3));
+    CU_ASSERT_TRUE(xml_property_read(root, "vec3", &test_vec3));
     CU_ASSERT_EQUAL(test_vec3.x, 1.25f);
     CU_ASSERT_EQUAL(test_vec3.y, -35.7f);
-    CU_ASSERT_EQUAL(test_vec3.z, 0.0f);
+    CU_ASSERT_EQUAL(test_vec3.z, 45.01f);
+    CU_ASSERT_FALSE(xml_property_read(root, "vec2", &test_vec3));
+    CU_ASSERT_FALSE(xml_property_read(root, "vec4", &test_vec3));
+    CU_ASSERT_FALSE(xml_property_read(root, "vec5", &test_vec3));
     CU_ASSERT_FALSE(xml_property_read(root, "string", &test_vec3));
 
-    CU_ASSERT_TRUE(xml_property_read(root, "vec", &test_vec4));
-    CU_ASSERT_EQUAL(test_vec4.x, 1.25f);
-    CU_ASSERT_EQUAL(test_vec4.y, -35.7f);
+    CU_ASSERT_TRUE(xml_property_read(root, "vec4", &test_vec4));
+    CU_ASSERT_EQUAL(test_vec4.x, 1.0f);
+    CU_ASSERT_EQUAL(test_vec4.y, -0.15f);
     CU_ASSERT_EQUAL(test_vec4.z, 0.0f);
-    CU_ASSERT_EQUAL(test_vec4.w, 45.01f);
+    CU_ASSERT_EQUAL(test_vec4.w, 6.25f);
+    CU_ASSERT_FALSE(xml_property_read(root, "vec2", &test_vec4));
+    CU_ASSERT_FALSE(xml_property_read(root, "vec3", &test_vec4));
+    CU_ASSERT_FALSE(xml_property_read(root, "vec5", &test_vec4));
     CU_ASSERT_FALSE(xml_property_read(root, "string", &test_vec4));
 
     // Color tests

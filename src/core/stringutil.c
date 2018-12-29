@@ -2,6 +2,7 @@
 #include "stringutil.h"
 
 #include "core/check.h"
+#include "core/container/array.h"
 #include "core/memory/alloc.h"
 
 #include <stdarg.h>
@@ -59,6 +60,40 @@ int nstrncmp(const char* str_a, const char* str_b, size_t len) {
     }
 
     return strncmp(str_a, str_b, len);
+}
+char** nstrsplit(const char* str_a, const char* str_b, uint16* count) {
+    check_return(count != NULL, "count is null", NULL);
+
+    // Set count early, just in case of invalid args
+    *count = 0;
+
+    check_return(!nstrempty(str_a), "str_a is null or empty", NULL);
+    check_return(!nstrempty(str_b), "str_b is null or empty", NULL);
+
+    char* tmp_origin = nstrdup(str_a);
+    char* tmp = tmp_origin;
+    char* ptr = tmp;
+    array str_array = array_mnew_ordered(char*, 4);
+
+    while((ptr = strsep(&tmp, str_b)) != NULL) {
+        if(!nstrempty(ptr)) {
+            array_add(str_array, ptr);
+        }
+    }
+
+    char** output = NULL;
+    *count = array_get_length(str_array);
+    if(count > 0) {
+        output = mscalloc(*count, char*);
+        array_foreach(str_array, it) {
+            output[it.index] = nstrdup(array_iter_data(it, char*));
+        }
+    }
+
+    array_free(str_array);
+    sfree(tmp_origin);
+
+    return output;
 }
 bool aisi(const char* str) {
     check_return(str, "str is NULL", false);
