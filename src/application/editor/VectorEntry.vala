@@ -24,6 +24,60 @@ namespace DFGame.Application {
         }
         private int _precision = 0;
 
+        // Has minimum?
+        public bool has_min_value {
+            get {
+                return _has_min_value;
+            } set {
+                if (_has_min_value != value) {
+                    _has_min_value = value;
+                    limits_changed ();
+                }
+            }
+        }
+        private bool _has_min_value = false;
+
+        // The minium allowed value, null means no minimum
+        public float min_value {
+            get {
+                return _min_value;
+            } set {
+                if (!_has_min_value || _min_value != value) {
+                    _min_value = value;
+                    _has_min_value = true;
+                    limits_changed ();
+                }
+            }
+        }
+        private float _min_value = 0;
+
+        // Has maximum?
+        public bool has_max_value {
+            get {
+                return _has_max_value;
+            } set {
+                if (_has_max_value != value) {
+                    _has_max_value = value;
+                    limits_changed ();
+                }
+            }
+        }
+        private bool _has_max_value = false;
+
+        // The maxium allowed value, null means no maximum
+        public float max_value {
+            get {
+                return _max_value;
+            } set {
+                if (!_has_max_value || _max_value != value) {
+                    _max_value = value;
+                    _has_max_value = true;
+                    limits_changed ();
+                }
+            }
+        }
+        private float _max_value = 0;
+
         // The format string used to populate the entry text
         protected string format = "%d";
 
@@ -34,7 +88,7 @@ namespace DFGame.Application {
                 int res = text.scanf (format, &new_val);
 
                 if (res != 0) {
-                    value = new_val;
+                    value = clamp (new_val);
                     return true;
                 }
             } else {
@@ -42,7 +96,7 @@ namespace DFGame.Application {
                 int res = text.scanf (format, &new_val);
 
                 if (res != 0) {
-                    value = new_val;
+                    value = clamp (new_val);
                     return true;
                 }
             }
@@ -50,6 +104,18 @@ namespace DFGame.Application {
             value = 0;
             return false;
         }
+        // Clamp a numerical value to the min/max
+        protected float clamp (float input) {
+            if (has_min_value && min_value > input) {
+                input = min_value;
+            } else if (has_max_value && max_value < input) {
+                input = max_value;
+            }
+
+            return input;
+        }
+        // Called when the min/max changes
+        protected abstract void limits_changed ();
     }
 
     // Widget for editing a 2d vector
@@ -96,6 +162,11 @@ namespace DFGame.Application {
             }
         }
 
+        protected override void limits_changed () {
+            x = clamp (x);
+            y = clamp (y);
+        }
+
         private Vec2 _vector;
 
         [GtkChild]
@@ -113,6 +184,7 @@ namespace DFGame.Application {
             float new_x;
             if (try_get_value (x_entry.text, out new_x)) {
                 x = new_x;
+                update_entry_text ();
             }
         }
         [GtkCallback]
@@ -120,6 +192,7 @@ namespace DFGame.Application {
             float new_y;
             if (try_get_value (y_entry.text, out new_y)) {
                 y = new_y;
+                update_entry_text ();
             }
         }
 
@@ -205,6 +278,12 @@ namespace DFGame.Application {
             }
         }
 
+        protected override void limits_changed () {
+            x = clamp (x);
+            y = clamp (y);
+            z = clamp (z);
+        }
+
         [GtkChild]
         private Entry x_entry;
         [GtkChild]
@@ -224,6 +303,7 @@ namespace DFGame.Application {
             float new_x;
             if (try_get_value (x_entry.text, out new_x)) {
                 x = new_x;
+                update_entry_text ();
             }
         }
         [GtkCallback]
@@ -231,6 +311,7 @@ namespace DFGame.Application {
             float new_y;
             if (try_get_value (y_entry.text, out new_y)) {
                 y = new_y;
+                update_entry_text ();
             }
         }
         [GtkCallback]
@@ -238,6 +319,7 @@ namespace DFGame.Application {
             float new_z;
             if (try_get_value (z_entry.text, out new_z)) {
                 z = new_z;
+                update_entry_text ();
             }
         }
 
@@ -336,6 +418,13 @@ namespace DFGame.Application {
             }
         }
 
+        protected override void limits_changed () {
+            x = clamp (x);
+            y = clamp (y);
+            z = clamp (z);
+            w = clamp (w);
+        }
+
         [GtkChild]
         private Entry x_entry;
         [GtkChild]
@@ -357,6 +446,7 @@ namespace DFGame.Application {
             float new_x;
             if (try_get_value (x_entry.text, out new_x)) {
                 x = new_x;
+                update_entry_text ();
             }
         }
         [GtkCallback]
@@ -364,6 +454,7 @@ namespace DFGame.Application {
             float new_y;
             if (try_get_value (y_entry.text, out new_y)) {
                 y = new_y;
+                update_entry_text ();
             }
         }
         [GtkCallback]
@@ -371,6 +462,7 @@ namespace DFGame.Application {
             float new_z;
             if (try_get_value (z_entry.text, out new_z)) {
                 z = new_z;
+                update_entry_text ();
             }
         }
         [GtkCallback]
@@ -378,6 +470,7 @@ namespace DFGame.Application {
             float new_w;
             if (try_get_value (w_entry.text, out new_w)) {
                 w = new_w;
+                update_entry_text ();
             }
         }
 

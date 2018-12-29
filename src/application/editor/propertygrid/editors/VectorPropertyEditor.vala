@@ -11,6 +11,39 @@ namespace DFGame.PropertyGrid.Editors {
         protected override Widget? create_editor_widget () {
             entry = new Vec2Entry ();
 
+            // Check for restrictions
+            if (prop_type is SimpleType) {
+                SimpleType simple = (SimpleType)prop_type;
+                if (simple.restriction != null) {
+                    // Digit count
+                    if (simple.restriction.total_digits != null) {
+                        entry.precision = simple.restriction.total_digits;
+                    } else if (simple.restriction.fraction_digits != null) {
+                        // TODO
+                    }
+
+                    // Minimum value
+                    if (simple.restriction.min_inclusive != null) {
+                        entry.min_value = (float)simple.restriction.min_inclusive;
+                    } else if (simple.restriction.min_exclusive != null) {
+                        // Vector limits are inclusive, so we calculate
+                        // the closest valid number based on the digit count
+                        entry.min_value = (float)simple.restriction.min_exclusive
+                                        + (float)(1.0 / GLib.Math.pow (10, entry.precision));
+                    }
+
+                    // Maximum value
+                    if (simple.restriction.max_inclusive != null) {
+                        entry.max_value = (float)simple.restriction.max_inclusive;
+                    } else if (simple.restriction.max_exclusive != null) {
+                        // Vector limits are inclusive, so we calculate
+                        // the closest valid number based on the digit count
+                        entry.max_value = (float)simple.restriction.max_exclusive
+                                        - (float)(1.0 / GLib.Math.pow (10, entry.precision));
+                    }
+                }
+            }
+
             string hint;
             if (attribute.try_get_hint ("x_icon", out hint)) {
                 entry.x_icon = hint;
@@ -45,6 +78,39 @@ namespace DFGame.PropertyGrid.Editors {
         }
         protected override Widget? create_editor_widget () {
             entry = new Vec3Entry ();
+
+            // Check for restrictions
+            if (prop_type is SimpleType) {
+                SimpleType simple = (SimpleType)prop_type;
+                if (simple.restriction != null) {
+                    // Digit count
+                    if (simple.restriction.total_digits != null) {
+                        entry.precision = simple.restriction.total_digits;
+                    } else if (simple.restriction.fraction_digits != null) {
+                        // TODO
+                    }
+
+                    // Minimum value
+                    if (simple.restriction.min_inclusive != null) {
+                        entry.min_value = (float)simple.restriction.min_inclusive;
+                    } else if (simple.restriction.min_exclusive != null) {
+                        // Vector limits are inclusive, so we calculate
+                        // the closest valid number based on the digit count
+                        entry.min_value = (float)simple.restriction.min_exclusive
+                                        + (float)(1.0 / GLib.Math.pow (10, entry.precision));
+                    }
+
+                    // Maximum value
+                    if (simple.restriction.max_inclusive != null) {
+                        entry.max_value = (float)simple.restriction.max_inclusive;
+                    } else if (simple.restriction.max_exclusive != null) {
+                        // Vector limits are inclusive, so we calculate
+                        // the closest valid number based on the digit count
+                        entry.max_value = (float)simple.restriction.max_exclusive
+                                        - (float)(1.0 / GLib.Math.pow (10, entry.precision));
+                    }
+                }
+            }
 
             string hint;
             if (attribute.try_get_hint ("x_icon", out hint)) {
@@ -83,6 +149,39 @@ namespace DFGame.PropertyGrid.Editors {
         }
         protected override Widget? create_editor_widget () {
             entry = new Vec4Entry ();
+
+            // Check for restrictions
+            if (prop_type is SimpleType) {
+                SimpleType simple = (SimpleType)prop_type;
+                if (simple.restriction != null) {
+                    // Digit count
+                    if (simple.restriction.total_digits != null) {
+                        entry.precision = simple.restriction.total_digits;
+                    } else if (simple.restriction.fraction_digits != null) {
+                        // TODO
+                    }
+
+                    // Minimum value
+                    if (simple.restriction.min_inclusive != null) {
+                        entry.min_value = (float)simple.restriction.min_inclusive;
+                    } else if (simple.restriction.min_exclusive != null) {
+                        // Vector limits are inclusive, so we calculate
+                        // the closest valid number based on the digit count
+                        entry.min_value = (float)simple.restriction.min_exclusive
+                                        + (float)(1.0 / GLib.Math.pow (10, entry.precision));
+                    }
+
+                    // Maximum value
+                    if (simple.restriction.max_inclusive != null) {
+                        entry.max_value = (float)simple.restriction.max_inclusive;
+                    } else if (simple.restriction.max_exclusive != null) {
+                        // Vector limits are inclusive, so we calculate
+                        // the closest valid number based on the digit count
+                        entry.max_value = (float)simple.restriction.max_exclusive
+                                        - (float)(1.0 / GLib.Math.pow (10, entry.precision));
+                    }
+                }
+            }
 
             string hint;
             if (attribute.try_get_hint ("x_icon", out hint)) {
