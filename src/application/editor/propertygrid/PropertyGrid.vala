@@ -13,6 +13,7 @@ namespace DFGame.PropertyGrid {
             properties_list = new ListBox ();
             properties_list.selection_mode = SelectionMode.NONE;
             properties_list.set_header_func (listbox_header_separator);
+            properties_list.set_sort_func (sort_properties);
 
             this.add (properties_list);
         }
@@ -139,6 +140,21 @@ namespace DFGame.PropertyGrid {
             if (!frozen) {
                 value_changed ("<%s %s=\"%s\"/>".printf (editor.owner_name, editor.property_name, value));
             }
+        }
+
+        // Determine the ordering of two properties based on the ordering given to them
+        private int sort_properties (ListBoxRow row1, ListBoxRow row2) {
+            PropertyEditor e1 = row1.get_child () as PropertyEditor;
+            PropertyEditor e2 = row2.get_child () as PropertyEditor;
+
+            if (e1 == null) {
+                return -1;
+            } else if (e1 == null) {
+                return 1;
+            }
+
+            return (int)(e1.attribute.sort_index > e2.attribute.sort_index)
+                   - (int)(e1.attribute.sort_index < e2.attribute.sort_index);
         }
 
         private bool frozen = false;

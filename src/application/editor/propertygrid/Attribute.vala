@@ -3,7 +3,7 @@ using Xml;
 
 namespace DFGame.PropertyGrid {
     // Represents an XSD attribute
-    public class Attribute {
+    public class Attribute : Object {
         // The name to display in UI and documentation
         public string display_name { get; private set; }
 
@@ -19,7 +19,12 @@ namespace DFGame.PropertyGrid {
         // Annotation data
         public Annotation annotation { get; private set; }
 
-        public Attribute (Xml.Node* node_dat) {
+        // The order that this should appear in the UI
+        public uint sort_index { get; construct; }
+
+        public Attribute (Xml.Node* node_dat, uint index = 0) {
+            Object (sort_index: index);
+
             name = node_dat->get_prop ("name");
             display_name = node_dat->get_ns_prop (DF_DISPLAY_NAME, DF_NS) ?? make_display_name (name);
             type_name = node_dat->get_prop ("type");

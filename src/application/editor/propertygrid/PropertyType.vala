@@ -19,6 +19,8 @@ namespace DFGame.PropertyGrid {
         }
 
         public virtual void prepare (Xml.Node* node_dat) {
+            uint current_index = 0;
+
             for (Xml.Node* node = node_dat->first_element_child ();
                 node != null;
                 node = node->next_element_sibling ()) {
@@ -27,13 +29,15 @@ namespace DFGame.PropertyGrid {
                         annotation = new Annotation (node);
                     break;
                     case XSD_ATTRIBUTE:
-                        Attribute attr = new Attribute (node);
+                        Attribute attr = new Attribute (node, current_index);
+                        current_index++;
                         attrs.set (attr.name, attr);
                     break;
                     default:
                         Logger.warn ("Unrecognized property content %s", node->name);
                     break;
                 }
+
             }
         }
 
