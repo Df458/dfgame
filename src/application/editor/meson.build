@@ -16,6 +16,7 @@ applicationeditorsrc  = [
   'propertygrid/editors/ColorPropertyEditor.vala',
   'propertygrid/editors/EnumPropertyEditor.vala',
   'propertygrid/editors/FloatPropertyEditor.vala',
+  'propertygrid/editors/IntPropertyEditor.vala',
   'propertygrid/editors/PropertyEditor.vala',
   'propertygrid/editors/VectorPropertyEditor.vala',
   'propertygrid/PropertyEditorBuilder.vala',

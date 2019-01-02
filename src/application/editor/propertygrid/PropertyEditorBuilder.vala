@@ -26,6 +26,9 @@ namespace DFGame.PropertyGrid {
                 case "xs:float":
                     return new FloatPropertyEditor (owner, attr, value);
 
+                case "xs:integer":
+                    return new IntPropertyEditor (owner, attr, value);
+
                 case "xs:Boolean":
                     return new BoolPropertyEditor (owner, attr, value);
 
