@@ -6,6 +6,7 @@ namespace DFGame.PropertyGrid {
     public class PropertyType {
         public string name { get; protected set; }
         public string type_name { get; protected set; }
+        public Gee.Collection<string> prop_names { owned get { return attrs.keys; } }
 
         // The name of the underlying primitive type
         public virtual string primitive_name { get { return name; } }

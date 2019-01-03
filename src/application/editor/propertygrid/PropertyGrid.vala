@@ -72,8 +72,12 @@ namespace DFGame.PropertyGrid {
             }
 
             for (var node = doc->children; node != null; node = node->next) {
-                for (var attr = node->properties; attr != null; attr = attr->next) {
-                    add_property (node->name, attr->name, node->get_prop (attr->name));
+                PropertyType parent = types.get (node->name);
+
+                if (parent != null) {
+                    foreach (string prop in parent.prop_names) {
+                        add_property (parent.type_name, prop, node->get_prop (prop));
+                    }
                 }
             }
 
@@ -106,12 +110,13 @@ namespace DFGame.PropertyGrid {
         }
 
         // Adds a property editing widget for an object with the given property data
-        public bool add_property (string owner, string name, string value) {
+        // If value is null, the attribute's default value will be used
+        public bool add_property (string owner, string name, string? value) {
             PropertyType owner_type = types.get (owner);
             Attribute attr;
 
             if (owner_type.try_get_attr (out attr, name)) {
-                PropertyEditor editor = builder.create_editor (owner, attr, value);
+                PropertyEditor editor = builder.create_editor (owner, attr, value ?? attr.default_value ?? "");
                 editor.value_changed.connect (on_update_value);
                 editor.set_groups (label_group, control_group);
                 properties_list.add (editor);

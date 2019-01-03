@@ -13,6 +13,9 @@ namespace DFGame.PropertyGrid {
         // The type name of the attribute
         public string type_name { get; private set; }
 
+        // The default value to use when nothing is provided
+        public string default_value { get; private set; }
+
         // The attribute's property type
         public PropertyType prop_type { get; internal set; }
 
@@ -28,6 +31,7 @@ namespace DFGame.PropertyGrid {
             name = node_dat->get_prop ("name");
             display_name = node_dat->get_ns_prop (DF_DISPLAY_NAME, DF_NS) ?? make_display_name (name);
             type_name = node_dat->get_prop ("type");
+            default_value = node_dat->get_prop ("default") ?? "";
 
             for (Xml.Node* node = node_dat->first_element_child ();
                 node != null;
