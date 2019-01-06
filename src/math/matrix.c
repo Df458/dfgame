@@ -67,8 +67,8 @@ mat4 mat4_rotate_3d(mat4 m, vec3 euler) {
 
     my.data[0] = cy;
     my.data[2] = sy;
-    my.data[4] = -sy;
-    my.data[6] = cy;
+    my.data[8] = -sy;
+    my.data[10] = cy;
 
     mz.data[0] = cz;
     mz.data[1] = -sz;

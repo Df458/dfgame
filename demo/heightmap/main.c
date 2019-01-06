@@ -64,8 +64,8 @@ void update_camera() {
     vec2 vplane = (vec2) { .x = cos(control_point.y / 25.0f) * cam_distance, .y = sin(control_point.y / 25.0f) * cam_distance };
     vec3 v = (vec3){.x = 25 + (sin(control_point.x) * (vplane.x)), .y=25 + vplane.y, .z = 25 + (cos(control_point.x) * (vplane.x))};
     transform_translate(camera_get_transform(c_main), v, false);
-    transform_rotate(camera_get_transform(c_main), (vec3){.x=-control_point.x}, false);
-    transform_rotate(camera_get_transform(c_main), (vec3){.y=atan2(90 * (control_point.y / 25), cam_distance)}, true);
+    transform_rotate(camera_get_transform(c_main), (vec3){.y=-control_point.x}, false);
+    transform_rotate(camera_get_transform(c_main), (vec3){.x=atan2(90 * (control_point.y / 25), cam_distance)}, true);
 }
 bool loop(mainloop l, float dt) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -158,7 +158,7 @@ int main() {
 
     t_water = transform_new();
     vec3 v = (vec3){.x=25, .y=17, .z=25};
-    vec3 vr = (vec3){ .y=PI * 0.5f };
+    vec3 vr = (vec3){ .x=PI * 0.5f };
     transform_translate(t_water, v, false);
     transform_rotate(t_water, vr, false);
     transform_scale(t_water, 50, false);

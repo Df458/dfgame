@@ -7,12 +7,12 @@
 
 // Converts euler angles in v to a quat
 quat euler_to_quat(vec3 v) {
-    float s1 = sin(v.x * 0.5);
-    float c1 = cos(v.x * 0.5);
+    float s3 = sin(v.x * 0.5);
+    float c3 = cos(v.x * 0.5);
     float s2 = sin(v.z * 0.5);
     float c2 = cos(v.z * 0.5);
-    float s3 = sin(v.y * 0.5);
-    float c3 = cos(v.y * 0.5);
+    float s1 = sin(v.y * 0.5);
+    float c1 = cos(v.y * 0.5);
 
     return (quat) {
         .w = (c1 * c2 * c3) - (s1 * s2 * s3),

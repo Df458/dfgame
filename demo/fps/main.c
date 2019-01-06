@@ -156,7 +156,7 @@ bool loop(mainloop l, float dt) {
 
     glUseProgram(s_default.id);
 
-    transform_rotate(camera_get_transform(c_main), (vec3){ .x=get_axis_value(a_turn) }, true);
+    transform_rotate(camera_get_transform(c_main), (vec3){ .y=get_axis_value(a_turn) }, true);
 
     quat q = camera_get_orientation(c_main);
     q.w *= -1;
