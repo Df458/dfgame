@@ -38,11 +38,14 @@ mat4 mat4_translate_vec4(mat4 m, vec4 v);
 
 // Rotates the transformation matrix m by r (in degrees)
 #define mat4_rotate_deg(m, r) _Generic(r,\
-    float: mat4_rotate_2d(m, degtorad(r))\
-    vec3:  mat4_rotate_3d(m, (vec3){.x=degtorad(r.x),.y=degtorad(r.y),.z=degtorad(r.z)})\
-)
+    float: mat4_rotate_2d_deg,\
+    int: mat4_rotate_2d_deg,\
+    vec3:  mat4_rotate_3d_deg\
+)(m, r)
 mat4 mat4_rotate_2d(mat4 m, float theta);
+mat4 mat4_rotate_2d_deg(mat4 m, float theta);
 mat4 mat4_rotate_3d(mat4 m, vec3 euler);
+mat4 mat4_rotate_3d_deg(mat4 m, vec3 euler);
 mat4 mat4_rotate_3d_quat(mat4 m, quat q);
 
 // Rotates the transformation matrix m by v

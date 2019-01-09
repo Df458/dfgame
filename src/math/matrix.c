@@ -3,10 +3,10 @@
 
 #include "matrix.h"
 
-#include "check.h"
-#include "quat.h"
-#include "types.h"
-#include "vector.h"
+#include "core/check.h"
+#include "core/types.h"
+#include "math/quat.h"
+#include "math/vector.h"
 #include <math.h>
 
 // Translates the transformation matrix m by v
@@ -48,6 +48,9 @@ mat4 mat4_rotate_2d(mat4 m, float theta) {
 
     return mat4_mul(m, m2);
 }
+mat4 mat4_rotate_2d_deg(mat4 m, float theta) {
+    return mat4_rotate_2d(m, degtorad(theta));
+}
 mat4 mat4_rotate_3d(mat4 m, vec3 euler) {
     float sx = sin(euler.x);
     float cx = cos(euler.x);
@@ -76,6 +79,9 @@ mat4 mat4_rotate_3d(mat4 m, vec3 euler) {
     mz.data[5] = cz;
 
     return mat4_mul(m, mat4_mul(mx, mat4_mul(my, mz)));
+}
+mat4 mat4_rotate_3d_deg(mat4 m, vec3 euler) {
+    return mat4_rotate_3d(m, (vec3){.x=degtorad(euler.x),.y=degtorad(euler.y),.z=degtorad(euler.z)});
 }
 mat4 mat4_rotate_3d_quat(mat4 m, quat q) {
     mat4 m2 = m;
@@ -140,7 +146,7 @@ mat4 mat4_mul_mat4(mat4 m1, mat4 m2) {
     return res;
 }
 vec4 mat4_mul_vec2(mat4 m1, vec2 v) {
-    return mat4_mul_vec4(m1, (vec4){ .x=v.x, .y=v.y, .z=0, .w=1 });
+    return mat4_mul_vec4(m1, (vec4){ .x=v.x, .y=v.y, .z=1, .w=1 });
 }
 vec4 mat4_mul_vec3(mat4 m1, vec3 v) {
     return mat4_mul_vec4(m1, (vec4){ .x=v.x, .y=v.y, .z=v.z, .w=1 });
@@ -172,7 +178,7 @@ float mat4_determinant(mat4 m) {
 
 // Transposes m
 mat4 mat4_transpose(mat4 m) {
-    mat4 m2 = mat4_ident;
+    mat4 m2 = m;
     for(int i = 0; i < 3; ++i) {
         for(int j = i + 1; j < 4; ++j) {
             m2.data[i * 4 + j] = m.data[j * 4 + i];
@@ -218,8 +224,11 @@ mat4 mat4_invert(mat4 m) {
 mat4 mat4_projection(projection_settings settings) {
     mat4 m = mat4_ident;
 
+    check_return(!eq0(settings.dims.x * settings.dims.y * settings.dims.z * settings.dims.w) && !eq0(settings.dims.w - settings.dims.z), "Ortho projection settings are invalid", mat4_ident);
+
     if(settings.is_ortho)
     {
+        check_return(eq0(settings.fov), "Orthographic projection settings contain an FOV", mat4_ident);
         m.data[0]  = 2.0f / (settings.dims.x);
         m.data[5]  = 2.0f / (-settings.dims.y);
         m.data[10] = 2.0f / (settings.dims.w - settings.dims.z);
@@ -228,6 +237,7 @@ mat4 mat4_projection(projection_settings settings) {
     }
     else
     {
+        check_return(settings.fov > 0, "Projection FOV must be greater than 0", mat4_ident);
         float ratio = settings.dims.x / settings.dims.y;
         float tfov  = 1.0f / tan(degtorad(settings.fov * 0.5f));
         float zdiff = 1.0f/ (settings.dims.z - settings.dims.w);
