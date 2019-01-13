@@ -66,7 +66,7 @@ void triangle_draw(triangle* t) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(s_main.id);
-    shader_bind_uniform_name(s_main, "transform", mat4_rotate_2d(mat4_scale(mat4_ident, t->size), degtorad(t->angle + 180)));
+    shader_bind_uniform_name(s_main, "u_transform", mat4_rotate_2d(mat4_scale(mat4_ident, t->size), degtorad(t->angle + 180)));
     shader_bind_uniform_name(s_main, "u_color", t->color);
     glPolygonMode(GL_FRONT_AND_BACK, t->filled ? GL_FILL : GL_LINE);
     mesh_render(s_main, t->tri_data, GL_TRIANGLES, "i_pos", VT_POSITION);
