@@ -37,6 +37,7 @@ mesh mesh_new_type(uint32_t size, uint8_t vertex_type, void* data, const char* p
 }
 
 void _mesh_render(shader s, mesh m, GLenum mode, ...) {
+    check_return(m != NULL, "Mesh is NULL", );
 
     va_list args;
     va_start(args, mode);
@@ -59,32 +60,41 @@ void _mesh_free(mesh m) {
 
 // Returns the OpenGL handle for the mesh's data.
 GLuint mesh_get_handle(mesh m) {
-    check_return(m, "Can't get handle: mesh is NULL", 0);
+    check_return(m, "Mesh is NULL", 0);
 
     return m->handle;
 }
 
 // Returns whether or not the mesh's data has the vertex data described in type.
 bool mesh_has_vertex_data(mesh m, vertex_types type) {
+    check_return(m != NULL, "Mesh is NULL", false);
+
     return m->type_flags & type;
 }
 
 // Returns the size of a vertex in the mesh, in bytes.
 uint32 mesh_get_data_size(mesh m) {
+    check_return(m != NULL, "Mesh is NULL", 0);
+
     return m->data_size;
 }
 
 // Returns the type of a vertex in the mesh, in bytes.
 uint8 mesh_get_data_type(mesh m) {
+    check_return(m != NULL, "Mesh is NULL", 0);
+
     return m->type_flags;
 }
 
 // Returns the contents of the mesh.
 void* mesh_get_data(mesh m) {
+    check_return(m != NULL, "Mesh is NULL", NULL);
+
     return m->data;
 }
 
 void mesh_set_data_type(mesh m, uint32 size, uint8 vertex_type, void* data) {
+    check_return(m != NULL, "Mesh is NULL", );
     check_return(vertex_type & VT_POSITION, "Unsupported vertex type %u: Type must contain position.", , vertex_type);
 
     if(m->data)
@@ -112,6 +122,8 @@ void mesh_set_data_type(mesh m, uint32 size, uint8 vertex_type, void* data) {
 
 // Updates the mesh for rendering
 void mesh_update(mesh m) {
+    check_return(m != NULL, "Mesh is NULL", );
+
     glBindBuffer(GL_ARRAY_BUFFER, m->handle);
     glBufferData(GL_ARRAY_BUFFER, m->vertex_count * m->data_size, m->data, GL_DYNAMIC_DRAW);
 }
@@ -120,6 +132,8 @@ void mesh_update(mesh m) {
 // Return value is an integer typed as GLvoid* in order to satisfy the
 // requirements of glVertexAttribPointer.
 GLvoid* mesh_get_element_offset(mesh m, vertex_types type) {
+    check_return(m != NULL, "Mesh is NULL", NULL);
+
     GLvoid* count = 0;
     if(type == VT_POSITION)
         return count;
