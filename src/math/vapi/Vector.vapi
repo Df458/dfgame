@@ -1,9 +1,7 @@
-namespace DFGame.Math
-{
+namespace DFGame.Math {
     [CCode (cname = "vec2", cheader_filename = "math/vector.h", has_copy_function = false, has_destroy_function = false, default_value = "vec2_zero", has_type_id = false)]
     [Compact]
-    public struct Vec2
-    {
+    public struct Vec2 {
         public float x;
         public float y;
         public float data[2];
@@ -26,8 +24,7 @@ namespace DFGame.Math
 
     [CCode (cname = "vec3", cheader_filename = "math/vector.h", has_copy_function = false, has_destroy_function = false, has_type_id = false)]
     [Compact]
-    public struct Vec3
-    {
+    public struct Vec3 {
         public float x;
         public float y;
         public float z;
@@ -55,8 +52,7 @@ namespace DFGame.Math
 
     [CCode (cname = "vec4", cheader_filename = "math/vector.h", has_copy_function = false, has_destroy_function = false, has_type_id = false)]
     [Compact]
-    public struct Vec4
-    {
+    public struct Vec4 {
         public float x;
         public float y;
         public float z;
