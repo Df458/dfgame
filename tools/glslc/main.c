@@ -120,11 +120,12 @@ void make_path_relative(const char* base_path, char** rel_path) {
     char* pos = strrchr(base_path, '/');
 
     if(pos) {
+        size_t temp_len = strlen(*rel_path);
         char* temp = *rel_path;
-        size_t new_len = strlen(*rel_path) + (pos - base_path) / sizeof(char) + 1;
+        size_t new_len = temp_len + ((pos - base_path) / sizeof(char)) + 2;
         *rel_path = calloc(new_len, sizeof(char));
-        memcpy(*rel_path, base_path, (pos - base_path) + sizeof(char));
-        strncat(*rel_path, temp, new_len);
+        memcpy(*rel_path, base_path, (pos - base_path + 1) * sizeof(char));
+        strncat(*rel_path, temp, temp_len);
 
         free(temp);
     }
