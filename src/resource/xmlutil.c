@@ -433,7 +433,7 @@ bool xml_property_write_vec4(xmlTextWriterPtr writer, const char* name, vec4 val
 
     return ret != -1;
 }
-bool xml_property_write_string(xmlTextWriterPtr writer, const char* name, char* val) {
+bool xml_property_write_string(xmlTextWriterPtr writer, const char* name, const char* val) {
     if(!val) {
         return false;
     }

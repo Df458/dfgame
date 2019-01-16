@@ -57,7 +57,7 @@ bool xml_property_write_double(xmlTextWriterPtr writer, const char* name, double
 bool xml_property_write_vec2(xmlTextWriterPtr writer, const char* name, vec2 val);
 bool xml_property_write_vec3(xmlTextWriterPtr writer, const char* name, vec3 val);
 bool xml_property_write_vec4(xmlTextWriterPtr writer, const char* name, vec4 val);
-bool xml_property_write_string(xmlTextWriterPtr writer, const char* name, char* val);
+bool xml_property_write_string(xmlTextWriterPtr writer, const char* name, const char* val);
 
 bool xml_property_write_color3(xmlTextWriterPtr node, const char* name, vec3 val);
 bool xml_property_write_color4(xmlTextWriterPtr node, const char* name, vec4 val);
@@ -79,7 +79,8 @@ bool xml_property_write_color4(xmlTextWriterPtr node, const char* name, vec4 val
     vec2: xml_property_write_vec2,\
     vec3: xml_property_write_vec3,\
     vec4: xml_property_write_vec4,\
-    char*: xml_property_write_string\
+    char*: xml_property_write_string,\
+    const char*: xml_property_write_string\
 )(writer, name, val)
 
 #endif
