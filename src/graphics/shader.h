@@ -30,12 +30,19 @@ void _shader_free(shader s);
 
 // Binds uniform v to shader s using name
 #define shader_bind_uniform_name(s, name, v) _Generic(v,\
-        float: shader_bind_uniform_float_name,\
-        int:   shader_bind_uniform_int_name,\
-        vec2:  shader_bind_uniform_vec2_name,\
-        vec3:  shader_bind_uniform_vec3_name,\
-        vec4:  shader_bind_uniform_vec4_name,\
-        mat4:  shader_bind_uniform_mat4_name,\
+        float:  shader_bind_uniform_float_name,\
+        uint8:  shader_bind_uniform_int_name,\
+        uint16: shader_bind_uniform_int_name,\
+        uint32: shader_bind_uniform_int_name,\
+        uint64: shader_bind_uniform_int_name,\
+        int8:   shader_bind_uniform_int_name,\
+        int16:  shader_bind_uniform_int_name,\
+        int32:  shader_bind_uniform_int_name,\
+        int64:  shader_bind_uniform_int_name,\
+        vec2:   shader_bind_uniform_vec2_name,\
+        vec3:   shader_bind_uniform_vec3_name,\
+        vec4:   shader_bind_uniform_vec4_name,\
+        mat4:   shader_bind_uniform_mat4_name,\
         transform:  shader_bind_uniform_transform_name,\
         camera:  shader_bind_uniform_camera_name\
     )(s, name, v)
