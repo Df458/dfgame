@@ -92,6 +92,13 @@ void* mesh_get_data(mesh m) {
 
     return m->data;
 }
+//
+// Returns the number of vertices in the mesh
+uint32 mesh_get_vertex_count(mesh m) {
+    check_return(m != NULL, "Mesh is NULL", 0);
+
+    return m->vertex_count;
+}
 
 void mesh_set_data_type(mesh m, uint32 size, uint8 vertex_type, void* data) {
     check_return(m != NULL, "Mesh is NULL", );

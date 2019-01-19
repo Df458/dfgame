@@ -46,6 +46,9 @@ uint8 mesh_get_data_type(mesh m);
 // Returns the contents of the mesh.
 void* mesh_get_data(mesh m);
 
+// Returns the number of vertices in the mesh
+uint32 mesh_get_vertex_count(mesh m);
+
 // Sets the mesh's data
 void mesh_set_data_type(mesh m, uint32 size, uint8 vertex_type, void* data);
 
