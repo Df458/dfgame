@@ -66,6 +66,8 @@ subdir('demo/fps')
 subdir('demo/editor')
 subdir('demo/text')
 
+subdir('doc')
+
 if tidy.found()
     run_target(
         'tidy',
