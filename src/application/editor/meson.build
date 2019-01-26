@@ -8,7 +8,7 @@ applicationeditorclib  = static_library('dfgame_application_editor_backend', app
 
 
 applicationeditordeps = [ gee, gtk, xml ]
-applicationeditorsrc  = [
+applicationeditorsrc  = files(
   'Init.vala',
   'propertygrid/Annotation.vala',
   'propertygrid/Attribute.vala',
@@ -27,11 +27,11 @@ applicationeditorsrc  = [
   'propertygrid/xsd_def.vala',
   'VectorEntry.vala',
   'Viewport.vala',
-]
+)
 applicationeditorresources = [
   gnome.compile_resources('dfgame_application_resources', 'DFGame.Application.gresources.xml', c_name: 'dfgame_application')
 ]
-applicationeditorvapi  = [ 'editorc.vapi' ] + core_vapi + math_vapi
+applicationeditorvapi  = files( 'editorc.vapi' ) + core_vapi + math_vapi
 applicationeditorinc  = [ include_directories('.') ] + applicationinc
 applicationeditorlib  = shared_library('dfgame_application_editor', applicationeditorsrc + applicationeditorresources + applicationeditorvapi,
                         include_directories : applicationeditorinc,

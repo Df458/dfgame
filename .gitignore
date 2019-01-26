@@ -6,8 +6,6 @@ lib/*.a
 *.un~
 *.taghl
 
-doc/html
-doc/latex
 src/editor-front.h
 vapi/editor-frontend.vapi
 vapi/editor-frontend.deps
