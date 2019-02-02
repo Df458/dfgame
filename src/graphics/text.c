@@ -14,6 +14,11 @@
 #include "graphics/texture_atlas.h"
 #include "graphics/vertex.hd"
 
+/** @brief Represents a piece of text to be rendered
+ *
+ * @see text.h
+ * @see text_new()
+ */
 typedef struct text {
     font fnt;
     char* str;
@@ -185,6 +190,8 @@ void text_update_mesh(text t) {
             offset.x += advance;
             current_data.box.dimensions.x = offset.x;
         }
+
+        t->bounding_size.x = max(t->bounding_size.x, current_data.box.dimensions.x);
     }
     current_data.end = i;
     if(current_data.start < current_data.end)
@@ -214,8 +221,8 @@ void text_set_str_va(text t, const char* s, va_list args) {
     text_update_mesh(t);
 }
 
+// ---------------------------------------------------------------------------------
 
-// Create a new text object with the provided string format
 text text_new(font f, const char* s, ...) {
     text t = mscalloc(1, struct text);
     t->fnt = f;
@@ -234,7 +241,6 @@ text text_new(font f, const char* s, ...) {
     return t;
 }
 
-//  Frees the text
 void _text_free(text t, bool free_src) {
     check_return(t, "Text is NULL", );
 
@@ -249,7 +255,6 @@ void _text_free(text t, bool free_src) {
     sfree(t);
 }
 
-// Update the text object's contents with the provided string format
 void text_set_str(text t, const char* s, ...) {
     check_return(t, "Text is NULL", );
 
@@ -259,21 +264,18 @@ void text_set_str(text t, const char* s, ...) {
 	va_end(args);
 }
 
-// Get the current text set to the text object
 char* text_get_str(const text t) {
     check_return(t, "Text is NULL", NULL);
 
     return nstrdup(t->str);
 }
 
-// Get the text object's generated mesh
 mesh text_get_mesh(const text t) {
     check_return(t, "Text is NULL", NULL);
 
     return t->msh;
 }
 
-// Gets/sets the text's alignment
 void text_set_align(text t, alignment_2d align) {
     check_return(t, "Text is NULL", );
     check_return(align <= ALIGN_LAST, "Invalid text alignment 0x%x", , align);
@@ -287,7 +289,6 @@ alignment_2d text_get_align(const text t) {
     return t->align;
 }
 
-// Gets/sets the text's wrap method
 void text_set_wrap(text t, text_wrap wrap) {
     check_return(t, "Text is NULL", );
     check_return(wrap <= TEXT_WRAP_LAST, "Invalid text wrap 0x%x", , wrap);
@@ -301,8 +302,12 @@ text_wrap text_get_wrap(const text t) {
     return t->wrap;
 }
 
-// Gets/sets the text's maximum width for wrapping.
-// If the value is 0, the text won't wrap.
+vec2 text_get_bounds(const text t) {
+    check_return(t, "Text is NULL", vec2_zero);
+
+    return t->bounding_size;
+}
+
 void text_set_max_width(text t, float width) {
     check_return(t, "Text is NULL", );
 
@@ -315,7 +320,11 @@ float text_get_max_width(const text t) {
     return t->max_width;
 }
 
-// Gets/sets the text object's font
+font text_get_font(const text t) {
+    check_return(t, "Text is NULL", NULL);
+
+    return t->fnt;
+}
 void text_set_font(text t, font f) {
     check_return(t, "Text is NULL", );
     check_return(f, "Font is NULL", );
@@ -323,13 +332,7 @@ void text_set_font(text t, font f) {
     t->fnt = f;
     text_update_mesh(t);
 }
-font text_get_font(const text t) {
-    check_return(t, "Text is NULL", NULL);
 
-    return t->fnt;
-}
-
-// Helper function to render text.
 void text_draw(const text t, shader s, mat4 m) {
     check_return(t, "Text is NULL", );
     check_return(t->fnt, "Text has no font", );
