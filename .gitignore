@@ -5,6 +5,7 @@ lib/*.a
 *.ui~
 *.un~
 *.taghl
+compile_commands.json
 
 src/editor-front.h
 vapi/editor-frontend.vapi
