@@ -3,16 +3,16 @@ using Gtk;
 
 namespace DFGame.PropertyGrid {
     /**
-     * Represents a list of property editors in a {@link[PropertyGrid]}'s hierarchy
+     * Represents a list of property editors in a {@link PropertyGrid}'s hierarchy
      */
     internal class PropertyList : Bin, IPropertyNode {
         /**
-         * The builder used to construct this list's {@link[IPropertyEditor]} children
+         * The builder used to construct this list's {@link IPropertyEditor} children
          */
         public IPropertyBuilder builder { get; set; }
 
         /**
-         * Expands/collapses this widget's {@link[Expander]}
+         * Expands/collapses this widget's {@link Expander}
          */
         public bool expanded {
             get { return expander.expanded; }
@@ -158,7 +158,7 @@ namespace DFGame.PropertyGrid {
         }
 
         /**
-         * Function to add a separator between rows in this widget's {@link[ListBox]}
+         * Function to add a separator between rows in this widget's {@link ListBox}
          */
         private void listbox_header_separator (Gtk.ListBoxRow row, Gtk.ListBoxRow? brow) {
             if (brow != null && row.get_header () == null) {

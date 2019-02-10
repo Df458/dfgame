@@ -11,7 +11,7 @@ namespace DFGame.PropertyGrid {
      */
     public class PropertyGrid : Bin {
         /**
-         * The builder used to construct this list's {@link[IPropertyEditor]) children
+         * The builder used to construct this list's {@link Editors.PropertyEditor} children
          */
         public IPropertyBuilder builder {
             get { return _builder; }
@@ -117,7 +117,7 @@ namespace DFGame.PropertyGrid {
         }
 
         /**
-         * Get a {@link[PropertyType]} from the type name
+         * Get a {@link PropertyType} from the type name
          */
         public bool try_get_prop_type (string name, out PropertyType prop_type) {
             prop_type = types.get (name);
@@ -172,7 +172,7 @@ namespace DFGame.PropertyGrid {
         }
 
         /**
-         * Create a new {@link[PropertyList]}, and initialize it with the provided XML
+         * Create a new {@link PropertyList}, and initialize it with the provided XML
          */
         private PropertyList create_property_list (Attribute attr, Xml.Node* node, string path) {
             PropertyList list = new PropertyList (label_group, control_group, attr);
@@ -183,7 +183,7 @@ namespace DFGame.PropertyGrid {
         }
 
         /**
-         * Initialize a {@link[PropertyList]} with the provided XML
+         * Initialize a {@link PropertyList} with the provided XML
          */
         private void init_property_list (ref PropertyList list, PropertyType prop_type, Xml.Node* node, string path) {
             list.builder = builder;
@@ -209,7 +209,7 @@ namespace DFGame.PropertyGrid {
         }
 
         /**
-         * Freeze/unfreeze notifications on all child {@link[PropertyList]}s
+         * Freeze/unfreeze notifications on all child {@link PropertyList}s
          */
         private void set_frozen (bool frozen) {
             foreach (PropertyList list in lists.values) {
