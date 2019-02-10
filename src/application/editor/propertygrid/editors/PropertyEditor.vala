@@ -2,12 +2,13 @@ using Gtk;
 
 namespace DFGame.PropertyGrid.Editors {
     // Widget for editing properties
-    public abstract class PropertyEditor : Box {
+    public abstract class PropertyEditor : Box, IPropertyNode {
         // The attribute being edited
         public Attribute attribute { get; private set; }
         public string owner_name { get; private set; }
         public string property_name { get { return attribute.name; } }
         public PropertyType prop_type { get { return attribute.prop_type; } }
+        public uint sort_index { get; protected set; default=0; }
 
         private string _current_value = null;
         public string current_value {
@@ -42,9 +43,12 @@ namespace DFGame.PropertyGrid.Editors {
                 set_tooltip_markup (tooltip);
             }
 
+            sort_index = attr.sort_index;
+
             name_label = new Label (attr.display_name);
-            name_label.halign = Align.END;
-            pack_start (name_label);
+            name_label.halign = Align.START;
+            name_label.xalign=0;
+            pack_start (name_label, false, false);
 
             reset_button = new Button.from_icon_name ("edit-clear-symbolic");
             reset_button.get_style_context ().add_class ("flat");
