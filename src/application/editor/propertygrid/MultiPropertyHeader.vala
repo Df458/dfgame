@@ -26,9 +26,6 @@ namespace DFGame.PropertyGrid {
 
             Box box = new Box (Orientation.HORIZONTAL, 6);
 
-            label = new Label (null);
-            label.xalign = 0;
-
             add_button = new Button.from_icon_name ("list-add-symbolic");
             add_button.tooltip_text = "Add a new entry to this list";
             add_button.clicked.connect (on_add);
@@ -59,9 +56,8 @@ namespace DFGame.PropertyGrid {
             pop_grid.attach (confirm_button, 0, 1, 2);
             add_pop.add (pop_grid);
 
-            box.pack_start (label, true, true);
-            box.pack_end (clear_button, false, false);
-            box.pack_end (add_button, false, false);
+            box.pack_start (add_button, false, false);
+            box.pack_start (clear_button, false, false);
 
             add (box);
             update ();
@@ -73,7 +69,6 @@ namespace DFGame.PropertyGrid {
          */
         public void update () {
             uint count = list.child_count;
-            label.label = "%u item%s".printf (count, count == 1 ? "" : "s");
 
             add_button.sensitive = count < element.max_occurs || element.max_occurs == 0;
             clear_button.sensitive = count > element.min_occurs;
@@ -110,7 +105,6 @@ namespace DFGame.PropertyGrid {
             confirm_button.sensitive = type_box.active_id != null;
         }
 
-        private Label label;
         private Button add_button;
         private Button clear_button;
         private Popover add_pop;

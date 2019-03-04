@@ -1,5 +1,6 @@
-using DFGame.PropertyGrid.Editors;
+using DFGame.Application;
 using DFGame.Core;
+using DFGame.PropertyGrid.Editors;
 using Gtk;
 using Xml;
 
@@ -36,7 +37,7 @@ namespace DFGame.PropertyGrid {
         public Element element { get; private set; }
 
         /**
-         * Expands/collapses this widget's {@link Expander}
+         * Expands/collapses this widget's {@link AdvancedExpander}
          */
         public bool expanded {
             get { return expander.expanded; }
@@ -78,7 +79,7 @@ namespace DFGame.PropertyGrid {
         public signal void value_changed (Xml.Node* data);
 
         construct {
-            expander = new Expander (null);
+            expander = new AdvancedExpander (null);
 
             expander_content = new Box (Orientation.VERTICAL, 6);
             properties_list = new ListBox ();
@@ -88,7 +89,7 @@ namespace DFGame.PropertyGrid {
             properties_list.margin_start = 12;
 
             expander_content.pack_end (properties_list);
-            expander.add (expander_content);
+            expander.body_child = expander_content;
             this.add (expander);
         }
 
@@ -109,7 +110,7 @@ namespace DFGame.PropertyGrid {
                     }
                     if (multi.max_occurs == 1) {
                         remove (expander);
-                        expander.remove (expander_content);
+                        expander.body_child = null;
                         add (expander_content);
                     }
                 }
@@ -265,6 +266,7 @@ namespace DFGame.PropertyGrid {
             add_child (list);
             list.set_index ((int)child_count - 1);
             header.update ();
+            update_label ();
 
             if (!frozen) {
                 Xml.Node* n = new Xml.Node (null, list.element.name);
@@ -282,6 +284,7 @@ namespace DFGame.PropertyGrid {
                 properties_list.remove (properties_list.get_row_at_index ((int)i - 1));
             }
             header.update ();
+            update_label ();
         }
 
         private void on_type_changed (Element? e) {
@@ -313,7 +316,7 @@ namespace DFGame.PropertyGrid {
                     header.add_request.connect (on_add_request);
                     header.clear_request.connect (clear_items);
 
-                    expander_content.pack_start (header, false, false);
+                    expander.header_child = header;
                 }
 
                 if (node != null) {
@@ -361,16 +364,28 @@ namespace DFGame.PropertyGrid {
         private void set_index (int index) {
             list_index = index;
 
+            update_label ();
+        }
+
+        private void update_label () {
             if (element != null) {
                 expander.label = list_index == -1 ? element.display_name : "%d: %s".printf (list_index, expander.label);
             } else {
                 expander.label = list_index == -1 ? "" : list_index.to_string ();
             }
+
+            if (is_collection) {
+                var multi = (MultiElement)element;
+                if (multi.min_occurs != 1 || multi.max_occurs != 1) {
+                    uint count = child_count;
+                    expander.label += " (%u item%s)".printf (count, count == 1 ? "" : "s");
+                }
+            }
         }
 
         private SizeGroup label_group = new SizeGroup (SizeGroupMode.BOTH);
         private SizeGroup control_group = new SizeGroup (SizeGroupMode.BOTH);
-        private Expander expander;
+        private AdvancedExpander expander;
         private Box expander_content;
         private ListBox properties_list;
         private Gee.HashMap<string, PropertyEditor> widgets = new Gee.HashMap<string, PropertyEditor> ();

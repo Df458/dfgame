@@ -9,6 +9,7 @@ applicationeditorclib  = static_library('dfgame_application_editor_backend', app
 
 applicationeditordeps = [ gee, gtk, xml ]
 applicationeditorsrc  = files(
+  'AdvancedExpander.vala',
   'Init.vala',
   'propertygrid/Annotation.vala',
   'propertygrid/Attribute.vala',
