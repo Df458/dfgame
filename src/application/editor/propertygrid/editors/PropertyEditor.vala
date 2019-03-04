@@ -53,8 +53,10 @@ namespace DFGame.PropertyGrid.Editors {
             reset_button = new Button.from_icon_name ("edit-clear-symbolic");
             reset_button.get_style_context ().add_class ("flat");
             reset_button.clicked.connect (reset);
+
             reset_revealer = new Revealer ();
             reset_revealer.add (reset_button);
+            reset_revealer.transition_duration = 0;
             pack_end (reset_revealer, false, false);
 
             widget = create_editor_widget ();
@@ -64,7 +66,7 @@ namespace DFGame.PropertyGrid.Editors {
 
             set_is_changed (false);
 
-            pack_start (widget, false, true);
+            pack_start (widget, true, true);
         }
 
         // Adds the label/editing widget to the provided size groups

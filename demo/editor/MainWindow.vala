@@ -3,7 +3,7 @@ using Gtk;
 
 [GtkTemplate (ui="/org/df458/EditorDemo/MainWindow.ui")]
 public class MainWindow : ApplicationWindow {
-    private Demo.Triangle triangle;
+    private Demo.Scene scene;
 
     [GtkChild]
     private PropertyGrid properties;
@@ -14,37 +14,31 @@ public class MainWindow : ApplicationWindow {
         viewport.make_current ();
 
         Demo.init ();
-        triangle = new Demo.Triangle ();
+        scene = new Demo.Scene ();
 
         properties.builder = new BasicPropertyBuilder ();
         properties.load_schema_from_resource ("/org/df458/EditorDemo/schemas/triangle.xsd");
 
-        properties.load_data (triangle.save ());
+        properties.load_data (scene.save ());
         properties.show_all ();
     }
 
     [GtkCallback]
     private bool on_loop (float dt) {
         viewport.make_current ();
-        triangle.draw ();
+        scene.draw ();
 
         return true;
     }
 
     [GtkCallback]
     public void on_reset () {
-        triangle.angle = 0;
-        triangle.size = 0.5f;
-        triangle.filled = true;
-        triangle.color.r = 1.0f;
-        triangle.color.g = 1.0f;
-        triangle.color.b = 1.0f;
-
-        properties.update_data (triangle.save ());
+        scene.reset ();
+        properties.update_data (scene.save ());
     }
 
     [GtkCallback]
-    private void triangle_property_changed (string data) {
-        triangle.load (data);
+    private void triangle_property_changed (Xml.Node* data) {
+        scene.load (data);
     }
 }

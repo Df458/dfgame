@@ -43,6 +43,7 @@ namespace DFGame.PropertyGrid.Editors {
 
             spin = new SpinButton.with_range (min, max, 1);
             spin.digits = digits;
+            spin.width_chars = digits + 2;
             spin.value_changed.connect (() => { handle_value_changed (spin.text); });
             return spin;
         }

@@ -56,6 +56,7 @@ triangle* triangle_init() {
     t->color = color_white;
     t->filled = true;
     t->tri_data = mesh_new(3, triangle_verts, NULL);
+    t->line_width = 1;
 
     return t;
 }
@@ -63,41 +64,45 @@ void triangle_free(triangle* t) {
     sfree(t);
 }
 void triangle_draw(triangle* t) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     glUseProgram(s_main.id);
     shader_bind_uniform_name(s_main, "u_transform", mat4_rotate_2d(mat4_scale(mat4_ident, t->size), degtorad(t->angle + 180)));
     shader_bind_uniform_name(s_main, "u_color", t->color);
     glPolygonMode(GL_FRONT_AND_BACK, t->filled ? GL_FILL : GL_LINE);
+    glLineWidth(t->line_width);
     mesh_render(s_main, t->tri_data, GL_TRIANGLES, "i_pos", VT_POSITION);
 }
-void triangle_load(triangle* t, char* data) {
-    xmlDocPtr doc = xmlReadMemory(data, strlen(data), "", NULL, 0);
-    xmlNodePtr root = xml_match_name(xmlDocGetRootElement(doc), "triangle");
+void triangle_load(triangle* t, xmlNodePtr root) {
     check_return(root != NULL, "Triangle data is invalid", );
 
-    setlocale(LC_NUMERIC, "C");
     xml_property_read(root, "size", &t->size);
     xml_property_read(root, "angle", &t->angle);
-    xml_property_read(root, "is_filled", &t->filled);
-    xml_property_read_color(root, "color", &t->color);
 
-    xmlFreeDoc(doc);
+    xmlNodePtr fill_node = xml_match_name(root->children, "fill");
+    xmlNodePtr line_node = xml_match_name(root->children, "line");
+    if(fill_node != NULL) {
+        t->filled = true;
+        xml_property_read_color(fill_node, "color", &t->color);
+    } else if(line_node != NULL) {
+        t->filled = false;
+        xml_property_read(line_node, "width", &t->line_width);
+        xml_property_read_color(line_node, "color", &t->color);
+    }
 }
-char* triangle_save(triangle* t) {
-    xmlBuffer buf = {0};
-    xmlTextWriter* writer = xmlNewTextWriterMemory(&buf, 0);
-
-    setlocale(LC_NUMERIC, "C");
-    xmlTextWriterStartDocument(writer, NULL, "ISO-8859-1", NULL);
+void triangle_save(triangle* t, xmlTextWriter* writer) {
     xmlTextWriterStartElement(writer, (xmlChar*)"triangle");
     xml_property_write(writer, "size", t->size);
     xml_property_write(writer, "angle", t->angle);
-    xml_property_write(writer, "is_filled", t->filled);
-    xml_property_write_color(writer, "color", t->color);
-    xmlTextWriterEndElement(writer);
-    xmlTextWriterEndDocument(writer);
 
-    xmlFreeTextWriter(writer);
-    return (char*)buf.content;
+    if(t->filled) {
+        xmlTextWriterStartElement(writer, (xmlChar*)"fill");
+        xml_property_write_color(writer, "color", t->color);
+        xmlTextWriterEndElement(writer);
+    } else {
+        xmlTextWriterStartElement(writer, (xmlChar*)"line");
+        xml_property_write(writer, "width", t->line_width);
+        xml_property_write_color(writer, "color", t->color);
+        xmlTextWriterEndElement(writer);
+    }
+
+    xmlTextWriterEndElement(writer);
 }

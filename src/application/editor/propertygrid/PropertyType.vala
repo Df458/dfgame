@@ -1,16 +1,33 @@
 using DFGame.Core;
+using Gee;
 using Xml;
 
 namespace DFGame.PropertyGrid {
-    // Represents a property on an object
+    /**
+     * Represents a property on an object
+     */
     public class PropertyType {
         public string name { get; protected set; }
         public string type_name { get; protected set; }
+
+        /**
+         * The list of all names associated with child attributes
+         */
         public Gee.Collection<string> prop_names { owned get { return attrs.keys; } }
 
-        // The name of the underlying primitive type
+        /**
+         * The list of all names associated with child elements
+         */
+        public Gee.Collection<string> element_names { owned get { return elements.keys; } }
+
+        /**
+         * The name of the underlying primitive type
+         */
         public virtual string primitive_name { get { return name; } }
 
+        /**
+         * Provides additional metadata
+         */
         public Annotation annotation { get; protected set; }
 
         public PropertyType.complex (Xml.Node* node_dat) {
@@ -34,22 +51,62 @@ namespace DFGame.PropertyGrid {
                         current_index++;
                         attrs.set (attr.name, attr);
                     break;
+                    case XSD_CHOICE:
+                        Element elem = new Choice (node, current_index);
+                        current_index++;
+                        elements.set (elem.name, elem);
+                    break;
+                    case XSD_ELEMENT:
+                        Element elem = new TypeElement (node, current_index);
+                        current_index++;
+                        elements.set (elem.name, elem);
+                    break;
                     default:
                         Logger.warn ("Unrecognized property content %s", node->name);
                     break;
                 }
-
             }
         }
 
-        // Try to get an attribute from its name
+        /**
+         * Try to get an attribute from its name
+         *
+         * @param name The name of the attribute
+         */
         public bool try_get_attr (out Attribute attr, string name) {
             attr = attrs.get (name);
 
             return attr != null;
         }
 
-        // Update the type data on attributes from the given property grid's registered data
+        /**
+         * Try to get an element from its name
+         *
+         * @param name The name of the attribute
+         */
+        public bool try_get_element (out Element elem, string name) {
+            elem = elements.get (name);
+
+            return elem != null;
+        }
+
+        /**
+         * Get all attributes contained in this type
+         */
+        public virtual Collection<Attribute> get_attributes () {
+            return attrs.values;
+        }
+
+        /**
+         * Get all elements contained in this type
+         */
+        public virtual Collection<Element> get_elements () {
+            return elements.values;
+        }
+
+        /**
+         * Update the type data on attributes from the given property grid's registered data
+         */
         public void update_types (PropertyGrid props) {
             foreach (var attr in attrs.values) {
                 PropertyType prop_type;
@@ -59,9 +116,15 @@ namespace DFGame.PropertyGrid {
                     attr.prop_type = new PrimitiveType (attr.type_name);
                 }
             }
+
+            foreach (var elem in elements.values) {
+                elem.update_types (props);
+            }
         }
 
-        // Try to get the hint value set at key
+        /**
+         * Try to get the hint value set at key
+         */
         public bool try_get_hint (string key, out string hint) {
             if (annotation == null) {
                 hint = null;
@@ -71,11 +134,20 @@ namespace DFGame.PropertyGrid {
             return annotation.try_get_hint (key, out hint);
         }
 
-        // All attributes on this property
+        /**
+         * The list of all attributes on this property
+         */
         private Gee.HashMap<string, Attribute> attrs = new Gee.HashMap<string, Attribute> ();
+
+        /**
+         * The list of all XSD elements in this type
+         */
+        private Gee.HashMap<string, Element> elements = new Gee.HashMap<string, Element> ();
     }
 
-    // A PropertyType with no special information; used for built-in types
+    /**
+     * A {@link PropertyType} with no special information; used for built-in types
+     */
     public class PrimitiveType : PropertyType {
         public PrimitiveType (string in_name) {
             name = in_name;

@@ -27,28 +27,41 @@
             <xs:documentation>An angle in degrees</xs:documentation>
         </xs:annotation>
     </xs:simpleType>
+    <xs:simpleType name="line_width">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="1"/>
+        </xs:restriction>
+        <xs:annotation>
+            <xs:documentation>An integer value above 0</xs:documentation>
+        </xs:annotation>
+    </xs:simpleType>
 
     <!-- Triangle struct -->
     <xs:complexType name="triangle">
-        <xs:attribute name="size" type="size_type">
+        <xs:attribute name="size" type="size_type" default="0.5">
             <xs:annotation>
                 <xs:documentation>The size of the triangle</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="angle" type="degree_type">
+        <xs:attribute name="angle" type="degree_type" default="0">
             <xs:annotation>
                 <xs:documentation>The angle of rotation</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="color" type="df:color4">
-            <xs:annotation>
-                <xs:documentation>The color of the triangle</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="is_filled" type="fill_type" df:displayName="Style">
-            <xs:annotation>
-                <xs:documentation>Toggles filled/wireframe rendering</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
+        <xs:choice minOccurs="1" maxOccurs="1" df:displayName="Style">
+            <xs:element name="fill">
+                <xs:attribute name="color" type="df:color4" default="#ffffffff"/>
+            </xs:element>
+            <xs:element name="line">
+                <xs:attribute name="color" type="df:color4" default="#ffffffff"/>
+                <xs:attribute name="width" type="line_width" default="1"/>
+            </xs:element>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="scene">
+        <xs:choice minOccurs="0" df:displayName="Elements">
+            <xs:element name="triangle" xs:type="triangle"/>
+        </xs:choice>
     </xs:complexType>
 </xs:schema>

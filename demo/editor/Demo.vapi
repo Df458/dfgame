@@ -24,7 +24,7 @@ namespace Demo {
         public void draw ();
 
         [CCode (cname = "triangle_load")]
-        public void load (string data);
+        public void load (Xml.Node* data);
 
         [CCode (cname = "triangle_save")]
         public string save ();

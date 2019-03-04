@@ -19,8 +19,8 @@ namespace DFGame.PropertyGrid {
                 if (_builder != value) {
                     _builder = value;
 
-                    foreach (PropertyList list in lists.values) {
-                        list.builder = _builder;
+                    if (properties_list != null) {
+                        properties_list.builder = _builder;
                     }
                 }
             }
@@ -30,14 +30,25 @@ namespace DFGame.PropertyGrid {
         /**
          * Called when the value of an editor changes
          *
-         * @param data The xml data, as a string
+         * @param data The xml data
          */
-        public signal void value_changed (string data);
+        public signal void value_changed (Xml.Node* data);
 
         construct {
-            properties_list = new PropertyList (label_group, control_group);
-            properties_list.expanded = true;
-            this.add (properties_list);
+            property_stack = new Stack ();
+
+            Box box = new Box (Orientation.VERTICAL, 6);
+            empty_icon = new Image ();
+            empty_label = new Label ("Test");
+            box.add (empty_icon);
+            box.add (empty_label);
+            property_stack.add_named (box, EMPTY_NAME);
+
+            add (property_stack);
+
+            show_all ();
+
+            property_stack.visible_child_name = EMPTY_NAME;
         }
 
         /**
@@ -53,15 +64,16 @@ namespace DFGame.PropertyGrid {
             }
 
             if (doc->children != null) {
-                PropertyType parent = types.get (doc->children->name);
+                Element elem = new TypeElement.with_type (types.get (doc->children->name));
 
-                if (parent != null) {
-                    properties_list.label = parent.type_name;
-                    init_property_list (ref properties_list, parent, doc->children, parent.type_name);
-                }
+                properties_list = new PropertyList (elem, doc->children, builder);
+                properties_list.expanded = true;
+                property_stack.add_named (properties_list, PROPERTIES_NAME);
+                properties_list.value_changed.connect (on_list_value_changed);
             }
 
             show_all ();
+            property_stack.visible_child_name = PROPERTIES_NAME;
 
             return false;
         }
@@ -127,100 +139,50 @@ namespace DFGame.PropertyGrid {
         /**
          * Updates existing properties with new values in the provided XML
          */
-        public bool update_data (string data) {
+        public void update_data (string data) {
             Xml.ParserCtxt parser = new Xml.ParserCtxt ();
             var doc = parser.read_memory (data.to_utf8 (), data.length, "");
 
             if (doc == null) {
                 Logger.error ("Failed to read xml data");
-                return false;
+                return;
             }
 
             // Freeze notifications to avoid sending the new data back
             set_frozen (true);
 
-
-            if (doc->children != null) {
-                var to_process = new Gee.ArrayQueue<Xml.Node*> ();
-                var paths = new Gee.ArrayQueue<string> ();
-                to_process.offer_head (doc->children);
-                paths.offer_head (doc->children->name);
-
-                while (!to_process.is_empty) {
-                    Xml.Node* node = to_process.poll_head ();
-                    string path = paths.poll_head ();
-
-                    PropertyList list = lists[path];
-                    if (list != null) {
-                        for (var attr = node->properties; attr != null; attr = attr->next) {
-                            list.update_property (attr->name, node->get_prop (attr->name));
-                        }
-
-                        for (var child = node->children; child != null; child = child->next) {
-                            to_process.offer_head (child);
-                            paths.offer_head (path + "/" + child->name);
-                        }
-                    }
-                }
+            if (doc->children != null
+                && properties_list != null
+                && properties_list.element.name == doc->children->name) {
+                properties_list.update_data (doc->children);
             }
 
             set_frozen (false);
 
             show_all ();
-
-            return false;
         }
 
-        /**
-         * Create a new {@link PropertyList}, and initialize it with the provided XML
-         */
-        private PropertyList create_property_list (Attribute attr, Xml.Node* node, string path) {
-            PropertyList list = new PropertyList (label_group, control_group, attr);
-
-            init_property_list (ref list, attr.prop_type, node, path);
-
-            return list;
-        }
-
-        /**
-         * Initialize a {@link PropertyList} with the provided XML
-         */
-        private void init_property_list (ref PropertyList list, PropertyType prop_type, Xml.Node* node, string path) {
-            list.builder = builder;
-
-            foreach (string prop in prop_type.prop_names) {
-                Attribute attr;
-                if (prop_type.try_get_attr (out attr, prop)) {
-                    PropertyType child_type = attr.prop_type;
-
-                    if (child_type != null) {
-                        if (child_type is SimpleType || child_type is PrimitiveType) {
-                            list.add_property (prop_type, prop, node->get_prop (prop));
-                        } else {
-                            list.add_child (create_property_list (attr, node, path + "/" + prop));
-                        }
-                    }
-                }
-            }
-
-            list.value_changed.connect ((s) => { value_changed (s); });
-            list.prop_path = path;
-            lists[path] = list;
+        private void on_list_value_changed (Xml.Node* node) {
+            value_changed (node);
         }
 
         /**
          * Freeze/unfreeze notifications on all child {@link PropertyList}s
          */
         private void set_frozen (bool frozen) {
-            foreach (PropertyList list in lists.values) {
-                list.frozen = frozen;
+            if (properties_list != null) {
+                properties_list.frozen = frozen;
             }
         }
 
         private PropertyList properties_list;
-        private SizeGroup label_group = new SizeGroup (SizeGroupMode.BOTH);
-        private SizeGroup control_group = new SizeGroup (SizeGroupMode.BOTH);
         private Gee.HashMap<string, PropertyType> types = new Gee.HashMap<string, PropertyType> ();
-        private Gee.HashMap<string, PropertyList> lists = new Gee.HashMap<string, PropertyList> ();
+
+        private Stack property_stack;
+        private Image empty_icon;
+        private Label empty_label;
+
+        private const string EMPTY_NAME = "empty";
+        private const string PROPERTIES_NAME = "properties";
     }
 }
