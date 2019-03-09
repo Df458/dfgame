@@ -28,6 +28,40 @@ namespace DFGame.PropertyGrid {
         private IPropertyBuilder _builder;
 
         /**
+         * Text to display when the property grid is empty
+         */
+        public string placeholder_label {
+            get { return _placeholder_label; }
+            set {
+                if (value != _placeholder_icon) {
+                    _placeholder_icon = value;
+
+                    if (empty_label != null) {
+                        empty_label.label = value;
+                    }
+                }
+            }
+        }
+        private string _placeholder_label;
+
+        /**
+         * Image to display when the property grid is empty
+         */
+        public string placeholder_icon {
+            get { return _placeholder_icon; }
+            set {
+                if (value != _placeholder_icon) {
+                    _placeholder_icon = value;
+
+                    if (empty_icon != null) {
+                        empty_icon.icon_name = value;
+                    }
+                }
+            }
+        }
+        private string _placeholder_icon;
+
+        /**
          * Called when the value of an editor changes
          *
          * @param data The xml data
@@ -38,8 +72,12 @@ namespace DFGame.PropertyGrid {
             property_stack = new Stack ();
 
             Box box = new Box (Orientation.VERTICAL, 6);
+            box.valign = Align.CENTER;
             empty_icon = new Image ();
-            empty_label = new Label ("Test");
+            empty_icon.icon_size = IconSize.DIALOG;
+            empty_icon.sensitive = false;
+            empty_label = new Label (null);
+            empty_label.sensitive = false;
             box.add (empty_icon);
             box.add (empty_label);
             property_stack.add_named (box, EMPTY_NAME);
@@ -68,6 +106,12 @@ namespace DFGame.PropertyGrid {
 
                 properties_list = new PropertyList (elem, doc->children, builder);
                 properties_list.expanded = true;
+
+                Widget? w = property_stack.get_child_by_name (PROPERTIES_NAME);
+                if (w != null) {
+                    property_stack.remove (w);
+                }
+
                 property_stack.add_named (properties_list, PROPERTIES_NAME);
                 properties_list.value_changed.connect (on_list_value_changed);
             }

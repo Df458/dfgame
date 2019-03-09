@@ -265,7 +265,9 @@ namespace DFGame.PropertyGrid {
             list.value_changed.connect (on_update_value_xml);
             add_child (list);
             list.set_index ((int)child_count - 1);
-            header.update ();
+            if (header != null) {
+                header.update ();
+            }
             update_label ();
 
             if (!frozen) {
@@ -283,7 +285,9 @@ namespace DFGame.PropertyGrid {
             for (uint i = child_count; i > 1 && i > multi.min_occurs; --i) {
                 properties_list.remove (properties_list.get_row_at_index ((int)i - 1));
             }
-            header.update ();
+            if (header != null) {
+                header.update ();
+            }
             update_label ();
         }
 
@@ -339,7 +343,15 @@ namespace DFGame.PropertyGrid {
                 }
             }
             foreach (Element e in element.get_elements ()) {
-                PropertyList list = new PropertyList (e, node, builder, this);
+                Xml.Node* n = node;
+                if (node != null && !(e is MultiElement)) {
+                    for (n = node->children; n != null; n = n->next) {
+                        if (n->name == e.name) {
+                            break;
+                        }
+                    }
+                }
+                PropertyList list = new PropertyList (e, n, builder, this);
                 add_child (list);
                 list.value_changed.connect (on_update_value_xml);
                 lists.add (list);
