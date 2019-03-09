@@ -1,0 +1,12 @@
+<xs:schema
+    xmlns:df="/org/df458/dfgame"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+    <xs:include schemaLocation="resource:///org/df458/EditorDemo/schemas/triangle.xsd"/>
+
+    <xs:complexType name="scene">
+        <xs:choice minOccurs="0" df:displayName="Elements">
+            <xs:element name="triangle" xs:type="triangle"/>
+        </xs:choice>
+    </xs:complexType>
+</xs:schema>

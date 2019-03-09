@@ -15,6 +15,7 @@ namespace DFGame.PropertyGrid {
     const string XSD_DOCUMENTATION = "documentation";
     const string XSD_ELEMENT = "element";
     const string XSD_ENUMERATION = "enumeration";
+    const string XSD_INCLUDE = "include";
     const string XSD_LIST = "list";
     const string XSD_MIN_INCLUSIVE = "minInclusive";
     const string XSD_MAX_INCLUSIVE = "maxInclusive";

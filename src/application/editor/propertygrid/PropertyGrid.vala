@@ -125,26 +125,50 @@ namespace DFGame.PropertyGrid {
         /**
          * Loads type information from an XSD document
          */
-        public bool load_schema (Xml.Doc* doc) {
+        public bool load_schema (Xml.Doc* doc, string? path = null) {
             if (doc == null || doc->children == null) {
                 Logger.error ("Failed to read schema");
                 return false;
             }
 
-            for (var node = doc->children->first_element_child (); node != null; node = node->next_element_sibling ()) {
-                PropertyType prop = null;
 
-                switch (node->name) {
-                    case XSD_COMPLEX_TYPE:
-                        prop = new PropertyType.complex (node);
-                    break;
-                    case XSD_SIMPLE_TYPE:
-                        prop = new SimpleType (node);
-                    break;
-                }
+            var loaded = new Gee.HashSet<string> ();
+            var to_load = new Gee.ArrayQueue<Xml.Doc*> ();
 
-                if (prop != null) {
-                    types.set (prop.type_name, prop);
+            if (path != null) {
+                loaded.add (path);
+            }
+            to_load.add (doc);
+
+            while (!to_load.is_empty) {
+                Xml.Doc* current_doc = to_load.poll ();
+
+                for (var node = current_doc->children->first_element_child ();
+                        node != null;
+                        node = node->next_element_sibling ()) {
+                    PropertyType prop = null;
+
+                    switch (node->name) {
+                        case XSD_COMPLEX_TYPE:
+                            prop = new PropertyType.complex (node);
+                        break;
+                        case XSD_SIMPLE_TYPE:
+                            prop = new SimpleType (node);
+                        break;
+                        case XSD_INCLUDE:
+                            string include_path = node->get_prop ("schemaLocation");
+                            if (include_path != null && loaded.add (include_path)) {
+                                Xml.Doc* include_doc = load_doc_from_uri (include_path);
+                                if (doc != null) {
+                                    to_load.add (include_doc);
+                                }
+                            }
+                        break;
+                    }
+
+                    if (prop != null) {
+                        types.set (prop.type_name, prop);
+                    }
                 }
             }
 
@@ -160,13 +184,9 @@ namespace DFGame.PropertyGrid {
          * Loads type information from an XSD file embedded as a GResource
          */
         public bool load_schema_from_resource (string path) {
-            Xml.ParserCtxt parser = new Xml.ParserCtxt ();
-            try {
-                var schema = resources_lookup_data (path, ResourceLookupFlags.NONE);
-                var doc = parser.read_memory ((char[])schema.get_data (), schema.length, "");
+            Xml.Doc* doc = load_doc_from_uri ("resource://%s".printf (path));
+            if (doc != null) {
                 return load_schema (doc);
-            } catch (GLib.Error e) {
-                Logger.error ("Failed to read schema from path %s", path);
             }
 
             return false;
@@ -178,6 +198,30 @@ namespace DFGame.PropertyGrid {
         public bool try_get_prop_type (string name, out PropertyType prop_type) {
             prop_type = types.get (name);
             return prop_type != null;
+        }
+
+        /**
+         * Load an XML document from the provided URI
+         */
+        private Xml.Doc* load_doc_from_uri (string uri) {
+            Xml.ParserCtxt parser = new Xml.ParserCtxt ();
+            try {
+                if (uri.index_of ("file://") == 0) {
+                    return parser.read_file (uri.substring (7));
+                } else if (uri.index_of ("resource://") == 0) {
+                    var schema = resources_lookup_data (uri.substring (11), ResourceLookupFlags.NONE);
+
+                    if (schema != null) {
+                        return parser.read_memory ((char[])schema.get_data (), schema.length, "");
+                    } else {
+                        Logger.error ("Failed to locate resource: %s", uri);
+                    }
+                }
+            } catch (GLib.Error e) {
+                Logger.error ("Failed to read schema from uri %s", uri);
+            }
+
+            return null;
         }
 
         /**

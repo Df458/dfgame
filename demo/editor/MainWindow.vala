@@ -17,7 +17,7 @@ public class MainWindow : ApplicationWindow {
         scene = new Demo.Scene ();
 
         properties.builder = new BasicPropertyBuilder ();
-        properties.load_schema_from_resource ("/org/df458/EditorDemo/schemas/triangle.xsd");
+        properties.load_schema_from_resource ("/org/df458/EditorDemo/schemas/scene.xsd");
 
         properties.load_data (scene.save ());
         properties.show_all ();
