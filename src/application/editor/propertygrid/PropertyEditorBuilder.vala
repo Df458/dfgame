@@ -26,7 +26,18 @@ namespace DFGame.PropertyGrid {
                 case "xs:float":
                     return new FloatPropertyEditor (owner, attr, value);
 
+                case "xs:int":
                 case "xs:integer":
+                case "xs:long":
+                case "xs:negativeInteger":
+                case "xs:nonNegativeInteger":
+                case "xs:nonPositiveInteger":
+                case "xs:positiveInteger":
+                case "xs:short":
+                case "xs:unsignedLong":
+                case "xs:unsignedInt":
+                case "xs:unsignedShort":
+                case "xs:unsignedByte":
                     return new IntPropertyEditor (owner, attr, value);
 
                 case "xs:Boolean":

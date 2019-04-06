@@ -6,8 +6,51 @@ namespace DFGame.PropertyGrid.Editors {
             base (owner, attr, value);
         }
         protected override Widget? create_editor_widget () {
-            double min = -1000000;
-            double max = 1000000;
+            double min = long.MIN;
+            double max = long.MAX;
+
+            switch (prop_type.primitive_name) {
+                case "xs:int":
+                    min = int.MIN;
+                    max = int.MAX;
+                    break;
+                case "xs:negativeInteger":
+                    min = int.MIN;
+                    max = -1;
+                    break;
+                case "xs:nonNegativeInteger":
+                    min = 0;
+                    max = int.MAX;
+                    break;
+                case "xs:nonPositiveInteger":
+                    min = int.MIN;
+                    max = 0;
+                    break;
+                case "xs:positiveInteger":
+                    min = 1;
+                    max = int.MAX;
+                    break;
+                case "xs:short":
+                    min = short.MIN;
+                    max = short.MAX;
+                    break;
+                case "xs:unsignedLong":
+                    min = ulong.MIN;
+                    max = ulong.MAX;
+                    break;
+                case "xs:unsignedInt":
+                    min = uint.MIN;
+                    max = uint.MAX;
+                    break;
+                case "xs:unsignedShort":
+                    min = ushort.MIN;
+                    max = ushort.MAX;
+                    break;
+                case "xs:unsignedByte":
+                    min = 0;
+                    max = 0xFF;
+                    break;
+            }
 
             // Check for restrictions
             if (prop_type is SimpleType) {
