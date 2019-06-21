@@ -1,4 +1,4 @@
-resourcedeps = [ vorbis, xml ]
+resourcedeps = [ vorbis, xml, zlib ]
 resourceargs = []
 resourcepkglibs = []
 resourcerequires = ['vorbisfile', 'libxml-2.0', 'dfgame-audio', 'dfgame-core', 'dfgame-graphics', 'dfgame-math']

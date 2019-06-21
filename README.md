@@ -32,6 +32,7 @@ and the following libraries:
 - libOgg
 - libVorbisfile
 - libXml
+- ZLib
 
 DFGame will pull in the following libraries on its own:
 - glew
