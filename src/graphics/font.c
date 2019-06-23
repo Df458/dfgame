@@ -2,13 +2,14 @@
 #define LOG_CATEGORY "Graphics"
 
 #include "font.h"
+#include "font.priv.h"
 
-#include "check.h"
-#include "container/array.h"
-#include "graphics_log.h"
-#include "memory/alloc.h"
-#include "stringutil.h"
-#include "texture_atlas.h"
+#include "core/check.h"
+#include "core/container/array.h"
+#include "core/memory/alloc.h"
+#include "core/stringutil.h"
+#include "graphics/graphics_log.h"
+#include "graphics/texture_atlas.h"
 
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
@@ -20,16 +21,6 @@ bool find_glyph_with_id(void* o1, void* o2, void* user) {
 
     return gp->index == id;
 }
-
-typedef struct font {
-    FT_Face font_face;
-    texture_atlas atlas;
-    array glyphs;
-    float height;
-
-    char* asset_path;
-}* font;
-
 
 // Creates a new font
 font font_new(uint16 height, const char* path) {
@@ -89,8 +80,9 @@ float font_get_height(const font f) {
 void _font_free(font f) {
     check_return(f, "Font is NULL", );
 
-    if(f->font_face)
+    if(f->font_face != NULL) {
         FT_CALL_NORETURN(FT_Done_Face(f->font_face));
+    }
 
     array_free(f->glyphs);
     texture_atlas_free(f->atlas);

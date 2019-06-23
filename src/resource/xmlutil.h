@@ -8,6 +8,9 @@
 // Finds the next sibling of node (including itself) that has a given name
 xmlNodePtr xml_match_name(const xmlNodePtr node, const char* name);
 
+// Loop all nodes with the given name, starting from source
+#define xml_foreach(node, source, name) for(xmlNodePtr node = xml_match_name(source, name); node; node = xml_match_name(node->next, name))
+
 bool xml_property_read_bool(const xmlNodePtr node, const char* name, bool* val);
 bool xml_property_read_int8(const xmlNodePtr node, const char* name, int8* val);
 bool xml_property_read_uint8(const xmlNodePtr node, const char* name, uint8* val);

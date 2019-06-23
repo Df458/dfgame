@@ -3,9 +3,10 @@
 
 #include "texture.h"
 
-#include "check.h"
-#include "memory/alloc.h"
-#include "stringutil.h"
+#include "core/check.h"
+#include "core/memory/alloc.h"
+#include "core/stringutil.h"
+#include "math/mathutil.h"
 
 const rawtex rawtex_empty = { .data = NULL, .width = 0, .height = 0, .elements = 0, .asset_path = NULL };
 
@@ -84,6 +85,65 @@ rawtex rawtex_new_data(uint16 w, uint16 h, uint8 elements, ubyte* data) {
         .data = data,
         .asset_path = NULL
     };
+}
+
+/** @brief Create a rawtex from a region of another
+ *
+ * As the name implies, this will create data in the new texture that must be
+ * cleaned up
+ *
+ * @param src The texture to clone
+ * @param x The x origin point to clone from
+ * @param y The y origin point to clone from
+ * @param w The width to take. A negative width will flip the result, and
+ *          a width of zero will take the full width of src
+ * @param h The height to take. A negative height will flip the result, and
+ *          a height of zero will take the full height of src
+ */
+rawtex rawtex_clone_section(rawtex src, uint16 x, uint16 y, int16 w, int16 h) {
+    if (w == 0) {
+        x = 0;
+        w = src.width;
+    }
+    if (h == 0) {
+        y = 0;
+        h = src.height;
+    }
+
+    check_return (w + x >= 0 && h + y >= 0, "Trying to create out of bounds subtexture", rawtex_empty);
+
+    uint16 startx = min(x, x + w);
+    uint16 endx = max(x, x + w);
+    uint16 starty = min(y, y + h);
+    uint16 endy = max(y, y + h);
+    uint16 twidth = endx - startx;
+    uint16 theight = endy - starty;
+
+    check_return(endx <= src.width && endy <= src.height, "Trying to create out of bounds subtexture [%u, %u] (%u, %u) from texture of size %ux%u", rawtex_empty, x, y, endx, endy, src.width, src.height);
+
+    rawtex tex = {
+        .width = twidth,
+        .height = theight,
+        .elements = src.elements,
+        .data = scalloc(twidth * theight * src.elements, sizeof(uint8)),
+        .asset_path = nstrdup(src.asset_path)
+    };
+
+    for(uint16 i = 0; i < theight; i++) {
+        uint16 src_y = h > 0 ? starty + i : endy - (i + 1);
+
+        if (w > 0) {
+            memcpy(tex.data + (i * tex.width * tex.elements * sizeof(uint8)), src.data + ((src_y * src.width + x) * src.elements * sizeof(uint8)), tex.width * src.elements * sizeof(uint8));
+        } else {
+            // Negative width can't take advantage of memcpy, since we're flipping the data
+            for (int16 j = 0; j < twidth; ++j) {
+                uint16 src_x = endx - (j + 1);
+                memcpy(tex.data + ((i * tex.width + j) * tex.elements * sizeof(uint8)), src.data + ((src_y * src.width + src_x) * src.elements * sizeof(uint8)), src.elements * sizeof(uint8));
+            }
+        }
+    }
+
+    return tex;
 }
 
 /** @brief Copy the content from one rawtex to another

@@ -1,0 +1,12 @@
+<font height="16">
+    <glyphs width="16" range="AZaz" file="TestFont-Alpha.png"/>
+    <glyphs width="8" margin="1" chars=".!?,':-" file="TestFont-Symbols.png">
+        <glyph char="." width="2" advance="8"/>
+        <glyph char="!" width="4" advance="10"/>
+        <glyph char="?" width="8" advance="14"/>
+        <glyph char="," width="3" advance="5"/>
+        <glyph char="'" width="3" advance="1"/>
+        <glyph char=":" width="2" advance="4"/>
+        <glyph char="-" width="12" advance="16"/>
+    </glyphs>
+</font>

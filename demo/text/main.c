@@ -26,12 +26,14 @@ text t_wrap_c;
 text t_wrap_w;
 text t_wrap_n;
 text t_info;
-font f_text;
+font f_sprite;
+font f_truetype;
 shader s_text;
 float counter = 0;
+bool toggle = true;
 
 const char* demo_str = "Check it out, it's text wrapping!";
-const char* info_str = "Q W E\nA S  D - Change text alignment\nZ X  C";
+const char* info_str = "Q W E\nA S D - Change text alignment\nZ X C\n\nF - Toggle font style";
 
 typedef struct align_key {
     key_id key;
@@ -55,6 +57,16 @@ void wrap(action_id id, void* user) {
     text_set_align(t_wrap_c, (alignment_2d)user);
     text_set_align(t_wrap_w, (alignment_2d)user);
     text_set_align(t_wrap_n, (alignment_2d)user);
+}
+
+void toggle_font(action_id id, void* user) {
+    toggle = !toggle;
+
+    font fnt = toggle ? f_truetype : f_sprite;
+    text_set_font(t_wrap_c, fnt);
+    text_set_font(t_wrap_w, fnt);
+    text_set_font(t_wrap_n, fnt);
+    text_set_font(t_info, fnt);
 }
 
 void draw_lines(alignment_2d align, vec2 pos, float level) {
@@ -131,22 +143,26 @@ int main(int argc, char** argv) {
     shaders_init();
     s_text = shader_basic_tex_get();
 
-    char* path = assets_path("OpenSans-Regular.ttf", NULL);
-    f_text = load_font(path, 16);
-    t_wrap_c = text_new(f_text, demo_str);
+    char* path_1 = assets_path("OpenSans-Regular.ttf", NULL);
+    char* path_2 = assets_path("TestFont.xml", NULL);
+    f_truetype = load_font(path_1, 16);
+    f_sprite = load_font(path_2, 16);
+    sfree(path_1);
+    sfree(path_2);
+
+    t_wrap_c = text_new(f_truetype, demo_str);
     text_set_wrap(t_wrap_c, TEXT_WRAP_CHARACTER);
     text_set_align(t_wrap_c, ALIGN_TOP);
 
-    t_wrap_w = text_new(f_text, demo_str);
+    t_wrap_w = text_new(f_truetype, demo_str);
     text_set_align(t_wrap_w, ALIGN_TOP);
     text_set_wrap(t_wrap_w, TEXT_WRAP_WORD);
 
-    t_wrap_n = text_new(f_text, demo_str);
+    t_wrap_n = text_new(f_truetype, demo_str);
     text_set_align(t_wrap_n, ALIGN_TOP);
 
-    t_info = text_new(f_text, info_str);
+    t_info = text_new(f_truetype, info_str);
     text_set_align(t_info, ALIGN_BOTTOM_LEFT);
-    sfree(path);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -155,6 +171,8 @@ int main(int argc, char** argv) {
     for(int i = 0; i < ALIGN_KEYS_COUNT; ++i) {
         input_add_key_action(keys[i].key, as_event(action_event, wrap, (void*)keys[i].alignment));
     }
+
+    input_add_key_action(K_F, as_event(action_event, toggle_font, NULL));
 
     input_add_key_action(K_W, as_event(action_event, wrap, (void*)ALIGN_TOP));
     input_add_key_action(K_E, as_event(action_event, wrap, (void*)ALIGN_TOP_RIGHT));
@@ -170,7 +188,7 @@ int main(int argc, char** argv) {
     text_free(t_wrap_c, false);
     text_free(t_wrap_w, false);
     text_free(t_wrap_n, false);
-    font_free(f_text);
+    font_free(f_truetype);
     resource_path_free();
 
     camera_free(c_main);
