@@ -35,6 +35,17 @@ rawtex rawtex_new_from_gl(const gltex tex, bool clone_path);
 // Creates a new rawtex, and initializes the data block with the provided data
 rawtex rawtex_new_data(uint16 w, uint16 h, uint8 elements, ubyte* data);
 
+/** @brief Copy the content from one rawtex to another
+ *
+ * This function assumes that src is amaller or equal in size to dest
+ *
+ * @param dest The destination texture
+ * @param src The source texture
+ * @param x The x position to place the source texture
+ * @param y The y position to place the source texture
+ */
+bool rawtex_copy_data(rawtex dest, rawtex src, uint16 x, uint16 y);
+
 // Converts a single-channel rawtex to a white RGBA rawtex, where the original
 // data becomes the alpha.
 // If clone_path is true, the asset_path on the new rawtex is a copy of the old

@@ -86,6 +86,47 @@ rawtex rawtex_new_data(uint16 w, uint16 h, uint8 elements, ubyte* data) {
     };
 }
 
+/** @brief Copy the content from one rawtex to another
+ *
+ * This function assumes that src is amaller or equal in size to dest
+ *
+ * @param dest The destination texture
+ * @param src The source texture
+ * @param x The x position to place the source texture
+ * @param y The y position to place the source texture
+ */
+bool rawtex_copy_data(rawtex dest, rawtex src, uint16 x, uint16 y) {
+    check_return(dest.width - x >= src.width && dest.height - y >= src.height, "Not enough space to fit texture", false);
+
+    if (src.elements == dest.elements) {
+        for (uint16 i = 0; i < src.height; ++i) {
+            // Copy a line
+            memcpy (dest.data + (((dest.width * (y + i)) + x) * dest.elements),
+                    src.data + (src.width * (y + i) * src.elements),
+                    src.width * src.elements);
+        }
+    } else {
+        // If the element counts differ, we have to copy each element individually.
+        for (uint16 i = 0; i < src.height; ++i) {
+            for (uint16 j = 0; j < src.width; ++j) {
+                for (uint8 elem = 0; elem < dest.elements; ++elem) {
+                    uint16 dest_element = (((dest.width * (y + i)) + (x + j)) * dest.elements) + elem;
+                    uint16 src_element = (((src.width * (y + i)) + (x + j)) * src.elements) + elem;
+                    if (elem < src.elements) {
+                        // Copy an element
+                        dest.data[dest_element] = src.data[src_element];
+                    } else {
+                        // Zero-out the unmatched element
+                        dest.data[dest_element] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 // Converts a single-channel rawtex to a white RGBA rawtex, where the original
 // data becomes the alpha.
 // If clone_path is true, the asset_path on the new rawtex is a copy of the old
