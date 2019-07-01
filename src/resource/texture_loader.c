@@ -236,6 +236,85 @@ rawtex load_png_raw(const char* path) {
 
     return tex;
 }
+
+/** @brief Save a rawtex to a PNG file
+ *
+ * @param path The filepath to save, or NULL to use the texture's asset_path
+ * @param tex The texture
+ */
+void save_png_raw(const char* path, rawtex tex) {
+    if (path == NULL) {
+        path = tex.asset_path;
+        check_return(path, "No filepath provided", );
+    }
+    FILE* outfile = fopen(path, "wb");
+    check_return(outfile, "Could not open file: %s", , path);
+
+    png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    check_return(png_ptr, "Failed to create write struct", );
+
+    png_infop info_ptr = png_create_info_struct(png_ptr);
+    if(check_error(info_ptr, "Failed to create info struct")) {
+        png_destroy_write_struct(&png_ptr,(png_infopp)NULL);
+        fclose(outfile);
+        return;
+    }
+
+    if(setjmp(png_jmpbuf(png_ptr))) {
+        png_destroy_write_struct(&png_ptr, &info_ptr);
+        fclose(outfile);
+
+        return;
+    }
+
+    png_init_io (png_ptr, outfile);
+
+    int color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+    switch (tex.elements) {
+        case 1: // 1 element, grayscale
+            color_type = PNG_COLOR_TYPE_GRAY;
+            break;
+
+        case 3: // 3 elements, RGB
+            color_type = PNG_COLOR_TYPE_RGB;
+            break;
+
+        case 4: // 4 elements, RGBA
+            color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+            break;
+
+        default:
+            error("Element count %d is unsupported", tex.elements);
+            png_destroy_write_struct(&png_ptr, &info_ptr);
+            fclose(outfile);
+            return;
+    }
+
+    png_set_IHDR(png_ptr, info_ptr, tex.width, tex.height, 8, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+    ubyte** row_ptrs = mscalloc(tex.height, ubyte*);
+    for(uint16 i = 0; i < tex.height; ++i) {
+        row_ptrs[i] = tex.data + (i * tex.width * tex.elements);
+    }
+
+    png_set_rows (png_ptr, info_ptr, row_ptrs);
+    png_write_png (png_ptr, info_ptr, 0, NULL);
+
+    png_destroy_write_struct(&png_ptr, &info_ptr);
+
+    fclose(outfile);
+}
+
+/** @brief Save a gltex to a PNG file
+ *
+ * @param path The filepath to save, or NULL to use the texture's asset_path
+ * @param tex The texture
+ */
+void save_png_gl(const char* path, gltex tex) {
+    rawtex rt = rawtex_new_from_gl(tex, true);
+    save_png_raw(path, rt);
+    rawtex_cleanup(&rt);
+}
 #endif
 
 #ifdef enable_jpeg
