@@ -8,6 +8,9 @@
 #ifndef DF_GRAPHICS_TEXTURE
 #define DF_GRAPHICS_TEXTURE
 #include "core/types.h"
+#include "graphics/framebuffer.h"
+#include "math/vector.h"
+
 #include <GL/glew.h>
 #include <GL/gl.h>
 
@@ -93,6 +96,30 @@ rawtex rawtex_clone_section(rawtex src, uint16 x, uint16 y, int16 w, int16 h);
  * @param y The y position to place the source texture
  */
 bool rawtex_copy_data(rawtex dest, rawtex src, uint16 x, uint16 y);
+
+/** @brief Fill a rawtex with a single color
+ *
+ * Every pixel will be set to the specified color, if the texture has more than
+ * 4 channels then further channels will be ignored.
+ *
+ * @param dest The destination texture
+ * @param color The color to set
+ */
+bool rawtex_fill(rawtex dest, vec4 color);
+
+/** @brief Fill part of a rawtex with a single color
+ *
+ * Every pixel will be set to the specified color, if the texture has more than
+ * 4 channels then further channels will be ignored.
+ *
+ * @param dest The destination texture
+ * @param color The color to set
+ * @param x The horizontal position of the area to fill
+ * @param y The vertical position of the area to fill
+ * @param width The width of the area to fill
+ * @param height The height of the area to fill
+ */
+bool rawtex_fill_area(rawtex dest, vec4 color, uint16 x, uint16 y, int16 width, int16 height);
 
 // Converts a single-channel rawtex to a white RGBA rawtex, where the original
 // data becomes the alpha.

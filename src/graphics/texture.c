@@ -162,7 +162,7 @@ bool rawtex_copy_data(rawtex dest, rawtex src, uint16 x, uint16 y) {
         for (uint16 i = 0; i < src.height; ++i) {
             // Copy a line
             memcpy (dest.data + (((dest.width * (y + i)) + x) * dest.elements),
-                    src.data + (src.width * (y + i) * src.elements),
+                    src.data + (src.width * i * src.elements),
                     src.width * src.elements);
         }
     } else {
@@ -181,6 +181,67 @@ bool rawtex_copy_data(rawtex dest, rawtex src, uint16 x, uint16 y) {
                     }
                 }
             }
+        }
+    }
+
+    return true;
+}
+
+/** @brief Fill a rawtex with a single color
+ *
+ * Every pixel will be set to the specified color, if the texture has more than
+ * 4 channels then further channels will be ignored.
+ *
+ * @param dest The destination texture
+ * @param color The color to set
+ */
+bool rawtex_fill(rawtex dest, vec4 color) {
+    return rawtex_fill_area(dest, color, 0, 0, 0, 0);
+}
+
+/** @brief Fill part of a rawtex with a single color
+ *
+ * Every pixel will be set to the specified color, if the texture has more than
+ * 4 channels then further channels will be ignored.
+ *
+ * @param dest The destination texture
+ * @param color The color to set
+ * @param x The horizontal position of the area to fill
+ * @param y The vertical position of the area to fill
+ * @param width The width of the area to fill
+ * @param height The height of the area to fill
+ */
+bool rawtex_fill_area(rawtex dest, vec4 color, uint16 x, uint16 y, int16 w, int16 h) {
+    if (w == 0) {
+        x = 0;
+        w = dest.width;
+    }
+    if (h == 0) {
+        y = 0;
+        h = dest.height;
+    }
+
+    check_return (w + x >= 0 && h + y >= 0, "Trying to fill an out of bounds area", false);
+
+    uint16 startx = min(x, x + w);
+    uint16 endx = max(x, x + w);
+    uint16 starty = min(y, y + h);
+    uint16 endy = max(y, y + h);
+
+    check_return(endx <= dest.width && endy <= dest.height, "Trying to fill an out of bounds area [%u, %u] (%u, %u) in a texture of size %ux%u", false, x, y, endx, endy, dest.width, dest.height);
+
+    ubyte bytes[4] = {
+        color.x * UINT8_MAX,
+        color.y * UINT8_MAX,
+        color.z * UINT8_MAX,
+        color.w * UINT8_MAX,
+    };
+
+    ubyte elements = min(dest.elements, 4) * sizeof(ubyte);
+
+    for(uint16 i = starty; i < endy; i++) {
+        for (int16 j = startx; j < endx; ++j) {
+            memcpy(dest.data + ((i * dest.width + j) * elements), bytes, elements);
         }
     }
 

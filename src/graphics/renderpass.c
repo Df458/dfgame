@@ -21,7 +21,7 @@ typedef struct renderpass {
 
 renderpass renderpass_new(uint16 w, uint16 h, framebuffer primary) {
     renderpass pass = salloc(sizeof(struct renderpass));
-    pass->fbo = framebuffer_new();
+    pass->fbo = framebuffer_new(w, h);
     pass->texture = gltex_new(GL_TEXTURE_2D, w, h);
     pass->depth = gltex_new_depth(GL_TEXTURE_2D, w, h);
     pass->primary_fbo = primary;
@@ -39,7 +39,7 @@ void _renderpass_free(renderpass pass) {
     check_return(pass, "Can't free renderpass: pass is NULL", );
     gltex_cleanup(&pass->texture);
     gltex_cleanup(&pass->depth);
-    glDeleteFramebuffers(1, &pass->fbo.handle);
+    framebuffer_cleanup(&pass->fbo);
 
     sfree(pass);
 }
