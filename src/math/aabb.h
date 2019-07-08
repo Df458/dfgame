@@ -34,7 +34,7 @@ const extern aabb_3d aabb_3d_zero;
 // Gets the area of the aabb
 #define aabb_area(box) _Generic(box,\
     aabb_2d: aabb_area_2d,\
-    aabb_3d: aabb_area_3d,\
+    aabb_3d: aabb_volume_3d\
 )(box)
 float aabb_area_2d(aabb_2d box);
 float aabb_volume_3d(aabb_3d box);
