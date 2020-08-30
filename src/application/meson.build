@@ -1,3 +1,4 @@
+applicationsrc  = files('input_common.c')
 applicationlink = [ corelib, gameplaylib, graphicslib, mathlib ]
 applicationinc  = [ include_directories('..') ]
 

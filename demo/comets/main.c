@@ -311,10 +311,8 @@ int main() {
     sfree(path);
 
     // Input binding
-    a_rotate = input_add_key_axis(K_LEFT, 4, 4, false);
-    input_bind_key_axis(K_RIGHT, a_rotate, -4);
-    a_accel = input_add_key_axis(K_UP, 5, 5, true);
-    input_bind_key_axis(K_DOWN, a_accel, -5);
+    a_rotate = input_add_key_axis_full(K_RIGHT, K_LEFT, 4, 4, false);
+    a_accel = input_add_key_axis_full(K_DOWN, K_UP, 5, 5, true);
     a_shoot = input_add_key_action(K_Z, NULL);
 
     rocks = array_mnew(rock, 30);

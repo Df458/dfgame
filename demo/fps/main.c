@@ -399,10 +399,8 @@ int main() {
     resource_path_free();
 
     // Input binding
-    a_side = input_add_key_axis(K_A, 1, 1, false);
-    input_bind_key_axis(K_D, a_side, -1);
-    a_forward = input_add_key_axis(K_W, 1, -1, true);
-    input_bind_key_axis(K_S, a_forward, 1);
+    a_side = input_add_key_axis_full(K_D, K_A, 1, 1, false);
+    a_forward = input_add_key_axis_full(K_S, K_W, 1, -1, true);
     a_turn = input_add_mouse_position_axis(false, 15.0, 0.025f, false);
 
     input_add_mouse_button_action(MB_LEFT, as_event(action_event, shoot, NULL));

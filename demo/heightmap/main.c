@@ -102,8 +102,7 @@ void init_resources() {
     a_drag = input_add_mouse_button_action(MB_LEFT, NULL);
     a_horizontal = input_add_mouse_position_axis(false, 20.0, 0.05f, true);
     a_vertical = input_add_mouse_position_axis(true, 20.0, 0.05f, true);
-    a_zoom = input_add_mouse_button_axis(MB_SCROLL_UP, 20.0, -1, true);
-    input_bind_mouse_button_axis(MB_SCROLL_DOWN, a_zoom, 1);
+    a_zoom = input_add_mouse_button_axis_full(MB_SCROLL_DOWN, MB_SCROLL_UP, 20.0, 1, true);
 
     path = assets_path("heightmap.vert", NULL);
     char* vert = (char*)load_data_buffer(path, NULL);

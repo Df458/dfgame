@@ -1,4 +1,4 @@
-applicationeditorcsrc  = [ 'input.c', 'window.c' ]
+applicationeditorcsrc  = files('input.c', 'window.c') + applicationsrc
 applicationeditorclib  = static_library('dfgame_application_editor_backend', applicationeditorcsrc,
                          include_directories : applicationinc,
                          dependencies : [ gtk ],
