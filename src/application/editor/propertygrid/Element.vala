@@ -30,7 +30,7 @@ namespace DFGame.PropertyGrid {
          */
         public uint sort_index { get; construct; }
 
-        public Element (uint index = 0) {
+        protected Element (uint index = 0) {
             Object (sort_index: index);
         }
 

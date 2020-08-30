@@ -19,7 +19,7 @@ namespace DFGame.PropertyGrid {
          */
         public uint min_occurs { get; private set; default = 0; }
 
-        public MultiElement (Xml.Node* node_dat, uint index = 0) {
+        protected MultiElement (Xml.Node* node_dat, uint index = 0) {
             base (index);
         }
 

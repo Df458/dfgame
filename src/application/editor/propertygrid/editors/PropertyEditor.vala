@@ -29,7 +29,7 @@ namespace DFGame.PropertyGrid.Editors {
             orientation = Orientation.HORIZONTAL;
             spacing = 6;
         }
-        public PropertyEditor (string owner, Attribute attr, string value) {
+        protected PropertyEditor (string owner, Attribute attr, string value) {
             owner_name = owner;
             attribute = attr;
 
