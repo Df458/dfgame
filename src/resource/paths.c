@@ -56,11 +56,19 @@ void resource_path_free() {
 }
 
 const char* get_base_resource_path() {
+    if (resource_path == NULL) {
+        init_base_resource_path(NULL);
+    }
+
     return resource_path;
 }
 
 char* get_resource_path(const char* prefix, const char* suffix, uint16* len) {
     check_return(suffix, "Trying to load a resource without a suffix", NULL);
+
+    if (resource_path == NULL) {
+        init_base_resource_path(NULL);
+    }
 
     uint16 prefix_len = prefix ? strlen(prefix) : 0;
     uint16 suffix_len = strlen(suffix);
@@ -88,6 +96,14 @@ char* get_resource_path(const char* prefix, const char* suffix, uint16* len) {
         *len = length;
 
     return data;
+}
+
+char* as_resource_path(const char* path) {
+    if (is_absolute_path(path)) {
+        return nstrdup(path);
+    } else {
+        return assets_path(path, NULL);
+    }
 }
 
 const char* get_extension(const char* path) {
@@ -212,4 +228,9 @@ char* get_relative_base(const char* a, const char* b) {
         strncpy(base, a, j);
 
     return base;
+}
+
+bool is_absolute_path(const char* path) {
+    check_return(path, "Path is null", false);
+    return path[0] == '/';
 }

@@ -139,16 +139,11 @@ int main(int argc, char** argv) {
     win = window_new(1280, 720, false, "Heightmap Demo");
     c_main = window_create_2d_camera(win);
 
-    init_base_resource_path(NULL);
     shaders_init();
     s_text = shader_basic_tex_get();
 
-    char* path_1 = assets_path("OpenSans-Regular.ttf", NULL);
-    char* path_2 = assets_path("TestFont.xml", NULL);
-    f_truetype = load_font(path_1, 16);
-    f_sprite = load_font(path_2, 16);
-    sfree(path_1);
-    sfree(path_2);
+    f_truetype = load_font("OpenSans-Regular.ttf", 16);
+    f_sprite = load_font("TestFont.xml", 16);
 
     t_wrap_c = text_new(f_truetype, demo_str);
     text_set_wrap(t_wrap_c, TEXT_WRAP_CHARACTER);

@@ -19,15 +19,20 @@
 // Setting preload to true will load the data into memory, false will stream
 // from the disk
 audio_source load_audio_source(const char* path, bool preload) {
-    const char* ext = get_extension(path);
-    if(!strcmp(ext, "wav"))
-        return load_wav_audio(path, preload);
-    else if(!strcmp(ext, "ogg"))
-        return load_ogg_audio(path, preload);
+    audio_source src = NULL;
+    char* load_path = as_resource_path(path);
+    const char* ext = get_extension(load_path);
 
-    error("Failed to load audio: File extension %s not recognized", ext);
+    if(!strcmp(ext, "wav")) {
+        src = load_wav_audio(load_path, preload);
+    }
+    else if(!strcmp(ext, "ogg")) {
+        src = load_ogg_audio(load_path, preload);
+    } else {
+        error("Failed to load audio: File extension %s not recognized", ext);
+    }
 
-    return NULL;
+    return src;
 }
 
 #define WAV_HEADER_SIZE 44

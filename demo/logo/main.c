@@ -9,8 +9,6 @@
 #include "vector.h"
 #include "window.h"
 
-const char* logo_file = "logo.png";
-
 window win;
 camera c_main;
 shader s_default;
@@ -36,15 +34,12 @@ bool loop(mainloop l, float dt) {
 
 int main() {
     win = window_new(1280, 720, false, "Logo Demo");
-    init_base_resource_path(NULL);
     shaders_init();
 
     s_default  = shader_basic_tex_get();
     color      = color_white;
     c_main     = window_create_2d_camera(win);
-    char* path = assets_path(logo_file, NULL);
-    t_logo     = load_texture_gl(path);
-    sfree(path);
+    t_logo     = load_texture_gl("logo.png");
 
     mainloop_create_run(loop);
 

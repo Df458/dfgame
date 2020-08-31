@@ -289,26 +289,15 @@ int main() {
     audio_init();
     audio = array_mnew(audio_player, 30);
 
-    init_base_resource_path(NULL);
-    char* path = assets_path("OpenSans-Regular.ttf", NULL);
-    info_text = text_new(load_font(path, 16), info_str);
+    info_text = text_new(load_font("OpenSans-Regular.ttf", 16), info_str);
     text_set_align(info_text, ALIGN_BOTTOM_LEFT);
-    sfree(path);
 
     bullets = array_mnew(bullet, 40);
-
-    path = assets_path("bullet.xml", NULL);
-    bullet_set = load_spriteset(path);
-    sfree(path);
-
-    path = assets_path("Laser01.wav", NULL);
-    au_shot = load_audio_source(path, true);
-    sfree(path);
+    bullet_set = load_spriteset("bullet.xml");
+    au_shot = load_audio_source("Laser01.wav", true);
 
     t_player = transform_new();
-    path = assets_path("player.xml", NULL);
-    s_player = sprite_new(load_spriteset(path));
-    sfree(path);
+    s_player = sprite_new(load_spriteset("player.xml"));
 
     // Input binding
     a_rotate = input_add_key_axis_full(K_RIGHT, K_LEFT, 4, 4, false);
@@ -317,13 +306,9 @@ int main() {
 
     rocks = array_mnew(rock, 30);
 
-    path = assets_path("rock.xml", NULL);
-    rock_set = load_spriteset(path);
-    sfree(path);
+    rock_set = load_spriteset("rock.xml");
 
-    path = assets_path("Explosion01.wav", NULL);
-    au_explosion = load_audio_source(path, true);
-    sfree(path);
+    au_explosion = load_audio_source("Explosion01.wav", true);
 
     resource_path_free();
 

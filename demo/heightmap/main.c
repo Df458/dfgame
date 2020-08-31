@@ -94,17 +94,14 @@ bool loop(mainloop l, float dt) {
 }
 
 void init_resources() {
-    init_base_resource_path(NULL);
-    char* path = assets_path("Heightmap.png", NULL);
-    t_heightmap = load_texture_gl(path);
-    sfree(path);
+    t_heightmap = load_texture_gl("Heightmap.png");
 
     a_drag = input_add_mouse_button_action(MB_LEFT, NULL);
     a_horizontal = input_add_mouse_position_axis(false, 20.0, 0.05f, true);
     a_vertical = input_add_mouse_position_axis(true, 20.0, 0.05f, true);
     a_zoom = input_add_mouse_button_axis_full(MB_SCROLL_DOWN, MB_SCROLL_UP, 20.0, 1, true);
 
-    path = assets_path("heightmap.vert", NULL);
+    char* path = assets_path("heightmap.vert", NULL);
     char* vert = (char*)load_data_buffer(path, NULL);
     sfree(path);
 
@@ -120,12 +117,10 @@ void init_resources() {
     s_water = shader_basic_untex_get();
     s_text = shader_basic_tex_get();
 
-    path = assets_path("OpenSans-Regular.ttf", NULL);
-    info_text = text_new(load_font(path, 16), info_str);
+    info_text = text_new(load_font("OpenSans-Regular.ttf", 16), info_str);
     text_set_align(info_text, ALIGN_BOTTOM_LEFT);
-    sfree(path);
-
 }
+
 void prepare_mesh() {
     for(uint16 i = 0; i < MESH_DIM; ++i) {
         for(uint16 j = 0; j < MESH_DIM; ++j) {

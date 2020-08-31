@@ -18,13 +18,19 @@ typedef struct mesh_index {
 } mesh_index;
 
 mesh load_mesh(const char* path) {
-    const char* ext = get_extension(path);
-    if(!strcmp(ext, "obj"))
-        return load_obj_mesh(path);
+    mesh msh = NULL;
+    char* load_path = as_resource_path(path);
+    const char* ext = get_extension(load_path);
 
-    error("Failed to load mesh: File extension %s not recognized", ext);
+    if(!strcmp(ext, "obj")) {
+        msh = load_obj_mesh(load_path);
+    } else {
+        error("Failed to load mesh: File extension %s not recognized", ext);
+    }
 
-    return NULL;
+    sfree (load_path);
+
+    return msh;
 }
 
 mesh load_obj_mesh(const char* path) {

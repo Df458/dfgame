@@ -235,29 +235,43 @@ iter_result write_animation(void* a, void* user) {
 }
 
 spriteset load_spriteset(const char* path) {
-    const char* ext = get_extension(path);
+    spriteset set = NULL;
+    char* load_path = as_resource_path(path);
+    const char* ext = get_extension(load_path);
+
+    if (false) {}
 #ifdef enable_gif
-    if(!strcmp(ext, "gif"))
-        return load_spriteset_from_image(path);
+    else if(!strcmp(ext, "gif")) {
+        set = load_spriteset_from_image(load_path);
+    }
 #endif
 #ifdef enable_png
-    if(!strcmp(ext, "png"))
-        return load_spriteset_from_image(path);
+    else if(!strcmp(ext, "png")) {
+        set = load_spriteset_from_image(load_path);
+    }
 #endif
 #ifdef enable_jpeg
-    if(!strcmp(ext, "jpg") || !strcmp(ext, "jpeg"))
-        return load_spriteset_from_image(path);
+    else if(!strcmp(ext, "jpg") || !strcmp(ext, "jpeg")) {
+        set = load_spriteset_from_image(load_path);
+    }
 #endif
 #ifdef enable_tga
-    if(!strcmp(ext, "tga"))
-        return load_spriteset_from_image(path);
+    else if(!strcmp(ext, "tga")) {
+        set = load_spriteset_from_image(load_path);
+    }
 #endif
 #ifdef enable_tiff
-    if(!strcmp(ext, "tif") || !strcmp(ext, "tiff"))
-        return load_spriteset_from_image(path);
+    else if(!strcmp(ext, "tif") || !strcmp(ext, "tiff")) {
+        set = load_spriteset_from_image(load_path);
+    }
 #endif
+    else {
+        set = load_spriteset_from_xml(load_path);
+    }
 
-    return load_spriteset_from_xml(path);
+    sfree(load_path);
+
+    return set;
 }
 
 spriteset load_spriteset_from_xml(const char* path) {

@@ -199,7 +199,10 @@ bool loop(mainloop l, float dt) {
 void prepare_mesh(const char* path) {
     uint32 size = 0;
     uint32 len = 0;
-    byte* loaded = load_data_buffer(path, &len);
+
+    char* load_path = as_resource_path(path);
+    byte* loaded = load_data_buffer(load_path, &len);
+    sfree(load_path);
 
     width = strchr((char*)loaded, '\n') - (char*)loaded;
 
@@ -376,26 +379,13 @@ int main() {
     bullets = array_mnew(bullet, 5);
     barrels = array_mnew(barrel, 5);
 
-    init_base_resource_path(NULL);
-    char* path = assets_path("OpenSans-Regular.ttf", NULL);
-    info_text = text_new(load_font(path, 16), info_str);
+    info_text = text_new(load_font("OpenSans-Regular.ttf", 16), info_str);
     text_set_align(info_text, ALIGN_BOTTOM_LEFT);
-    sfree(path);
-    path = assets_path("FPSDungeonTiles.png", NULL);
-    t_floor = load_texture_gl(path);
-    sfree(path);
-    path = assets_path("Pistol.xml", NULL);
-    pistol_sprite = sprite_new(load_spriteset(path));
-    sfree(path);
-    path = assets_path("barrel.xml", NULL);
-    barrel_set = load_spriteset(path);
-    sfree(path);
-    path = assets_path("test.txt", NULL);
-    prepare_mesh(path);
-    sfree(path);
-    path = assets_path("PistolShot.wav", NULL);
-    pistol_sfx = audio_player_new(load_audio_source(path, true));
-    sfree(path);
+    t_floor = load_texture_gl("FPSDungeonTiles.png");
+    pistol_sprite = sprite_new(load_spriteset("Pistol.xml"));
+    barrel_set = load_spriteset("barrel.xml");
+    prepare_mesh("test.txt");
+    pistol_sfx = audio_player_new(load_audio_source("PistolShot.wav", true));
     resource_path_free();
 
     // Input binding

@@ -54,31 +54,43 @@ gltex load_texture_gl(const char* path) {
 }
 
 rawtex load_texture_raw(const char* path) {
-    const char* ext = get_extension(path);
+    rawtex tex = rawtex_empty;
+    char* load_path = as_resource_path(path);
+    const char* ext = get_extension(load_path);
+
+    if (false) {}
 #ifdef enable_gif
-    if(!strcmp(ext, "gif"))
-        return load_gif_raw(path);
+    else if(!strcmp(ext, "gif")) {
+        tex = load_gif_raw(load_path);
+    }
 #endif
 #ifdef enable_png
-    if(!strcmp(ext, "png"))
-        return load_png_raw(path);
+    else if(!strcmp(ext, "png")) {
+        tex = load_png_raw(load_path);
+    }
 #endif
 #ifdef enable_jpeg
-    if(!strcmp(ext, "jpg") || !strcmp(ext, "jpeg"))
-        return load_jpeg_raw(path);
+    else if(!strcmp(ext, "jpg") || !strcmp(ext, "jpeg")) {
+        tex = load_jpeg_raw(load_path);
+    }
 #endif
 #ifdef enable_tga
-    if(!strcmp(ext, "tga"))
-        return load_tga_raw(path);
+    else if(!strcmp(ext, "tga")) {
+        tex = load_tga_raw(load_path);
+    }
 #endif
 #ifdef enable_tiff
-    if(!strcmp(ext, "tif") || !strcmp(ext, "tiff"))
-        return load_tiff_raw(path);
+    else if(!strcmp(ext, "tif") || !strcmp(ext, "tiff")) {
+        tex = load_tiff_raw(load_path);
+    }
 #endif
+    else {
+        error("Failed to load texture: File extension %s not recognized", ext);
+    }
 
-    error("Failed to load texture: File extension %s not recognized", ext);
+    sfree(load_path);
 
-    return rawtex_empty;
+    return tex;
 }
 
 #ifdef enable_gif

@@ -24,15 +24,18 @@ static FT_Library font_library;
 static bool font_library_init = false;
 
 font load_font(const char* path, uint16 height) {
-    const char* ext = get_extension(path);
-    if(!strcmp(ext, "ttf") || !strcmp(ext, "otf"))
-        return load_freetype_font(path, height);
-    else if(!strcmp(ext, "xml"))
-        return load_bitmap_font(path);
+    font fnt = NULL;
+    char* load_path = as_resource_path(path);
+    const char* ext = get_extension(load_path);
+    if(!strcmp(ext, "ttf") || !strcmp(ext, "otf")) {
+        fnt = load_freetype_font(load_path, height);
+    } else if(!strcmp(ext, "xml")) {
+        fnt = load_bitmap_font(load_path);
+    } else {
+        error("Failed to load font: File extension %s not recognized", ext);
+    }
 
-    error("Failed to load font: File extension %s not recognized", ext);
-
-    return NULL;
+    return fnt;
 }
 
 // FreeType Loader
