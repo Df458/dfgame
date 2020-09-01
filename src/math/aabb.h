@@ -24,8 +24,20 @@ typedef struct aabb_2d {
 const extern aabb_2d aabb_2d_zero;
 
 typedef struct aabb_3d {
-    vec3 position;
-    vec3 dimensions;
+    union {
+        struct {
+            vec3 position;
+            vec3 dimensions;
+        };
+        struct {
+            float x;
+            float y;
+            float z;
+            float width;
+            float height;
+            float depth;
+        };
+    };
 } aabb_3d;
 
 // A bounding box at [0,0,0] with dimensions of [0,0,0]

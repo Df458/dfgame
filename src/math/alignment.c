@@ -130,6 +130,21 @@ aabb_3d aabb_align_point_3d(aabb_3d box, vec3 point, alignment_3d align) {
     return result;
 }
 
+// Constrain a vector to the given box
+vec2 aabb_constrain_point_2d(aabb_2d box, vec2 point) {
+    return (vec2) {
+        .x = clamp(point.x, box.x, box.x + box.width),
+        .y = clamp(point.y, box.y, box.y + box.height),
+    };
+}
+vec3 aabb_constrain_point_3d(aabb_3d box, vec3 point) {
+    return (vec3) {
+        .x = clamp(point.x, box.x, box.x + box.width),
+        .y = clamp(point.y, box.y, box.y + box.height),
+        .z = clamp(point.z, box.z, box.z + box.depth),
+    };
+}
+
 // Get an aabb with the dimensions of box aligned to box2
 aabb_2d aabb_align_box_2d(aabb_2d box, aabb_2d box2, alignment_2d align) {
     check_return(align >= 0 && align <= ALIGN_LAST, "Invalid alignment 0x%x provided", aabb_2d_zero, align);

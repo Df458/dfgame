@@ -74,6 +74,14 @@ vec3 aabb_get_origin_3d(aabb_3d box, alignment_3d align);
 aabb_2d aabb_align_point_2d(aabb_2d box, vec2 point, alignment_2d align);
 aabb_3d aabb_align_point_3d(aabb_3d box, vec3 point, alignment_3d align);
 
+// Constrain a vector to the given box
+#define aabb_constrain_point(a, b) _Generic(a,\
+    aabb_2d: aabb_constrain_point_2d,\
+    aabb_3d: aabb_constrain_point_3d\
+)(a, b)
+vec2 aabb_constrain_point_2d(aabb_2d box, vec2 point);
+vec3 aabb_constrain_point_3d(aabb_3d box, vec3 point);
+
 // Get an aabb with the dimensions of box aligned to box2
 #define aabb_align_box(a, b, c) _Generic(a,\
     aabb_2d: aabb_align_box_2d,\
